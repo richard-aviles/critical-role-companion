@@ -1,9 +1,11 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import asyncio
-import os
+from pydantic import BaseModel, Field
+import asyncio, os
+from typing import Optional, Dict, Any, List
+
 from settings import settings
+from db import init_db, fetch_all_characters, insert_character, set_on_screen
 
 app = FastAPI(title="CR Companion API", version=os.getenv("COMMIT_SHA", "dev"))
 
@@ -17,6 +19,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- Startup: ensure tables exist in staging ---
+@app.on_event("startup")
+def _startup():
+    try:
+        init_db()
+    except Exception as e:
+        # keep API alive even if DB isn't ready yet
+        print("DB init failed:", e)
+
 # --- Health/version ---
 @app.get("/healthz")
 def healthz():
@@ -26,7 +37,7 @@ def healthz():
 def version():
     return {"version": app.version, "env": settings.ENV}
 
-# --- Simple WS hub for testing ---
+# --- WS hub for live overlay updates ---
 clients = set()
 
 async def ping_loop(ws: WebSocket, interval: int):
@@ -45,7 +56,6 @@ async def ws_updates(ws: WebSocket):
     try:
         while True:
             msg = await ws.receive_text()
-            # Echo back for now; your app will broadcast updates
             await ws.send_text(f"echo:{msg}")
     except WebSocketDisconnect:
         pass
@@ -53,10 +63,10 @@ async def ws_updates(ws: WebSocket):
         ping_task.cancel()
         clients.discard(ws)
 
-# --- Example broadcast endpoint ---
+# --- Broadcast endpoint used by your admin UI ---
 class Broadcast(BaseModel):
     channel: str
-    payload: dict
+    payload: Dict[str, Any]
 
 @app.post("/broadcast")
 async def broadcast(b: Broadcast):
@@ -69,3 +79,27 @@ async def broadcast(b: Broadcast):
     for d in dead:
         clients.discard(d)
     return {"delivered": len(clients)}
+
+# --- Characters API (staging-friendly) ---
+class CharacterIn(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    on_screen: bool = False
+    data: Optional[Dict[str, Any]] = None
+
+class CharacterOut(CharacterIn):
+    id: int
+
+@app.get("/characters", response_model=List[CharacterOut])
+def list_characters():
+    return fetch_all_characters()
+
+@app.post("/characters", response_model=CharacterOut, status_code=201)
+def create_character(ch: CharacterIn):
+    return insert_character(ch.name, ch.on_screen, ch.data)
+
+@app.patch("/characters/{char_id}/on_screen", response_model=CharacterOut)
+def patch_on_screen(char_id: int, on_screen: bool):
+    row = set_on_screen(char_id, on_screen)
+    if not row:
+        raise HTTPException(status_code=404, detail="Character not found")
+    return row
