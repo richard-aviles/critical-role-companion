@@ -1,0 +1,20 @@
+name: frontend-pages
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-pages.yml"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish static site
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: cr-overlay-staging
+          directory: frontend
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

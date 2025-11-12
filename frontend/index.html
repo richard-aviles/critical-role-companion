@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CR Overlay (Staging)</title>
+  <style>
+    body { margin:0; background:#111; color:#eee; font-family:system-ui, sans-serif }
+    .ok { color:#6ee7b7 } .bad { color:#fda4af }
+  </style>
+</head>
+<body>
+  <div style="padding:16px">
+    <h1>CR Overlay (Staging)</h1>
+    <div id="status">WS: connecting…</div>
+  </div>
+  <script>
+    const API_BASE = (new URLSearchParams(location.search).get("api")) || "https://<fly-staging-app>.fly.dev";
+    const ws = new WebSocket(API_BASE.replace(/^http/, "ws") + "/ws/updates");
+    const status = document.getElementById("status");
+    ws.onopen = () => { status.textContent = "WS: connected"; status.className="ok"; };
+    ws.onclose = () => { status.textContent = "WS: closed"; status.className="bad"; };
+    ws.onmessage = (e) => { if (e.data !== "__ping__") console.log("WS:", e.data); };
+    // basic heartbeat-aware reconnect
+    let timer;
+    ws.addEventListener("close", ()=> {
+      clearTimeout(timer);
+      timer = setTimeout(()=>location.reload(), 2000);
+    });
+  </script>
+</body>
+</html>
