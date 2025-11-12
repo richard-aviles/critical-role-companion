@@ -15,7 +15,7 @@
     <div id="status">WS: connecting…</div>
   </div>
   <script>
-    const API_BASE = (new URLSearchParams(location.search).get("api")) || "https://<fly-staging-app>.fly.dev";
+    const API_BASE = (new URLSearchParams(location.search).get("api")) || "https://cr-overlay-staging.fly.dev";
     const ws = new WebSocket(API_BASE.replace(/^http/, "ws") + "/ws/updates");
     const status = document.getElementById("status");
     ws.onopen = () => { status.textContent = "WS: connected"; status.className="ok"; };
