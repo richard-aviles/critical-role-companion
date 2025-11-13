@@ -24,8 +24,8 @@ app.add_middleware(
 def _startup():
     try:
         init_db()
+        print("DB init: OK (tables ensured)")
     except Exception as e:
-        # keep API alive even if DB isn't ready yet
         print("DB init failed:", e)
 
 # --- Health/version ---

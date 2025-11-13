@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for cr-overlay-staging on 2025-11-11T22:30:27-06:00
+# fly.toml app configuration file generated for cr-overlay-staging-bold-feather-4496 on 2025-11-12T20:57:06-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'cr-overlay-staging'
+app = 'cr-overlay-staging-bold-feather-4496'
 primary_region = 'dfw'
 
 [build]

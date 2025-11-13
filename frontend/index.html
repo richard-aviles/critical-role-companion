@@ -2,31 +2,126 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CR Overlay (Staging)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { margin:0; background:#111; color:#eee; font-family:system-ui, sans-serif }
-    .ok { color:#6ee7b7 } .bad { color:#fda4af }
+    :root { color-scheme: dark; }
+    body { margin:0; font-family: system-ui, sans-serif; background:#0b0b0c; color:#e9ecef }
+    header { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#141416; border-bottom:1px solid #24262a }
+    .pill { padding:6px 10px; border:1px solid #2e3238; border-radius:999px; background:#111317 }
+    .ok { color:#89f0b8 } .bad { color:#f9a3b3 }
+    main { padding:16px; display:grid; gap:12px }
+    .row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#141416; border:1px solid #24262a; border-radius:12px }
+    button { background:#1f6feb; border:0; color:white; padding:6px 10px; border-radius:8px; cursor:pointer }
+    button.ghost { background:transparent; border:1px solid #2e3238; color:#cbd5e1 }
+    .filters { display:flex; gap:8px; }
+    .muted { color:#9aa4b2; font-size:12px }
+    .name { font-weight:600 }
   </style>
 </head>
 <body>
-  <div style="padding:16px">
-    <h1>CR Overlay (Staging)</h1>
-    <div id="status">WS: connecting…</div>
-  </div>
-  <script>
-    const API_BASE = (new URLSearchParams(location.search).get("api")) || "https://cr-overlay-staging.fly.dev";
-    const ws = new WebSocket(API_BASE.replace(/^http/, "ws") + "/ws/updates");
-    const status = document.getElementById("status");
-    ws.onopen = () => { status.textContent = "WS: connected"; status.className="ok"; };
-    ws.onclose = () => { status.textContent = "WS: closed"; status.className="bad"; };
-    ws.onmessage = (e) => { if (e.data !== "__ping__") console.log("WS:", e.data); };
-    // basic heartbeat-aware reconnect
-    let timer;
-    ws.addEventListener("close", ()=> {
-      clearTimeout(timer);
-      timer = setTimeout(()=>location.reload(), 2000);
+  <header>
+    <div>API: <span id="apiBase" class="pill"></span></div>
+    <div>WS: <span id="wsStatus" class="pill bad">connecting…</span></div>
+    <div class="filters">
+      <button id="filter-all"   class="ghost">All</button>
+      <button id="filter-onscr" class="ghost">On-screen</button>
+    </div>
+    <div class="muted">Tip: you can override with <code>?api=https://your-fly-app.fly.dev</code></div>
+  </header>
+
+  <main>
+    <div id="list"></div>
+  </main>
+
+  <script type="module">
+    import { API_BASE } from "./config.js";
+    import { getCharacters, setOnScreen, connectUpdates } from "./api.js";
+
+    const apiBaseEl = document.getElementById("apiBase");
+    const wsStatusEl = document.getElementById("wsStatus");
+    const listEl = document.getElementById("list");
+    const btnAll = document.getElementById("filter-all");
+    const btnOn = document.getElementById("filter-onscr");
+
+    apiBaseEl.textContent = API_BASE;
+
+    let filter = "all"; // "all" | "on"
+    let state = [];
+
+    function render() {
+      const rows = filter === "on" ? state.filter(c => c.on_screen) : state;
+      listEl.innerHTML = "";
+      if (!rows.length) {
+        const empty = document.createElement("div");
+        empty.className = "muted";
+        empty.textContent = "(no characters yet)";
+        listEl.appendChild(empty);
+        return;
+      }
+      for (const c of rows) {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+          <div>
+            <div class="name">${c.name}</div>
+            <div class="muted">AC ${c?.data?.ac ?? "?"} · HP ${c?.data?.hp ?? "?"}</div>
+          </div>
+          <div>
+            <button data-id="${c.id}" class="${c.on_screen ? "" : "ghost"}">
+              ${c.on_screen ? "On-screen" : "Off-screen"}
+            </button>
+          </div>
+        `;
+        row.querySelector("button").addEventListener("click", async (e) => {
+          const id = Number(e.currentTarget.dataset.id);
+          const next = !c.on_screen;
+          try {
+            const updated = await setOnScreen(id, next);
+            // update local state
+            state = state.map(x => x.id === id ? updated : x);
+            render();
+          } catch (err) {
+            alert("Failed to toggle on_screen:\n" + err.message);
+          }
+        });
+        listEl.appendChild(row);
+      }
+    }
+
+    async function refresh() {
+      try {
+        state = await getCharacters();
+        render();
+      } catch (err) {
+        wsStatusEl.textContent = "fetch error";
+        wsStatusEl.className = "pill bad";
+        console.error(err);
+      }
+    }
+
+    // Filter buttons
+    btnAll.addEventListener("click", () => { filter = "all";  btnAll.classList.remove("ghost"); btnOn.classList.add("ghost"); render(); });
+    btnOn.addEventListener("click",  () => { filter = "on";   btnOn.classList.remove("ghost");  btnAll.classList.add("ghost"); render(); });
+    // Default selected:
+    btnAll.classList.remove("ghost");
+
+    // Initial fetch
+    await refresh();
+
+    // WebSocket
+    const ws = connectUpdates({
+      onOpen: () => { wsStatusEl.textContent = "connected"; wsStatusEl.className = "pill ok"; },
+      onClose: () => { wsStatusEl.textContent = "reconnecting…"; wsStatusEl.className = "pill bad"; },
+      onMessage: (msg) => {
+        // Future: if backend broadcasts granular updates, apply them here.
+        // For now, just refetch on any message.
+        refresh();
+      },
     });
+
+    // Optional: expose for console testing
+    window.__overlay = { refresh, ws, API_BASE };
   </script>
 </body>
 </html>
