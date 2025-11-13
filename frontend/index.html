@@ -114,10 +114,21 @@
       onOpen: () => { wsStatusEl.textContent = "connected"; wsStatusEl.className = "pill ok"; },
       onClose: () => { wsStatusEl.textContent = "reconnecting…"; wsStatusEl.className = "pill bad"; },
       onMessage: (msg) => {
-        // Future: if backend broadcasts granular updates, apply them here.
-        // For now, just refetch on any message.
-        refresh();
-      },
+		if (msg?.channel === "characters" && msg?.payload?.type === "update") {
+			const updated = msg.payload.character;
+			const found = state.findIndex(c => c.id === updated.id);
+			if (found !== -1) {
+				state[found] = updated;
+			} else {
+				state.push(updated);
+			}
+			render();
+		} else {
+			// fallback: full refresh
+			refresh();
+		}
+	},
+
     });
 
     // Optional: expose for console testing
