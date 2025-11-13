@@ -60,3 +60,18 @@ export function connectUpdates({ onOpen, onClose, onMessage, pingFilter = "__pin
     stop: () => { stopped = true; try { ws?.close(); } catch {} },
   };
 }
+
+export async function broadcastUI(type, value) {
+  return fetch(`${API_BASE}/broadcast`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      channel: "ui",
+      payload: { type, value },
+    }),
+  }).then(async (r) => {
+    if (!r.ok) throw new Error(`broadcast failed: ${r.status} ${await r.text()}`);
+    return r.json();
+  });
+}
+

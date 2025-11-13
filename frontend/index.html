@@ -37,6 +37,19 @@
   <script type="module">
     import { API_BASE } from "./config.js";
     import { getCharacters, setOnScreen, connectUpdates } from "./api.js";
+	import { getCharacters, setOnScreen, connectUpdates, broadcastUI } from "./api.js";
+	
+	const params = new URLSearchParams(location.search);
+	const mode = params.get("mode") || "admin";
+	// default viewer filter = on-screen
+	if (mode === "view") {
+	  filter = "on";
+	  // hide buttons
+	  document.querySelector(".filters")?.remove();
+	  // you can also hide the WS pill if you like
+	}
+
+
 
     const apiBaseEl = document.getElementById("apiBase");
     const wsStatusEl = document.getElementById("wsStatus");
@@ -101,8 +114,20 @@
     }
 
     // Filter buttons
-    btnAll.addEventListener("click", () => { filter = "all";  btnAll.classList.remove("ghost"); btnOn.classList.add("ghost"); render(); });
-    btnOn.addEventListener("click",  () => { filter = "on";   btnOn.classList.remove("ghost");  btnAll.classList.add("ghost"); render(); });
+	btnAll.addEventListener("click", async () => {
+	  filter = "all";
+	  btnAll.classList.remove("ghost"); btnOn.classList.add("ghost");
+	  render();
+	  try { await broadcastUI("filter", "all"); } catch (e) { console.warn(e); }
+	});
+
+	btnOn.addEventListener("click", async () => {
+	  filter = "on";
+	  btnOn.classList.remove("ghost"); btnAll.classList.add("ghost");
+	  render();
+	  try { await broadcastUI("filter", "on"); } catch (e) { console.warn(e); }
+	});
+
     // Default selected:
     btnAll.classList.remove("ghost");
 
@@ -114,20 +139,30 @@
       onOpen: () => { wsStatusEl.textContent = "connected"; wsStatusEl.className = "pill ok"; },
       onClose: () => { wsStatusEl.textContent = "reconnecting…"; wsStatusEl.className = "pill bad"; },
       onMessage: (msg) => {
-		if (msg?.channel === "characters" && msg?.payload?.type === "update") {
+		  // Character change from backend
+		  if (msg?.channel === "characters" && msg?.payload?.type === "update") {
 			const updated = msg.payload.character;
 			const found = state.findIndex(c => c.id === updated.id);
-			if (found !== -1) {
-				state[found] = updated;
-			} else {
-				state.push(updated);
-			}
+			if (found !== -1) state[found] = updated; else state.push(updated);
 			render();
-		} else {
-			// fallback: full refresh
-			refresh();
-		}
-	},
+			return;
+		  }
+
+		  // UI broadcasts (e.g., filter changes)
+		  if (msg?.channel === "ui" && msg?.payload?.type === "filter") {
+			const v = msg.payload.value; // "all" | "on"
+			filter = (v === "on") ? "on" : "all";
+			// reflect button states if present
+			if (filter === "on") { btnOn.classList.remove("ghost"); btnAll.classList.add("ghost"); }
+			else { btnAll.classList.remove("ghost"); btnOn.classList.add("ghost"); }
+			render();
+			return;
+		  }
+
+		  // fallback: full refresh on unknown messages
+		  refresh();
+		},
+
 
     });
 
