@@ -7,8 +7,8 @@
   <style>
     :root { color-scheme: dark; }
     body { margin:0; font-family: system-ui, sans-serif; background:#0b0b0c; color:#e9ecef }
-    header { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#141416; border-bottom:1px solid #24262a }
-    .pill { padding:6px 10px; border:1px solid #2e3238; border-radius:999px; background:#111317 }
+    header { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#141416; border-bottom:1px solid #24262a; flex-wrap:wrap }
+    .pill { padding:6px 10px; border:1px solid #2e3238; border-radius:999px; background:#111317; font-size:12px }
     .ok { color:#89f0b8 } .bad { color:#f9a3b3 }
     main { padding:16px; display:grid; gap:12px }
     .row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:#141416; border:1px solid #24262a; border-radius:12px }
@@ -20,14 +20,14 @@
   </style>
 </head>
 <body>
-  <header>
+  <header id="topbar">
     <div>API: <span id="apiBase" class="pill"></span></div>
     <div>WS: <span id="wsStatus" class="pill bad">connecting…</span></div>
-    <div class="filters">
+    <div class="filters" id="filters">
       <button id="filter-all"   class="ghost">All</button>
       <button id="filter-onscr" class="ghost">On-screen</button>
     </div>
-    <div class="muted">Tip: you can override with <code>?api=https://your-fly-app.fly.dev</code></div>
+    <div class="muted">Tip: override backend via <code>?api=https://your-fly-app.fly.dev</code></div>
   </header>
 
   <main>
@@ -36,39 +36,35 @@
 
   <script type="module">
     import { API_BASE } from "./config.js";
-    import { getCharacters, setOnScreen, connectUpdates } from "./api.js";
-	import { getCharacters, setOnScreen, connectUpdates, broadcastUI } from "./api.js";
-	
-	const params = new URLSearchParams(location.search);
-	const mode = params.get("mode") || "admin";
-	// default viewer filter = on-screen
-	if (mode === "view") {
-	  filter = "on";
-	  // hide buttons
-	  document.querySelector(".filters")?.remove();
-	  // you can also hide the WS pill if you like
-	}
+    import { getCharacters, setOnScreen, connectUpdates, broadcastUI } from "./api.js";
 
+    // --- Viewer/Admin mode ---
+    const params = new URLSearchParams(location.search);
+    const mode = params.get("mode") || "admin"; // "admin" | "view"
 
-
+    // --- DOM refs ---
     const apiBaseEl = document.getElementById("apiBase");
     const wsStatusEl = document.getElementById("wsStatus");
     const listEl = document.getElementById("list");
     const btnAll = document.getElementById("filter-all");
     const btnOn = document.getElementById("filter-onscr");
+    const filtersWrap = document.getElementById("filters");
+    const topbar = document.getElementById("topbar");
 
     apiBaseEl.textContent = API_BASE;
 
-    let filter = "all"; // "all" | "on"
+    // --- State ---
+    let filter = (mode === "view") ? "on" : "all"; // viewers default to on-screen
     let state = [];
 
+    // --- Render list ---
     function render() {
       const rows = filter === "on" ? state.filter(c => c.on_screen) : state;
       listEl.innerHTML = "";
       if (!rows.length) {
         const empty = document.createElement("div");
         empty.className = "muted";
-        empty.textContent = "(no characters yet)";
+        empty.textContent = "(no characters)";
         listEl.appendChild(empty);
         return;
       }
@@ -86,15 +82,19 @@
             </button>
           </div>
         `;
-        row.querySelector("button").addEventListener("click", async (e) => {
+        const toggleBtn = row.querySelector("button");
+        toggleBtn.addEventListener("click", async (e) => {
+          // In viewer mode, there should be no buttons; but guard anyway.
+          if (mode === "view") return;
           const id = Number(e.currentTarget.dataset.id);
           const next = !c.on_screen;
           try {
             const updated = await setOnScreen(id, next);
-            // update local state
-            state = state.map(x => x.id === id ? updated : x);
+            const i = state.findIndex(x => x.id === id);
+            if (i !== -1) state[i] = updated; else state.push(updated);
             render();
           } catch (err) {
+            console.error(err);
             alert("Failed to toggle on_screen:\n" + err.message);
           }
         });
@@ -102,6 +102,7 @@
       }
     }
 
+    // --- Fetch all ---
     async function refresh() {
       try {
         state = await getCharacters();
@@ -113,61 +114,63 @@
       }
     }
 
-    // Filter buttons
-	btnAll.addEventListener("click", async () => {
-	  filter = "all";
-	  btnAll.classList.remove("ghost"); btnOn.classList.add("ghost");
-	  render();
-	  try { await broadcastUI("filter", "all"); } catch (e) { console.warn(e); }
-	});
+    // --- Filter buttons (admin only) ---
+    if (mode === "admin") {
+      btnAll.addEventListener("click", async () => {
+        filter = "all";
+        btnAll.classList.remove("ghost"); btnOn.classList.add("ghost");
+        render();
+        try { await broadcastUI("filter", "all"); } catch (e) { console.warn(e); }
+      });
+      btnOn.addEventListener("click", async () => {
+        filter = "on";
+        btnOn.classList.remove("ghost"); btnAll.classList.add("ghost");
+        render();
+        try { await broadcastUI("filter", "on"); } catch (e) { console.warn(e); }
+      });
+      // default selected style
+      (filter === "on" ? btnOn : btnAll).classList.remove("ghost");
+    } else {
+      // Viewer: hide controls & ws pill if desired
+      filtersWrap?.remove();
+      // topbar.remove(); // uncomment to hide the entire header in OBS
+    }
 
-	btnOn.addEventListener("click", async () => {
-	  filter = "on";
-	  btnOn.classList.remove("ghost"); btnAll.classList.add("ghost");
-	  render();
-	  try { await broadcastUI("filter", "on"); } catch (e) { console.warn(e); }
-	});
-
-    // Default selected:
-    btnAll.classList.remove("ghost");
-
-    // Initial fetch
+    // --- Initial load ---
     await refresh();
 
-    // WebSocket
+    // --- WebSocket updates ---
     const ws = connectUpdates({
       onOpen: () => { wsStatusEl.textContent = "connected"; wsStatusEl.className = "pill ok"; },
       onClose: () => { wsStatusEl.textContent = "reconnecting…"; wsStatusEl.className = "pill bad"; },
       onMessage: (msg) => {
-		  // Character change from backend
-		  if (msg?.channel === "characters" && msg?.payload?.type === "update") {
-			const updated = msg.payload.character;
-			const found = state.findIndex(c => c.id === updated.id);
-			if (found !== -1) state[found] = updated; else state.push(updated);
-			render();
-			return;
-		  }
-
-		  // UI broadcasts (e.g., filter changes)
-		  if (msg?.channel === "ui" && msg?.payload?.type === "filter") {
-			const v = msg.payload.value; // "all" | "on"
-			filter = (v === "on") ? "on" : "all";
-			// reflect button states if present
-			if (filter === "on") { btnOn.classList.remove("ghost"); btnAll.classList.add("ghost"); }
-			else { btnAll.classList.remove("ghost"); btnOn.classList.add("ghost"); }
-			render();
-			return;
-		  }
-
-		  // fallback: full refresh on unknown messages
-		  refresh();
-		},
-
-
+        // Character update
+        if (msg?.channel === "characters" && msg?.payload?.type === "update") {
+          const updated = msg.payload.character;
+          const i = state.findIndex(c => c.id === updated.id);
+          if (i !== -1) state[i] = updated; else state.push(updated);
+          render();
+          return;
+        }
+        // UI filter change (admin -> viewers)
+        if (msg?.channel === "ui" && msg?.payload?.type === "filter") {
+          const v = msg.payload.value; // "all" | "on"
+          filter = (v === "on") ? "on" : "all";
+          // reflect buttons if present
+          if (mode === "admin") {
+            if (filter === "on") { btnOn.classList.remove("ghost"); btnAll.classList.add("ghost"); }
+            else { btnAll.classList.remove("ghost"); btnOn.classList.add("ghost"); }
+          }
+          render();
+          return;
+        }
+        // Fallback: full refresh on unknown signals
+        refresh();
+      },
     });
 
-    // Optional: expose for console testing
-    window.__overlay = { refresh, ws, API_BASE };
+    // Expose for quick console testing if needed
+    window.__overlay = { refresh, API_BASE, mode, get state(){ return state; } };
   </script>
 </body>
 </html>
