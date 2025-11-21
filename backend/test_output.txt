@@ -1,0 +1,307 @@
+
+============================================================
+CHARACTER BACKEND TESTS - PHASE 2
+============================================================
+
+=== Test 1: Create Character (No Image) ===
+2025-11-21 10:47:49,994 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-11-21 10:47:49,994 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-11-21 10:47:50,065 INFO sqlalchemy.engine.Engine select current_schema()
+2025-11-21 10:47:50,065 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-11-21 10:47:50,138 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-11-21 10:47:50,138 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-11-21 10:47:50,209 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:50,210 INFO sqlalchemy.engine.Engine DELETE FROM characters WHERE characters.name LIKE %(name_1)s
+2025-11-21 10:47:50,211 INFO sqlalchemy.engine.Engine [generated in 0.00013s] {'name_1': 'Test Character%'}
+2025-11-21 10:47:50,279 INFO sqlalchemy.engine.Engine DELETE FROM characters WHERE characters.name LIKE %(name_1)s
+2025-11-21 10:47:50,279 INFO sqlalchemy.engine.Engine [cached since 0.06827s ago] {'name_1': 'Unique Character%'}
+2025-11-21 10:47:50,314 INFO sqlalchemy.engine.Engine DELETE FROM campaigns WHERE campaigns.slug = %(slug_1)s
+2025-11-21 10:47:50,314 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'slug_1': 'test-character-campaign'}
+2025-11-21 10:47:50,349 INFO sqlalchemy.engine.Engine DELETE FROM campaigns WHERE campaigns.slug = %(slug_1)s
+2025-11-21 10:47:50,349 INFO sqlalchemy.engine.Engine [cached since 0.03564s ago] {'slug_1': 'other-campaign'}
+2025-11-21 10:47:50,385 INFO sqlalchemy.engine.Engine DELETE FROM users WHERE users.email = %(email_1)s
+2025-11-21 10:47:50,386 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'email_1': 'test-characters@critical-role.test'}
+2025-11-21 10:47:50,421 INFO sqlalchemy.engine.Engine DELETE FROM users WHERE users.email = %(email_1)s
+2025-11-21 10:47:50,421 INFO sqlalchemy.engine.Engine [cached since 0.03599s ago] {'email_1': 'other-user@critical-role.test'}
+2025-11-21 10:47:50,458 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:50,713 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:50,714 INFO sqlalchemy.engine.Engine INSERT INTO users (id, email, password_hash, created_at, updated_at) VALUES (%(id)s::UUID, %(email)s, %(password_hash)s, %(created_at)s, %(updated_at)s)
+2025-11-21 10:47:50,714 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'id': UUID('cb5e3b4f-498f-42e2-b766-63a2dd19186c'), 'email': 'test-characters@critical-role.test', 'password_hash': '$2b$12$UXMgQQkCQ.EcpnooobgQnu2jNtLLidbaCAl9J/zDih.WDPbUSJL4W', 'created_at': datetime.datetime(2025, 11, 21, 16, 47, 50, 714870), 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 50, 714872)}
+2025-11-21 10:47:50,785 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:50,858 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:50,860 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.created_at, users.updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+2025-11-21 10:47:50,860 INFO sqlalchemy.engine.Engine [generated in 0.00013s] {'pk_1': UUID('cb5e3b4f-498f-42e2-b766-63a2dd19186c')}
+2025-11-21 10:47:50,931 INFO sqlalchemy.engine.Engine INSERT INTO campaigns (id, slug, name, description, owner_id, admin_token, settings, created_at, updated_at) VALUES (%(id)s::UUID, %(slug)s, %(name)s, %(description)s, %(owner_id)s::UUID, %(admin_token)s, %(settings)s::JSONB, %(created_at)s, %(updated_at)s)
+2025-11-21 10:47:50,931 INFO sqlalchemy.engine.Engine [generated in 0.00022s] {'id': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6'), 'slug': 'test-character-campaign', 'name': 'Test Character Campaign', 'description': 'Test campaign for character testing', 'owner_id': UUID('cb5e3b4f-498f-42e2-b766-63a2dd19186c'), 'admin_token': 'e2d2077b7834bc8e3ca3b6be0b5d39247bb14cfaf34b95c95ce87d8eb9c7e881', 'settings': '{}', 'created_at': datetime.datetime(2025, 11, 21, 16, 47, 50, 930992), 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 50, 930994)}
+2025-11-21 10:47:50,965 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:51,038 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:51,039 INFO sqlalchemy.engine.Engine SELECT campaigns.id, campaigns.slug, campaigns.name, campaigns.description, campaigns.owner_id, campaigns.admin_token, campaigns.settings, campaigns.created_at, campaigns.updated_at 
+FROM campaigns 
+WHERE campaigns.id = %(pk_1)s::UUID
+2025-11-21 10:47:51,039 INFO sqlalchemy.engine.Engine [generated in 0.00011s] {'pk_1': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6')}
+2025-11-21 10:47:51,110 INFO sqlalchemy.engine.Engine INSERT INTO characters (id, campaign_id, name, slug, class_name, race, player_name, description, backstory, image_url, image_r2_key, is_active, level, created_at, updated_at) VALUES (%(id)s::UUID, %(campaign_id)s::UUID, %(name)s, %(slug)s, %(class_name)s, %(race)s, %(player_name)s, %(description)s, %(backstory)s, %(image_url)s, %(image_r2_key)s, %(is_active)s, %(level)s, %(created_at)s, %(updated_at)s)
+2025-11-21 10:47:51,110 INFO sqlalchemy.engine.Engine [generated in 0.00021s] {'id': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0'), 'campaign_id': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6'), 'name': 'Test Character 1', 'slug': 'test-character-1', 'class_name': 'Rogue', 'race': 'Tiefling', 'player_name': 'Test Player', 'description': 'A test character', 'backstory': 'Once upon a time...', 'image_url': None, 'image_r2_key': None, 'is_active': True, 'level': 5, 'created_at': datetime.datetime(2025, 11, 21, 16, 47, 51, 110765), 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 51, 110768)}
+2025-11-21 10:47:51,145 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:51,218 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:51,219 INFO sqlalchemy.engine.Engine SELECT characters.id, characters.campaign_id, characters.name, characters.slug, characters.class_name, characters.race, characters.player_name, characters.description, characters.backstory, characters.image_url, characters.image_r2_key, characters.is_active, characters.level, characters.created_at, characters.updated_at 
+FROM characters 
+WHERE characters.id = %(pk_1)s::UUID
+2025-11-21 10:47:51,219 INFO sqlalchemy.engine.Engine [generated in 0.00012s] {'pk_1': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0')}
+[OK] Character created: Test Character 1 (ID: 9b1ad726-8bd1-4998-b481-6226858d87d0)
+  - Class: Rogue
+  - Race: Tiefling
+  - Level: 5
+2025-11-21 10:47:51,291 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE campaigns.id = %(pk_1)s::UUID
+2025-11-21 10:47:51,291 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'pk_1': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6')}
+  - Campaign: Test Character Campaign
+2025-11-21 10:47:51,326 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+2025-11-21 10:47:51,326 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'pk_1': UUID('cb5e3b4f-498f-42e2-b766-63a2dd19186c')}
+2025-11-21 10:47:51,361 INFO sqlalchemy.engine.Engine ROLLBACK
+
+=== Test 2: List Campaign Characters ===
+2025-11-21 10:47:51,433 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:51,434 INFO sqlalchemy.engine.Engine INSERT INTO characters (id, campaign_id, name, slug, class_name, race, player_name, description, backstory, image_url, image_r2_key, is_active, level, created_at, updated_at) VALUES (%(id)s::UUID, %(campaign_id)s::UUID, %(name)s, %(slug)s, %(class_name)s, %(race)s, %(player_name)s, %(description)s, %(backstory)s, %(image_url)s, %(image_r2_key)s, %(is_active)s, %(level)s, %(created_at)s, %(updated_at)s)
+2025-11-21 10:47:51,434 INFO sqlalchemy.engine.Engine [generated in 0.00021s] {'id': UUID('36bec089-e735-42fe-80ea-bac7987e138a'), 'campaign_id': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6'), 'name': 'Test Character 2', 'slug': 'test-character-2', 'class_name': 'Cleric', 'race': 'Half-Elf', 'player_name': 'Another Player', 'description': None, 'backstory': None, 'image_url': None, 'image_r2_key': None, 'is_active': True, 'level': 3, 'created_at': datetime.datetime(2025, 11, 21, 16, 47, 51, 434247), 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 51, 434249)}
+2025-11-21 10:47:51,505 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:51,579 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:51,583 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE characters.campaign_id = %(campaign_id_1)s::UUID ORDER BY characters.name
+2025-11-21 10:47:51,583 INFO sqlalchemy.engine.Engine [generated in 0.00060s] {'campaign_id_1': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6')}
+[OK] Found 2 characters in campaign:
+  - Test Character 1 (Rogue, Level 5)
+  - Test Character 2 (Cleric, Level 3)
+2025-11-21 10:47:51,654 INFO sqlalchemy.engine.Engine ROLLBACK
+
+=== Test 3: Get Character Detail ===
+2025-11-21 10:47:51,725 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:51,726 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE characters.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 10:47:51,726 INFO sqlalchemy.engine.Engine [generated in 0.00012s] {'id_1': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0'), 'param_1': 1}
+[OK] Character retrieved: Test Character 1
+  - ID: 9b1ad726-8bd1-4998-b481-6226858d87d0
+  - Slug: test-character-1
+  - Description: A test character
+  - Backstory: Once upon a time......
+2025-11-21 10:47:51,798 INFO sqlalchemy.engine.Engine ROLLBACK
+
+=== Test 4: Update Character ===
+2025-11-21 10:47:51,869 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:51,869 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE characters.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 10:47:51,869 INFO sqlalchemy.engine.Engine [cached since 0.1437s ago] {'id_1': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0'), 'param_1': 1}
+C:\Development\Twitch_CriticalRole_Project\CR_Companion_PreReq_Layout\critical-role-companion\backend\test_characters.py:222: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  char.updated_at = datetime.utcnow()
+2025-11-21 10:47:51,943 INFO sqlalchemy.engine.Engine UPDATE characters SET name=%(name)s, slug=%(slug)s, description=%(description)s, is_active=%(is_active)s, level=%(level)s, updated_at=%(updated_at)s WHERE characters.id = %(characters_id)s::UUID
+2025-11-21 10:47:51,943 INFO sqlalchemy.engine.Engine [generated in 0.00014s] {'name': 'Updated Character Name', 'slug': 'updated-character-name', 'description': 'Updated description', 'is_active': False, 'level': 10, 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 51, 942285), 'characters_id': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0')}
+2025-11-21 10:47:51,978 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:52,049 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:52,049 INFO sqlalchemy.engine.Engine SELECT characters.id, characters.campaign_id, characters.name, characters.slug, characters.class_name, characters.race, characters.player_name, characters.description, characters.backstory, characters.image_url, characters.image_r2_key, characters.is_active, characters.level, characters.created_at, characters.updated_at 
+FROM characters 
+WHERE characters.id = %(pk_1)s::UUID
+2025-11-21 10:47:52,049 INFO sqlalchemy.engine.Engine [cached since 0.8303s ago] {'pk_1': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0')}
+[OK] Character updated successfully
+  - New name: Updated Character Name
+  - New level: 10
+  - Is active: False
+2025-11-21 10:47:52,118 INFO sqlalchemy.engine.Engine ROLLBACK
+
+=== Test 5: Character Ownership Validation ===
+2025-11-21 10:47:52,189 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:52,189 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 10:47:52,190 INFO sqlalchemy.engine.Engine [generated in 0.00011s] {'id_1': UUID('cb5e3b4f-498f-42e2-b766-63a2dd19186c'), 'param_1': 1}
+2025-11-21 10:47:52,262 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE campaigns.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 10:47:52,262 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'id_1': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6'), 'param_1': 1}
+2025-11-21 10:47:52,485 INFO sqlalchemy.engine.Engine INSERT INTO users (id, email, password_hash, created_at, updated_at) VALUES (%(id)s::UUID, %(email)s, %(password_hash)s, %(created_at)s, %(updated_at)s)
+2025-11-21 10:47:52,485 INFO sqlalchemy.engine.Engine [cached since 1.771s ago] {'id': UUID('ec70bb6f-d91f-4045-b922-fd40741d7985'), 'email': 'other-user@critical-role.test', 'password_hash': '$2b$12$CyPhwQeTBFCsP.JlnbfxKuRuqNhxchXRmA1hIlEj3m5VWVOtJ0kyq', 'created_at': datetime.datetime(2025, 11, 21, 16, 47, 52, 485746), 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 52, 485749)}
+2025-11-21 10:47:52,521 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:52,593 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:52,594 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.created_at, users.updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+2025-11-21 10:47:52,594 INFO sqlalchemy.engine.Engine [cached since 1.734s ago] {'pk_1': UUID('ec70bb6f-d91f-4045-b922-fd40741d7985')}
+2025-11-21 10:47:52,665 INFO sqlalchemy.engine.Engine INSERT INTO campaigns (id, slug, name, description, owner_id, admin_token, settings, created_at, updated_at) VALUES (%(id)s::UUID, %(slug)s, %(name)s, %(description)s, %(owner_id)s::UUID, %(admin_token)s, %(settings)s::JSONB, %(created_at)s, %(updated_at)s)
+2025-11-21 10:47:52,666 INFO sqlalchemy.engine.Engine [cached since 1.735s ago] {'id': UUID('f13d03fa-dd5d-4a62-8309-bbaa57cdfe89'), 'slug': 'other-campaign', 'name': 'Other Campaign', 'description': None, 'owner_id': UUID('ec70bb6f-d91f-4045-b922-fd40741d7985'), 'admin_token': '9e59d83a13a9351b6ff1f7eece7cefcd229e6f16d1da9269a485edfe4b6e0230', 'settings': '{}', 'created_at': datetime.datetime(2025, 11, 21, 16, 47, 52, 665809), 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 52, 665814)}
+2025-11-21 10:47:52,701 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:52,773 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:52,773 INFO sqlalchemy.engine.Engine SELECT campaigns.id, campaigns.slug, campaigns.name, campaigns.description, campaigns.owner_id, campaigns.admin_token, campaigns.settings, campaigns.created_at, campaigns.updated_at 
+FROM campaigns 
+WHERE campaigns.id = %(pk_1)s::UUID
+2025-11-21 10:47:52,774 INFO sqlalchemy.engine.Engine [cached since 1.735s ago] {'pk_1': UUID('f13d03fa-dd5d-4a62-8309-bbaa57cdfe89')}
+2025-11-21 10:47:52,845 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE campaigns.id = %(pk_1)s::UUID
+2025-11-21 10:47:52,846 INFO sqlalchemy.engine.Engine [cached since 1.554s ago] {'pk_1': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6')}
+2025-11-21 10:47:52,881 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+2025-11-21 10:47:52,881 INFO sqlalchemy.engine.Engine [cached since 1.556s ago] {'pk_1': UUID('cb5e3b4f-498f-42e2-b766-63a2dd19186c')}
+2025-11-21 10:47:52,918 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+2025-11-21 10:47:52,918 INFO sqlalchemy.engine.Engine [cached since 1.592s ago] {'pk_1': UUID('ec70bb6f-d91f-4045-b922-fd40741d7985')}
+[OK] Ownership validation working correctly
+  - User 1 owns Campaign 1: True
+  - User 2 owns Campaign 2: True
+  - User 2 cannot access Campaign 1: True
+2025-11-21 10:47:52,955 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE %(param_1)s::UUID = characters.campaign_id
+2025-11-21 10:47:52,955 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'param_1': UUID('f13d03fa-dd5d-4a62-8309-bbaa57cdfe89')}
+2025-11-21 10:47:52,997 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE %(param_1)s::UUID = episodes.campaign_id
+2025-11-21 10:47:52,997 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'param_1': UUID('f13d03fa-dd5d-4a62-8309-bbaa57cdfe89')}
+2025-11-21 10:47:53,034 INFO sqlalchemy.engine.Engine SELECT rosters.campaign_id AS rosters_campaign_id, rosters.character_ids AS rosters_character_ids, rosters.updated_at AS rosters_updated_at 
+FROM rosters 
+WHERE rosters.campaign_id = %(pk_1)s::UUID
+2025-11-21 10:47:53,034 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'pk_1': UUID('f13d03fa-dd5d-4a62-8309-bbaa57cdfe89')}
+2025-11-21 10:47:53,070 INFO sqlalchemy.engine.Engine SELECT layout_overrides.id AS layout_overrides_id, layout_overrides.campaign_id AS layout_overrides_campaign_id, layout_overrides.tier AS layout_overrides_tier, layout_overrides.badges AS layout_overrides_badges, layout_overrides.chips AS layout_overrides_chips, layout_overrides.updated_at AS layout_overrides_updated_at 
+FROM layout_overrides 
+WHERE %(param_1)s::UUID = layout_overrides.campaign_id
+2025-11-21 10:47:53,070 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'param_1': UUID('f13d03fa-dd5d-4a62-8309-bbaa57cdfe89')}
+2025-11-21 10:47:53,106 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE %(param_1)s::UUID = campaigns.owner_id
+2025-11-21 10:47:53,106 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'param_1': UUID('ec70bb6f-d91f-4045-b922-fd40741d7985')}
+2025-11-21 10:47:53,142 INFO sqlalchemy.engine.Engine DELETE FROM campaigns WHERE campaigns.id = %(id)s::UUID
+2025-11-21 10:47:53,142 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'id': UUID('f13d03fa-dd5d-4a62-8309-bbaa57cdfe89')}
+2025-11-21 10:47:53,179 INFO sqlalchemy.engine.Engine DELETE FROM users WHERE users.id = %(id)s::UUID
+2025-11-21 10:47:53,179 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'id': UUID('ec70bb6f-d91f-4045-b922-fd40741d7985')}
+2025-11-21 10:47:53,214 INFO sqlalchemy.engine.Engine COMMIT
+
+=== Test 6: Delete Character ===
+2025-11-21 10:47:53,285 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:53,285 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE characters.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 10:47:53,285 INFO sqlalchemy.engine.Engine [cached since 1.56s ago] {'id_1': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0'), 'param_1': 1}
+2025-11-21 10:47:53,359 INFO sqlalchemy.engine.Engine DELETE FROM characters WHERE characters.id = %(id)s::UUID
+2025-11-21 10:47:53,359 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'id': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0')}
+2025-11-21 10:47:53,394 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:53,465 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:53,465 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE characters.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 10:47:53,465 INFO sqlalchemy.engine.Engine [cached since 1.74s ago] {'id_1': UUID('9b1ad726-8bd1-4998-b481-6226858d87d0'), 'param_1': 1}
+[OK] Character deleted successfully
+  - Deleted: Updated Character Name
+  - ID: 9b1ad726-8bd1-4998-b481-6226858d87d0
+  - Verification: Character no longer exists in database
+2025-11-21 10:47:53,538 INFO sqlalchemy.engine.Engine ROLLBACK
+
+=== Test 7: 404 Handling ===
+2025-11-21 10:47:53,609 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:53,609 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE characters.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 10:47:53,609 INFO sqlalchemy.engine.Engine [cached since 1.884s ago] {'id_1': UUID('83764284-12da-4a40-a881-72d0c34c0c60'), 'param_1': 1}
+[OK] 404 handling works correctly
+  - Queried for: 83764284-12da-4a40-a881-72d0c34c0c60
+  - Result: None (expected)
+2025-11-21 10:47:53,678 INFO sqlalchemy.engine.Engine ROLLBACK
+
+=== Test 8: Slug Generation ===
+2025-11-21 10:47:53,749 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:53,750 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s
+2025-11-21 10:47:53,750 INFO sqlalchemy.engine.Engine [generated in 0.00011s] {'email_1': 'test-characters@critical-role.test', 'param_1': 1}
+2025-11-21 10:47:53,822 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE campaigns.slug = %(slug_1)s 
+ LIMIT %(param_1)s
+2025-11-21 10:47:53,822 INFO sqlalchemy.engine.Engine [generated in 0.00015s] {'slug_1': 'test-character-campaign', 'param_1': 1}
+  [OK] 'Vax'ildan' -> 'vaxildan'
+  [OK] 'Pike Trickfoot' -> 'pike-trickfoot'
+  [OK] 'Grog Strongjaw' -> 'grog-strongjaw'
+  [OK] 'Keyleth of the Air Ashari' -> 'keyleth-of-the-air-ashari'
+[OK] Slug generation working correctly
+2025-11-21 10:47:53,858 INFO sqlalchemy.engine.Engine ROLLBACK
+
+=== Test 9: Unique Constraints ===
+2025-11-21 10:47:53,929 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:53,929 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s 
+ LIMIT %(param_1)s
+2025-11-21 10:47:53,930 INFO sqlalchemy.engine.Engine [cached since 0.18s ago] {'email_1': 'test-characters@critical-role.test', 'param_1': 1}
+2025-11-21 10:47:53,999 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE campaigns.slug = %(slug_1)s 
+ LIMIT %(param_1)s
+2025-11-21 10:47:53,999 INFO sqlalchemy.engine.Engine [cached since 0.177s ago] {'slug_1': 'test-character-campaign', 'param_1': 1}
+2025-11-21 10:47:54,034 INFO sqlalchemy.engine.Engine INSERT INTO characters (id, campaign_id, name, slug, class_name, race, player_name, description, backstory, image_url, image_r2_key, is_active, level, created_at, updated_at) VALUES (%(id)s::UUID, %(campaign_id)s::UUID, %(name)s, %(slug)s, %(class_name)s, %(race)s, %(player_name)s, %(description)s, %(backstory)s, %(image_url)s, %(image_r2_key)s, %(is_active)s, %(level)s, %(created_at)s, %(updated_at)s)
+2025-11-21 10:47:54,034 INFO sqlalchemy.engine.Engine [generated in 0.00022s] {'id': UUID('cc373978-764e-4679-bf95-3d93b3f126c3'), 'campaign_id': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6'), 'name': 'Unique Character', 'slug': 'unique-character', 'class_name': 'Wizard', 'race': 'Human', 'player_name': None, 'description': None, 'backstory': None, 'image_url': None, 'image_r2_key': None, 'is_active': True, 'level': 1, 'created_at': datetime.datetime(2025, 11, 21, 16, 47, 54, 34441), 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 54, 34443)}
+2025-11-21 10:47:54,069 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:54,141 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:54,141 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE campaigns.id = %(pk_1)s::UUID
+2025-11-21 10:47:54,141 INFO sqlalchemy.engine.Engine [cached since 2.85s ago] {'pk_1': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6')}
+2025-11-21 10:47:54,214 INFO sqlalchemy.engine.Engine INSERT INTO characters (id, campaign_id, name, slug, class_name, race, player_name, description, backstory, image_url, image_r2_key, is_active, level, created_at, updated_at) VALUES (%(id)s::UUID, %(campaign_id)s::UUID, %(name)s, %(slug)s, %(class_name)s, %(race)s, %(player_name)s, %(description)s, %(backstory)s, %(image_url)s, %(image_r2_key)s, %(is_active)s, %(level)s, %(created_at)s, %(updated_at)s)
+2025-11-21 10:47:54,214 INFO sqlalchemy.engine.Engine [cached since 0.1802s ago] {'id': UUID('af337d1e-79d0-4bf9-8bdb-25f2efb5057c'), 'campaign_id': UUID('18a93d05-418a-4417-a813-4b9d4cf652e6'), 'name': 'Unique Character', 'slug': 'unique-character', 'class_name': 'Rogue', 'race': 'Elf', 'player_name': None, 'description': None, 'backstory': None, 'image_url': None, 'image_r2_key': None, 'is_active': True, 'level': 1, 'created_at': datetime.datetime(2025, 11, 21, 16, 47, 54, 214454), 'updated_at': datetime.datetime(2025, 11, 21, 16, 47, 54, 214456)}
+2025-11-21 10:47:54,249 INFO sqlalchemy.engine.Engine COMMIT
+[OK] Unique constraint working (duplicate prevented)
+  - Error (expected): AssertionError
+2025-11-21 10:47:54,321 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:54,322 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE characters.id = %(pk_1)s::UUID
+2025-11-21 10:47:54,322 INFO sqlalchemy.engine.Engine [generated in 0.00012s] {'pk_1': UUID('cc373978-764e-4679-bf95-3d93b3f126c3')}
+2025-11-21 10:47:54,394 INFO sqlalchemy.engine.Engine DELETE FROM characters WHERE characters.id = %(id)s::UUID
+2025-11-21 10:47:54,394 INFO sqlalchemy.engine.Engine [cached since 1.035s ago] {'id': UUID('cc373978-764e-4679-bf95-3d93b3f126c3')}
+2025-11-21 10:47:54,429 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 10:47:54,501 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 10:47:54,501 INFO sqlalchemy.engine.Engine DELETE FROM characters WHERE characters.name LIKE %(name_1)s
+2025-11-21 10:47:54,501 INFO sqlalchemy.engine.Engine [cached since 4.291s ago] {'name_1': 'Test Character%'}
+2025-11-21 10:47:54,574 INFO sqlalchemy.engine.Engine DELETE FROM characters WHERE characters.name LIKE %(name_1)s
+2025-11-21 10:47:54,574 INFO sqlalchemy.engine.Engine [cached since 4.363s ago] {'name_1': 'Unique Character%'}
+2025-11-21 10:47:54,609 INFO sqlalchemy.engine.Engine DELETE FROM campaigns WHERE campaigns.slug = %(slug_1)s
+2025-11-21 10:47:54,610 INFO sqlalchemy.engine.Engine [cached since 4.296s ago] {'slug_1': 'test-character-campaign'}
+2025-11-21 10:47:54,645 INFO sqlalchemy.engine.Engine DELETE FROM campaigns WHERE campaigns.slug = %(slug_1)s
+2025-11-21 10:47:54,645 INFO sqlalchemy.engine.Engine [cached since 4.331s ago] {'slug_1': 'other-campaign'}
+2025-11-21 10:47:54,682 INFO sqlalchemy.engine.Engine DELETE FROM users WHERE users.email = %(email_1)s
+2025-11-21 10:47:54,682 INFO sqlalchemy.engine.Engine [cached since 4.296s ago] {'email_1': 'test-characters@critical-role.test'}
+2025-11-21 10:47:54,718 INFO sqlalchemy.engine.Engine DELETE FROM users WHERE users.email = %(email_1)s
+2025-11-21 10:47:54,718 INFO sqlalchemy.engine.Engine [cached since 4.333s ago] {'email_1': 'other-user@critical-role.test'}
+2025-11-21 10:47:54,753 INFO sqlalchemy.engine.Engine COMMIT
+
+[OK] Test cleanup completed
+
+============================================================
+ALL TESTS PASSED [OK]
+============================================================
+
+Test Summary:
+  [OK] Create character (without image)
+  [OK] List campaign characters
+  [OK] Get character detail
+  [OK] Update character
+  [OK] Ownership validation
+  [OK] Delete character
+  [OK] 404 handling
+  [OK] Slug generation
+  [OK] Unique constraints
+
+============================================================
