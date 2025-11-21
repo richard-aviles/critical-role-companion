@@ -1,0 +1,115 @@
+/**
+ * Create Episode Page
+ * Form to create a new episode for a campaign
+ */
+
+'use client';
+
+import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { createEpisode, CreateEpisodeData, UpdateEpisodeData, Episode } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
+import { EpisodeForm } from '@/components/EpisodeForm';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { AdminHeader } from '@/components/AdminHeader';
+
+function NewEpisodePageContent() {
+  const params = useParams<{ id: string }>();
+  const router = useRouter();
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const campaignId = params.id;
+
+  const handleSubmit = async (data: CreateEpisodeData | UpdateEpisodeData) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const episode = await createEpisode(data as CreateEpisodeData);
+
+      // Redirect to episode detail page on success
+      router.push(`/admin/campaigns/${campaignId}/episodes/${episode.id}`);
+    } catch (err: any) {
+      const status = err.response?.status;
+
+      if (status === 403) {
+        setError('You do not have permission to create episodes for this campaign.');
+      } else if (status === 404) {
+        setError('Campaign not found. It may have been deleted.');
+      } else {
+        setError(err.response?.data?.detail || err.message || 'Failed to create episode');
+      }
+      setIsLoading(false);
+      throw err;
+    }
+  };
+
+  const handleCancel = () => {
+    router.push(`/admin/campaigns/${campaignId}/episodes`);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <AdminHeader title="Create Episode" />
+
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Navigation back to episodes list */}
+        <div className="mb-6">
+          <Link
+            href={`/admin/campaigns/${campaignId}/episodes`}
+            className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Episodes
+          </Link>
+        </div>
+
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Create New Episode</h1>
+          <p className="mt-1 text-sm text-gray-600">
+            Add a new episode to your campaign
+          </p>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 rounded-md border border-red-300 bg-red-50 p-4">
+            <div className="flex">
+              <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="ml-3">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Episode Form */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <EpisodeForm
+            mode="create"
+            campaignId={campaignId}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            isLoading={isLoading}
+          />
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default function NewEpisodePage() {
+  return (
+    <ProtectedRoute>
+      <NewEpisodePageContent />
+    </ProtectedRoute>
+  );
+}
