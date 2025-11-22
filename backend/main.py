@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List, Set
 from io import BytesIO
 
-from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File, Header
+from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File, Header, Form
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -459,9 +459,8 @@ class CharacterUpdate(BaseModel):
     player_name: Optional[str] = None
     class_name: Optional[str] = None
     race: Optional[str] = None
-    stats: Optional[Dict[str, Any]] = None
-    status: Optional[str] = None
-    appearance: Optional[str] = None
+    description: Optional[str] = None
+    backstory: Optional[str] = None
 
 
 @app.get("/campaigns/{campaign_id}/characters", response_model=List[Dict])
@@ -541,11 +540,18 @@ def get_character(campaign_id: str, char_id: str, db: Session = Depends(get_db))
 def update_character(
     campaign_id: str,
     char_id: str,
-    payload: CharacterUpdate,
     campaign: Campaign = Depends(verify_campaign_token),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    # Form fields (for FormData uploads)
+    name: Optional[str] = Form(None),
+    player_name: Optional[str] = Form(None),
+    class_name: Optional[str] = Form(None),
+    race: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    backstory: Optional[str] = Form(None),
+    image: Optional[UploadFile] = File(None),
 ):
-    """Update character (admin only)"""
+    """Update character (admin only) - supports JSON and FormData"""
     try:
         char_uuid = uuid.UUID(char_id)
     except ValueError:
@@ -558,31 +564,45 @@ def update_character(
     if not character:
         raise HTTPException(status_code=404, detail="Character not found")
 
-    # Update fields
-    if payload.name:
-        character.name = payload.name
-    if payload.player_name is not None:
-        character.player_name = payload.player_name
-    if payload.class_name is not None:
-        character.class_name = payload.class_name
-    if payload.race is not None:
-        character.race = payload.race
-    if payload.stats:
-        character.stats = payload.stats
-    if payload.status:
-        character.status = payload.status
-    if payload.appearance is not None:
-        character.appearance = payload.appearance
+    # Update fields from form data
+    if name:
+        character.name = name
+    if player_name is not None:
+        character.player_name = player_name
+    if class_name is not None:
+        character.class_name = class_name
+    if race is not None:
+        character.race = race
+    if description is not None:
+        character.description = description
+    if backstory is not None:
+        character.backstory = backstory
+
+    # Handle image upload if provided
+    if image and image.filename:
+        try:
+            image_data = image.file.read()
+            # Upload to S3/R2
+            r2_key = f"characters/{campaign.id}/{character.id}/{image.filename}"
+            public_url = s3_client.upload_file(image_data, r2_key)
+            character.image_url = public_url
+            character.image_r2_key = r2_key
+        except Exception as e:
+            print(f"[IMAGE UPLOAD ERROR] {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
     character.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(character)
 
     # Broadcast update
-    asyncio.create_task(broadcast_to_campaign(str(campaign.id), {
-        "type": "CHAR_UPDATED",
-        "character": character.to_dict()
-    }))
+    try:
+        asyncio.create_task(broadcast_to_campaign(str(campaign.id), {
+            "type": "CHAR_UPDATED",
+            "character": character.to_dict()
+        }))
+    except Exception as e:
+        print(f"[BROADCAST ERROR] {str(e)}")
 
     return character.to_dict()
 

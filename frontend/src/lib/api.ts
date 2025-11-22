@@ -4,9 +4,15 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+});
+
+// Set default JSON content type for non-FormData requests
+apiClient.interceptors.request.use((config) => {
+  // Don't set Content-Type if data is FormData (let browser handle it)
+  if (!(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+  return config;
 });
 
 /**
@@ -240,10 +246,31 @@ export const getCharacter = async (campaignId: string, characterId: string): Pro
 export const updateCharacter = async (
   campaignId: string,
   characterId: string,
-  data: UpdateCharacterData | FormData
+  data: UpdateCharacterData | FormData,
+  imageFile?: File
 ): Promise<Character> => {
   try {
-    const response = await apiClient.patch(`/campaigns/${campaignId}/characters/${characterId}`, data);
+    // Convert data to FormData for consistency with backend
+    let requestData: FormData;
+
+    if (data instanceof FormData) {
+      requestData = data;
+    } else {
+      // Convert JSON data to FormData
+      requestData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          requestData.append(key, String(value));
+        }
+      });
+    }
+
+    // Add image if provided separately
+    if (imageFile) {
+      requestData.append('image', imageFile);
+    }
+
+    const response = await apiClient.patch(`/campaigns/${campaignId}/characters/${characterId}`, requestData);
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 404) {
