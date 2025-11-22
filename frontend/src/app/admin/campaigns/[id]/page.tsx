@@ -258,6 +258,21 @@ function CampaignDetailContent() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Navigation Tabs */}
+        <div className="mb-8 border-b border-gray-200">
+          <div className="flex gap-8">
+            <button className="px-4 py-3 border-b-2 border-blue-600 text-blue-600 font-medium">
+              Details
+            </button>
+            <a href={`/admin/campaigns/${campaign.id}/characters`} className="px-4 py-3 border-b-2 border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300">
+              Characters
+            </a>
+            <a href={`/admin/campaigns/${campaign.id}/episodes`} className="px-4 py-3 border-b-2 border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300">
+              Episodes
+            </a>
+          </div>
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Edit Form */}
           <div className="lg:col-span-2">

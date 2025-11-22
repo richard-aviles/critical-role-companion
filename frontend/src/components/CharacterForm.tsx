@@ -33,7 +33,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
     player_name: initialData?.player_name || '',
     description: initialData?.description || '',
     backstory: initialData?.backstory || '',
-    level: initialData?.level || 1,
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,11 +53,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
     }
   };
 
-  const handleLevelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 1;
-    const clampedValue = Math.max(1, Math.min(20, value));
-    setFormData((prev) => ({ ...prev, level: clampedValue }));
-  };
 
   const handleImageSelect = (file: File) => {
     setSelectedImage(file);
@@ -80,11 +74,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
       return;
     }
 
-    if (formData.level < 1 || formData.level > 20) {
-      setError('Level must be between 1 and 20');
-      return;
-    }
-
     try {
       // Prepare data for submission
       const submitData: CreateCharacterData | UpdateCharacterData = mode === 'create'
@@ -96,7 +85,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
             player_name: formData.player_name.trim() || undefined,
             description: formData.description.trim() || undefined,
             backstory: formData.backstory.trim() || undefined,
-            level: formData.level,
           }
         : {
             name: formData.name.trim(),
@@ -105,7 +93,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
             player_name: formData.player_name.trim() || undefined,
             description: formData.description.trim() || undefined,
             backstory: formData.backstory.trim() || undefined,
-            level: formData.level,
           };
 
       await onSubmit(submitData, selectedImage || undefined);
@@ -178,42 +165,21 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
         </div>
       </div>
 
-      {/* Player Name and Level */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Player Name */}
-        <div>
-          <label htmlFor="player_name" className="block text-sm font-medium text-gray-700">
-            Player Name
-          </label>
-          <input
-            id="player_name"
-            name="player_name"
-            type="text"
-            value={formData.player_name}
-            onChange={handleChange}
-            disabled={isLoading}
-            placeholder="e.g., Laura Bailey"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-          />
-        </div>
-
-        {/* Level */}
-        <div>
-          <label htmlFor="level" className="block text-sm font-medium text-gray-700">
-            Level (1-20)
-          </label>
-          <input
-            id="level"
-            name="level"
-            type="number"
-            min="1"
-            max="20"
-            value={formData.level}
-            onChange={handleLevelChange}
-            disabled={isLoading}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-          />
-        </div>
+      {/* Player Name */}
+      <div>
+        <label htmlFor="player_name" className="block text-sm font-medium text-gray-700">
+          Player Name
+        </label>
+        <input
+          id="player_name"
+          name="player_name"
+          type="text"
+          value={formData.player_name}
+          onChange={handleChange}
+          disabled={isLoading}
+          placeholder="e.g., Laura Bailey"
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+        />
       </div>
 
       {/* Description */}
@@ -227,7 +193,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
           value={formData.description}
           onChange={handleChange}
           disabled={isLoading}
-          placeholder="Brief character description..."
+          placeholder="Character description and physical appearance..."
           rows={3}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
         />
@@ -244,8 +210,8 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
           value={formData.backstory}
           onChange={handleChange}
           disabled={isLoading}
-          placeholder="Character backstory and history..."
-          rows={5}
+          placeholder="Character backstory and background..."
+          rows={3}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
         />
       </div>

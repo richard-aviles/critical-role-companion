@@ -21,10 +21,18 @@ interface User {
   campaigns: any[];
 }
 
+interface Campaign {
+  id: string;
+  slug: string;
+  name: string;
+  admin_token: string;
+}
+
 interface UseAuthReturn {
   isLoggedIn: boolean;
   isLoading: boolean;
   user: User | null;
+  campaigns: Campaign[];
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
@@ -36,6 +44,7 @@ export const useAuth = (): UseAuthReturn => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Initialize auth state from localStorage on mount
@@ -44,8 +53,9 @@ export const useAuth = (): UseAuthReturn => {
     const currentUser = getCurrentUser();
 
     if (token && currentUser) {
-      setAuthToken(token);
+      // Don't set a global token - each page will set its own campaign's admin_token
       setUser(currentUser);
+      setCampaigns(currentUser.campaigns || []);
       setIsLoggedIn(true);
     }
 
@@ -65,14 +75,15 @@ export const useAuth = (): UseAuthReturn => {
         saveUserEmail(response.email);
         saveCampaigns(response.campaigns);
 
-        // Set auth token in API client
-        setAuthToken(response.user_id);
+        // Note: We don't set auth token here because each campaign has its own admin_token
+        // The token will be set per-campaign when needed
 
         // Update state
         setUser({
           email: response.email,
           campaigns: response.campaigns,
         });
+        setCampaigns(response.campaigns);
         setIsLoggedIn(true);
       } catch (err: any) {
         const errorMessage =
@@ -113,6 +124,7 @@ export const useAuth = (): UseAuthReturn => {
     clearAuth();
     setAuthToken(null);
     setUser(null);
+    setCampaigns([]);
     setIsLoggedIn(false);
     setError(null);
   }, []);
@@ -125,6 +137,7 @@ export const useAuth = (): UseAuthReturn => {
     isLoggedIn,
     isLoading,
     user,
+    campaigns,
     error,
     login,
     signup,

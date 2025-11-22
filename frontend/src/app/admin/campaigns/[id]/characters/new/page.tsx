@@ -5,27 +5,51 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { createCharacter, CreateCharacterData, UpdateCharacterData, Character, updateCharacter } from '@/lib/api';
+import { createCharacter, CreateCharacterData, UpdateCharacterData, Character, updateCharacter, setAuthToken } from '@/lib/api';
 import { CharacterForm } from '@/components/CharacterForm';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AdminHeader } from '@/components/AdminHeader';
 import { useAuth } from '@/hooks/useAuth';
+import { getToken } from '@/lib/auth';
 
 function NewCharacterContent() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, campaigns, isLoading: isAuthLoading } = useAuth();
   const campaignId = params.id;
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
-  if (!user) {
-    router.push('/admin/login');
-    return null;
-  }
+  // Set campaign auth token on mount
+  useEffect(() => {
+    // Find the campaign's admin_token from the campaigns list
+    const campaign = campaigns.find((c) => c.id === campaignId);
+    if (campaign) {
+      console.log('Campaign admin_token found:', campaign.admin_token ? 'Token exists' : 'No token');
+      setAuthToken(campaign.admin_token);
+      console.log('Campaign admin_token set in API client');
+    } else {
+      console.warn('Campaign not found in campaigns list');
+    }
+  }, [campaignId, campaigns]);
+
+  // Redirect to login if not authenticated, only after auth has loaded
+  useEffect(() => {
+    if (isAuthLoading) {
+      return; // Don't do anything while auth is loading
+    }
+
+    if (!user) {
+      router.push('/admin/login');
+      return;
+    }
+
+    setIsReady(true);
+  }, [isAuthLoading, user, router]);
 
   const handleSubmit = async (data: CreateCharacterData | UpdateCharacterData, imageFile?: File) => {
     setIsLoading(true);
@@ -41,7 +65,7 @@ function NewCharacterContent() {
           const formData = new FormData();
           formData.append('image', imageFile);
 
-          await updateCharacter(character.id, formData);
+          await updateCharacter(campaignId, character.id, formData);
         } catch (imageErr: any) {
           // Character was created but image upload failed
           console.error('Image upload failed:', imageErr);
@@ -68,6 +92,17 @@ function NewCharacterContent() {
   const handleCancel = () => {
     router.push(`/admin/campaigns/${campaignId}/characters`);
   };
+
+  if (isAuthLoading || !isReady) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

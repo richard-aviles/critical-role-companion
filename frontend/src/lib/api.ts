@@ -14,9 +14,11 @@ const apiClient = axios.create({
  */
 export const setAuthToken = (token: string | null) => {
   if (token) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    apiClient.defaults.headers.common['X-Token'] = token;
+    console.log('API Client - X-Token header set');
   } else {
-    delete apiClient.defaults.headers.common['Authorization'];
+    delete apiClient.defaults.headers.common['X-Token'];
+    console.log('API Client - X-Token header removed');
   }
 };
 
@@ -129,7 +131,7 @@ export interface Character {
   id: string;
   campaign_id: string;
   name: string;
-  slug: string;
+  slug?: string;
   class_name?: string;
   race?: string;
   player_name?: string;
@@ -138,7 +140,7 @@ export interface Character {
   image_url?: string;
   image_r2_key?: string;
   level?: number;
-  is_active: boolean;
+  is_active?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -146,12 +148,12 @@ export interface Character {
 export interface CreateCharacterData {
   campaign_id: string;
   name: string;
+  slug?: string;
   class_name?: string;
   race?: string;
   player_name?: string;
   description?: string;
   backstory?: string;
-  level?: number;
 }
 
 export interface UpdateCharacterData {
@@ -161,16 +163,32 @@ export interface UpdateCharacterData {
   player_name?: string;
   description?: string;
   backstory?: string;
-  level?: number;
-  is_active?: boolean;
 }
+
+/**
+ * Helper function to generate slug from text
+ */
+const generateSlug = (text: string): string => {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
+};
 
 /**
  * Create a new character
  */
 export const createCharacter = async (data: CreateCharacterData): Promise<Character> => {
   try {
-    const response = await apiClient.post('/characters', data);
+    const { campaign_id, ...characterData } = data;
+    // Generate slug from name
+    const slug = generateSlug(data.name);
+    const response = await apiClient.post(`/campaigns/${campaign_id}/characters`, {
+      ...characterData,
+      slug,
+    });
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.detail) {
@@ -201,9 +219,9 @@ export const getCharacters = async (campaignId: string): Promise<Character[]> =>
 /**
  * Get a single character by ID
  */
-export const getCharacter = async (characterId: string): Promise<Character> => {
+export const getCharacter = async (campaignId: string, characterId: string): Promise<Character> => {
   try {
-    const response = await apiClient.get(`/characters/${characterId}`);
+    const response = await apiClient.get(`/campaigns/${campaignId}/characters/${characterId}`);
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 404) {
@@ -220,11 +238,12 @@ export const getCharacter = async (characterId: string): Promise<Character> => {
  * Update a character (supports both JSON and multipart/form-data for image uploads)
  */
 export const updateCharacter = async (
+  campaignId: string,
   characterId: string,
   data: UpdateCharacterData | FormData
 ): Promise<Character> => {
   try {
-    const response = await apiClient.patch(`/characters/${characterId}`, data);
+    const response = await apiClient.patch(`/campaigns/${campaignId}/characters/${characterId}`, data);
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 404) {
@@ -243,9 +262,9 @@ export const updateCharacter = async (
 /**
  * Delete a character
  */
-export const deleteCharacter = async (characterId: string): Promise<void> => {
+export const deleteCharacter = async (campaignId: string, characterId: string): Promise<void> => {
   try {
-    await apiClient.delete(`/characters/${characterId}`);
+    await apiClient.delete(`/campaigns/${campaignId}/characters/${characterId}`);
   } catch (error: any) {
     if (error.response?.status === 404) {
       throw new Error('Character not found');
@@ -303,7 +322,7 @@ export interface UpdateEpisodeData {
 }
 
 export const createEpisode = async (data: CreateEpisodeData): Promise<Episode> => {
-  const response = await apiClient.post('/episodes', data);
+  const response = await apiClient.post(`/campaigns/${data.campaign_id}/episodes`, data);
   return response.data;
 };
 
@@ -312,18 +331,18 @@ export const getEpisodes = async (campaignId: string): Promise<Episode[]> => {
   return response.data;
 };
 
-export const getEpisode = async (episodeId: string): Promise<Episode> => {
-  const response = await apiClient.get(`/episodes/${episodeId}`);
+export const getEpisode = async (campaignId: string, episodeId: string): Promise<Episode> => {
+  const response = await apiClient.get(`/campaigns/${campaignId}/episodes/${episodeId}`);
   return response.data;
 };
 
-export const updateEpisode = async (episodeId: string, data: UpdateEpisodeData): Promise<Episode> => {
-  const response = await apiClient.patch(`/episodes/${episodeId}`, data);
+export const updateEpisode = async (campaignId: string, episodeId: string, data: UpdateEpisodeData): Promise<Episode> => {
+  const response = await apiClient.patch(`/campaigns/${campaignId}/episodes/${episodeId}`, data);
   return response.data;
 };
 
-export const deleteEpisode = async (episodeId: string): Promise<void> => {
-  await apiClient.delete(`/episodes/${episodeId}`);
+export const deleteEpisode = async (campaignId: string, episodeId: string): Promise<void> => {
+  await apiClient.delete(`/campaigns/${campaignId}/episodes/${episodeId}`);
 };
 
 // ============================================================================

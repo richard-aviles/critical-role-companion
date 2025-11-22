@@ -35,11 +35,6 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
             target.src = placeholderImage;
           }}
         />
-        {!character.is_active && (
-          <div className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">
-            Inactive
-          </div>
-        )}
       </div>
 
       {/* Character Info */}
@@ -69,21 +64,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
               <span className="text-gray-900">{character.player_name}</span>
             </div>
           )}
-
-          {character.level !== undefined && character.level !== null && (
-            <div className="flex items-center text-sm">
-              <span className="text-gray-600 font-medium mr-2">Level:</span>
-              <span className="text-gray-900">{character.level}</span>
-            </div>
-          )}
         </div>
-
-        {/* Description Preview */}
-        {character.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-            {character.description}
-          </p>
-        )}
 
         {/* Action Buttons */}
         <div className="flex gap-2">

@@ -446,10 +446,12 @@ def delete_campaign(
 
 class CharacterCreate(BaseModel):
     name: str
+    slug: Optional[str] = None
     player_name: Optional[str] = None
     class_name: Optional[str] = None
     race: Optional[str] = None
-    appearance: Optional[str] = None
+    description: Optional[str] = None
+    backstory: Optional[str] = None
 
 
 class CharacterUpdate(BaseModel):
@@ -486,24 +488,32 @@ def create_character(
     db: Session = Depends(get_db)
 ):
     """Create character in campaign (admin only)"""
+    # Generate slug if not provided
+    slug = payload.slug or payload.name.lower().replace(" ", "-")
+
     character = Character(
         campaign_id=campaign.id,
         name=payload.name,
+        slug=slug,
         player_name=payload.player_name,
         class_name=payload.class_name,
         race=payload.race,
-        appearance=payload.appearance,
-        stats={"hp": {"current": 0, "max": 0}, "ac": 10},
+        description=payload.description,
+        backstory=payload.backstory,
     )
     db.add(character)
     db.commit()
     db.refresh(character)
 
     # Broadcast to all connected clients (background task)
-    asyncio.create_task(broadcast_to_campaign(str(campaign.id), {
-        "type": "CHAR_CREATED",
-        "character": character.to_dict()
-    }))
+    try:
+        asyncio.create_task(broadcast_to_campaign(str(campaign.id), {
+            "type": "CHAR_CREATED",
+            "character": character.to_dict()
+        }))
+    except Exception as e:
+        print(f"[BROADCAST ERROR] {str(e)}")
+        # Don't fail the request if broadcast fails
 
     return character.to_dict()
 

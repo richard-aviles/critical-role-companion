@@ -5,11 +5,12 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createEpisode, CreateEpisodeData, UpdateEpisodeData, Episode } from '@/lib/api';
+import { createEpisode, CreateEpisodeData, UpdateEpisodeData, Episode, setAuthToken } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
+import { getToken } from '@/lib/auth';
 import { EpisodeForm } from '@/components/EpisodeForm';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AdminHeader } from '@/components/AdminHeader';
@@ -17,11 +18,35 @@ import { AdminHeader } from '@/components/AdminHeader';
 function NewEpisodePageContent() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, campaigns, isLoading: isAuthLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   const campaignId = params.id;
+
+  // Set campaign auth token on mount
+  useEffect(() => {
+    // Find the campaign's admin_token from the campaigns list
+    const campaign = campaigns.find((c) => c.id === campaignId);
+    if (campaign) {
+      setAuthToken(campaign.admin_token);
+    }
+  }, [campaignId, campaigns]);
+
+  // Redirect to login if not authenticated, only after auth has loaded
+  useEffect(() => {
+    if (isAuthLoading) {
+      return; // Don't do anything while auth is loading
+    }
+
+    if (!user) {
+      router.push('/admin/login');
+      return;
+    }
+
+    setIsReady(true);
+  }, [isAuthLoading, user, router]);
 
   const handleSubmit = async (data: CreateEpisodeData | UpdateEpisodeData) => {
     setIsLoading(true);
@@ -50,6 +75,17 @@ function NewEpisodePageContent() {
   const handleCancel = () => {
     router.push(`/admin/campaigns/${campaignId}/episodes`);
   };
+
+  if (isAuthLoading || !isReady) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,0 +1,348 @@
+================================================================================
+EPISODE & EVENT BACKEND TESTS
+================================================================================
+
+[SETUP] Creating test data...
+2025-11-21 15:49:41,822 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2025-11-21 15:49:41,823 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-11-21 15:49:41,893 INFO sqlalchemy.engine.Engine select current_schema()
+2025-11-21 15:49:41,893 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-11-21 15:49:41,964 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2025-11-21 15:49:41,965 INFO sqlalchemy.engine.Engine [raw sql] {}
+2025-11-21 15:49:42,038 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:42,040 INFO sqlalchemy.engine.Engine INSERT INTO users (id, email, password_hash, created_at, updated_at) VALUES (%(id)s::UUID, %(email)s, %(password_hash)s, %(created_at)s, %(updated_at)s)
+2025-11-21 15:49:42,040 INFO sqlalchemy.engine.Engine [generated in 0.00018s] {'id': UUID('f52d854b-e201-431a-afc6-d36e417655cd'), 'email': 'test_episodes_9bfda26e@test.com', 'password_hash': '$2b$12$/enszyvenx1iKZSGOAQkrehlleQ/sIa4xjhnz0Av.p8c1gG9/59pS', 'created_at': datetime.datetime(2025, 11, 21, 21, 49, 42, 40481), 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 42, 40484)}
+2025-11-21 15:49:42,113 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:42,184 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:42,186 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.created_at, users.updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+2025-11-21 15:49:42,186 INFO sqlalchemy.engine.Engine [generated in 0.00014s] {'pk_1': UUID('f52d854b-e201-431a-afc6-d36e417655cd')}
+[OK] Created test user: test_episodes_9bfda26e@test.com (ID: f52d854b-e201-431a-afc6-d36e417655cd)
+2025-11-21 15:49:42,259 INFO sqlalchemy.engine.Engine INSERT INTO campaigns (id, slug, name, description, owner_id, admin_token, settings, created_at, updated_at) VALUES (%(id)s::UUID, %(slug)s, %(name)s, %(description)s, %(owner_id)s::UUID, %(admin_token)s, %(settings)s::JSONB, %(created_at)s, %(updated_at)s)
+2025-11-21 15:49:42,259 INFO sqlalchemy.engine.Engine [generated in 0.00022s] {'id': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f'), 'slug': 'test-campaign-e58dd7f9', 'name': 'Test Campaign for Episodes', 'description': 'Test campaign for episode endpoint testing', 'owner_id': UUID('f52d854b-e201-431a-afc6-d36e417655cd'), 'admin_token': 'c52d1c84fdbb48e7ad60e89aae7411f6', 'settings': '{}', 'created_at': datetime.datetime(2025, 11, 21, 21, 49, 42, 258977), 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 42, 258979)}
+2025-11-21 15:49:42,293 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:42,364 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:42,365 INFO sqlalchemy.engine.Engine SELECT campaigns.id, campaigns.slug, campaigns.name, campaigns.description, campaigns.owner_id, campaigns.admin_token, campaigns.settings, campaigns.created_at, campaigns.updated_at 
+FROM campaigns 
+WHERE campaigns.id = %(pk_1)s::UUID
+2025-11-21 15:49:42,365 INFO sqlalchemy.engine.Engine [generated in 0.00012s] {'pk_1': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f')}
+[OK] Created test campaign: Test Campaign for Episodes (ID: 5a73b7ef-5b87-43e8-a3b7-368539bf380f)
+2025-11-21 15:49:42,437 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Create Episode
+2025-11-21 15:49:42,508 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:42,509 INFO sqlalchemy.engine.Engine INSERT INTO episodes (id, campaign_id, name, slug, episode_number, season, description, air_date, runtime, is_published, created_at, updated_at) VALUES (%(id)s::UUID, %(campaign_id)s::UUID, %(name)s, %(slug)s, %(episode_number)s, %(season)s, %(description)s, %(air_date)s, %(runtime)s, %(is_published)s, %(created_at)s, %(updated_at)s)
+2025-11-21 15:49:42,509 INFO sqlalchemy.engine.Engine [generated in 0.00018s] {'id': UUID('02866633-7a7b-427c-8547-4f2f3015670f'), 'campaign_id': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f'), 'name': 'The Adventure Begins', 'slug': 'the-adventure-begins', 'episode_number': 1, 'season': 1, 'description': 'The party meets for the first time', 'air_date': '2025-11-21', 'runtime': 180, 'is_published': True, 'created_at': datetime.datetime(2025, 11, 21, 21, 49, 42, 509862), 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 42, 509865)}
+2025-11-21 15:49:42,586 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:42,657 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:42,658 INFO sqlalchemy.engine.Engine SELECT episodes.id, episodes.campaign_id, episodes.name, episodes.slug, episodes.episode_number, episodes.season, episodes.description, episodes.air_date, episodes.runtime, episodes.is_published, episodes.created_at, episodes.updated_at 
+FROM episodes 
+WHERE episodes.id = %(pk_1)s::UUID
+2025-11-21 15:49:42,658 INFO sqlalchemy.engine.Engine [generated in 0.00011s] {'pk_1': UUID('02866633-7a7b-427c-8547-4f2f3015670f')}
+[PASS] Episode created: The Adventure Begins (ID: 02866633-7a7b-427c-8547-4f2f3015670f)
+2025-11-21 15:49:42,729 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] List Episodes
+2025-11-21 15:49:42,803 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:42,804 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE episodes.campaign_id = %(campaign_id_1)s::UUID ORDER BY episodes.season, episodes.episode_number
+2025-11-21 15:49:42,804 INFO sqlalchemy.engine.Engine [generated in 0.00012s] {'campaign_id_1': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f')}
+[PASS] Found 1 episode(s)
+  - The Adventure Begins (S1E1)
+2025-11-21 15:49:42,878 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Get Episode Detail
+2025-11-21 15:49:42,948 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:42,949 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE episodes.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:42,949 INFO sqlalchemy.engine.Engine [generated in 0.00012s] {'id_1': UUID('02866633-7a7b-427c-8547-4f2f3015670f'), 'param_1': 1}
+[PASS] Episode retrieved: The Adventure Begins
+  - Episode Number: 1
+  - Season: 1
+  - Runtime: 180 minutes
+  - Published: True
+2025-11-21 15:49:43,018 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Update Episode
+2025-11-21 15:49:43,088 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:43,089 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE episodes.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:43,089 INFO sqlalchemy.engine.Engine [cached since 0.1396s ago] {'id_1': UUID('02866633-7a7b-427c-8547-4f2f3015670f'), 'param_1': 1}
+C:\Development\Twitch_CriticalRole_Project\CR_Companion_PreReq_Layout\critical-role-companion\backend\test_episodes.py:215: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  episode.updated_at = datetime.utcnow()
+2025-11-21 15:49:43,161 INFO sqlalchemy.engine.Engine UPDATE episodes SET name=%(name)s, description=%(description)s, runtime=%(runtime)s, updated_at=%(updated_at)s WHERE episodes.id = %(episodes_id)s::UUID
+2025-11-21 15:49:43,161 INFO sqlalchemy.engine.Engine [generated in 0.00027s] {'name': 'The Adventure Begins (Updated)', 'description': 'Updated description for the first episode', 'runtime': 200, 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 43, 159473), 'episodes_id': UUID('02866633-7a7b-427c-8547-4f2f3015670f')}
+2025-11-21 15:49:43,197 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:43,268 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:43,269 INFO sqlalchemy.engine.Engine SELECT episodes.id, episodes.campaign_id, episodes.name, episodes.slug, episodes.episode_number, episodes.season, episodes.description, episodes.air_date, episodes.runtime, episodes.is_published, episodes.created_at, episodes.updated_at 
+FROM episodes 
+WHERE episodes.id = %(pk_1)s::UUID
+2025-11-21 15:49:43,269 INFO sqlalchemy.engine.Engine [cached since 0.6105s ago] {'pk_1': UUID('02866633-7a7b-427c-8547-4f2f3015670f')}
+[PASS] Episode updated successfully
+  - New name: The Adventure Begins (Updated)
+  - New runtime: 200 minutes
+2025-11-21 15:49:43,338 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Create Event
+2025-11-21 15:49:43,409 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:43,410 INFO sqlalchemy.engine.Engine INSERT INTO events (id, episode_id, name, description, timestamp_in_episode, event_type, characters_involved, created_at, updated_at) VALUES (%(id)s::UUID, %(episode_id)s::UUID, %(name)s, %(description)s, %(timestamp_in_episode)s, %(event_type)s, %(characters_involved)s, %(created_at)s, %(updated_at)s)
+2025-11-21 15:49:43,410 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'id': UUID('a90fdd95-0b5f-49af-90d5-c5e6bbb0386e'), 'episode_id': UUID('02866633-7a7b-427c-8547-4f2f3015670f'), 'name': 'The Party Meets', 'description': 'The adventurers meet at a tavern', 'timestamp_in_episode': 300, 'event_type': 'roleplay', 'characters_involved': '["char1", "char2", "char3"]', 'created_at': datetime.datetime(2025, 11, 21, 21, 49, 43, 410026), 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 43, 410028)}
+2025-11-21 15:49:43,500 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:43,573 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:43,573 INFO sqlalchemy.engine.Engine SELECT events.id, events.episode_id, events.name, events.description, events.timestamp_in_episode, events.event_type, events.characters_involved, events.created_at, events.updated_at 
+FROM events 
+WHERE events.id = %(pk_1)s::UUID
+2025-11-21 15:49:43,573 INFO sqlalchemy.engine.Engine [generated in 0.00011s] {'pk_1': UUID('a90fdd95-0b5f-49af-90d5-c5e6bbb0386e')}
+[PASS] Event created: The Party Meets (ID: a90fdd95-0b5f-49af-90d5-c5e6bbb0386e)
+  - Timestamp: 300s
+  - Type: roleplay
+2025-11-21 15:49:43,644 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] List Events
+2025-11-21 15:49:43,713 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:43,714 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE events.episode_id = %(episode_id_1)s::UUID ORDER BY events.timestamp_in_episode
+2025-11-21 15:49:43,714 INFO sqlalchemy.engine.Engine [generated in 0.00012s] {'episode_id_1': UUID('02866633-7a7b-427c-8547-4f2f3015670f')}
+[PASS] Found 1 event(s)
+  - The Party Meets (300s)
+2025-11-21 15:49:43,785 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Update Event
+2025-11-21 15:49:43,858 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:43,859 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE events.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:43,859 INFO sqlalchemy.engine.Engine [generated in 0.00011s] {'id_1': UUID('a90fdd95-0b5f-49af-90d5-c5e6bbb0386e'), 'param_1': 1}
+C:\Development\Twitch_CriticalRole_Project\CR_Companion_PreReq_Layout\critical-role-companion\backend\test_episodes.py:323: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  event.updated_at = datetime.utcnow()
+2025-11-21 15:49:43,929 INFO sqlalchemy.engine.Engine UPDATE events SET name=%(name)s, description=%(description)s, timestamp_in_episode=%(timestamp_in_episode)s, updated_at=%(updated_at)s WHERE events.id = %(events_id)s::UUID
+2025-11-21 15:49:43,930 INFO sqlalchemy.engine.Engine [generated in 0.00014s] {'name': 'The Party Meets (Updated)', 'description': 'Updated event description', 'timestamp_in_episode': 360, 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 43, 929424), 'events_id': UUID('a90fdd95-0b5f-49af-90d5-c5e6bbb0386e')}
+2025-11-21 15:49:43,965 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:44,043 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:44,043 INFO sqlalchemy.engine.Engine SELECT events.id, events.episode_id, events.name, events.description, events.timestamp_in_episode, events.event_type, events.characters_involved, events.created_at, events.updated_at 
+FROM events 
+WHERE events.id = %(pk_1)s::UUID
+2025-11-21 15:49:44,043 INFO sqlalchemy.engine.Engine [cached since 0.4697s ago] {'pk_1': UUID('a90fdd95-0b5f-49af-90d5-c5e6bbb0386e')}
+[PASS] Event updated successfully
+  - New name: The Party Meets (Updated)
+  - New timestamp: 360s
+2025-11-21 15:49:44,113 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Delete Event
+2025-11-21 15:49:44,183 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:44,183 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE events.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:44,183 INFO sqlalchemy.engine.Engine [cached since 0.3243s ago] {'id_1': UUID('a90fdd95-0b5f-49af-90d5-c5e6bbb0386e'), 'param_1': 1}
+2025-11-21 15:49:44,255 INFO sqlalchemy.engine.Engine DELETE FROM events WHERE events.id = %(id)s::UUID
+2025-11-21 15:49:44,255 INFO sqlalchemy.engine.Engine [generated in 0.00032s] {'id': UUID('a90fdd95-0b5f-49af-90d5-c5e6bbb0386e')}
+2025-11-21 15:49:44,293 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:44,363 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:44,363 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE events.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:44,363 INFO sqlalchemy.engine.Engine [cached since 0.5047s ago] {'id_1': UUID('a90fdd95-0b5f-49af-90d5-c5e6bbb0386e'), 'param_1': 1}
+[PASS] Event deleted successfully
+2025-11-21 15:49:44,433 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Cascade Delete Episode
+2025-11-21 15:49:44,505 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:44,505 INFO sqlalchemy.engine.Engine INSERT INTO episodes (id, campaign_id, name, slug, episode_number, season, description, air_date, runtime, is_published, created_at, updated_at) VALUES (%(id)s::UUID, %(campaign_id)s::UUID, %(name)s, %(slug)s, %(episode_number)s, %(season)s, %(description)s, %(air_date)s, %(runtime)s, %(is_published)s, %(created_at)s, %(updated_at)s)
+2025-11-21 15:49:44,505 INFO sqlalchemy.engine.Engine [generated in 0.00018s] {'id': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd'), 'campaign_id': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f'), 'name': 'Episode to Delete', 'slug': 'episode-to-delete', 'episode_number': 2, 'season': 1, 'description': None, 'air_date': None, 'runtime': None, 'is_published': False, 'created_at': datetime.datetime(2025, 11, 21, 21, 49, 44, 505561), 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 44, 505564)}
+2025-11-21 15:49:44,578 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:44,648 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:44,649 INFO sqlalchemy.engine.Engine SELECT episodes.id, episodes.campaign_id, episodes.name, episodes.slug, episodes.episode_number, episodes.season, episodes.description, episodes.air_date, episodes.runtime, episodes.is_published, episodes.created_at, episodes.updated_at 
+FROM episodes 
+WHERE episodes.id = %(pk_1)s::UUID
+2025-11-21 15:49:44,649 INFO sqlalchemy.engine.Engine [cached since 1.99s ago] {'pk_1': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd')}
+2025-11-21 15:49:44,718 INFO sqlalchemy.engine.Engine INSERT INTO events (id, episode_id, name, description, timestamp_in_episode, event_type, characters_involved, created_at, updated_at) VALUES (%(id__0)s::UUID, %(episode_id__0)s::UUID, %(name__0)s, %(description__0)s, %(timestamp_in_episode__0)s, %(ev ... 171 characters truncated ... n_episode__1)s, %(event_type__1)s, %(characters_involved__1)s, %(created_at__1)s, %(updated_at__1)s)
+2025-11-21 15:49:44,718 INFO sqlalchemy.engine.Engine [generated in 0.00008s (insertmanyvalues) 1/1 (unordered)] {'timestamp_in_episode__0': 100, 'updated_at__0': datetime.datetime(2025, 11, 21, 21, 49, 44, 718407), 'episode_id__0': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd'), 'name__0': 'Event 1', 'characters_involved__0': None, 'description__0': None, 'event_type__0': None, 'id__0': UUID('121cc3fc-5e3f-4375-8695-f7dc19823af9'), 'created_at__0': datetime.datetime(2025, 11, 21, 21, 49, 44, 718405), 'timestamp_in_episode__1': 200, 'updated_at__1': datetime.datetime(2025, 11, 21, 21, 49, 44, 718412), 'episode_id__1': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd'), 'name__1': 'Event 2', 'characters_involved__1': None, 'description__1': None, 'event_type__1': None, 'id__1': UUID('c5664f92-32ec-4f39-b17e-3231be9f443b'), 'created_at__1': datetime.datetime(2025, 11, 21, 21, 49, 44, 718411)}
+2025-11-21 15:49:44,753 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:44,825 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:44,825 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE episodes.id = %(pk_1)s::UUID
+2025-11-21 15:49:44,825 INFO sqlalchemy.engine.Engine [generated in 0.00011s] {'pk_1': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd')}
+2025-11-21 15:49:44,924 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM (SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE events.episode_id = %(episode_id_1)s::UUID) AS anon_1
+2025-11-21 15:49:44,924 INFO sqlalchemy.engine.Engine [generated in 0.00030s] {'episode_id_1': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd')}
+2025-11-21 15:49:44,971 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE %(param_1)s::UUID = events.episode_id
+2025-11-21 15:49:44,971 INFO sqlalchemy.engine.Engine [generated in 0.00028s] {'param_1': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd')}
+2025-11-21 15:49:45,010 INFO sqlalchemy.engine.Engine DELETE FROM events WHERE events.id = %(id)s::UUID
+2025-11-21 15:49:45,011 INFO sqlalchemy.engine.Engine [generated in 0.00029s] [{'id': UUID('121cc3fc-5e3f-4375-8695-f7dc19823af9')}, {'id': UUID('c5664f92-32ec-4f39-b17e-3231be9f443b')}]
+2025-11-21 15:49:45,082 INFO sqlalchemy.engine.Engine DELETE FROM episodes WHERE episodes.id = %(id)s::UUID
+2025-11-21 15:49:45,082 INFO sqlalchemy.engine.Engine [generated in 0.00027s] {'id': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd')}
+2025-11-21 15:49:45,117 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:45,189 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:45,189 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE episodes.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:45,189 INFO sqlalchemy.engine.Engine [cached since 2.24s ago] {'id_1': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd'), 'param_1': 1}
+2025-11-21 15:49:45,258 INFO sqlalchemy.engine.Engine SELECT count(*) AS count_1 
+FROM (SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE events.episode_id = %(episode_id_1)s::UUID) AS anon_1
+2025-11-21 15:49:45,258 INFO sqlalchemy.engine.Engine [cached since 0.3341s ago] {'episode_id_1': UUID('7cecd59f-7313-41fc-92fb-0aa4ab53f3dd')}
+[PASS] Episode deleted and events cascaded successfully
+  - Events before: 2
+  - Events after: 0
+2025-11-21 15:49:45,293 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Ownership Verification
+2025-11-21 15:49:45,549 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:45,549 INFO sqlalchemy.engine.Engine INSERT INTO users (id, email, password_hash, created_at, updated_at) VALUES (%(id)s::UUID, %(email)s, %(password_hash)s, %(created_at)s, %(updated_at)s)
+2025-11-21 15:49:45,549 INFO sqlalchemy.engine.Engine [cached since 3.509s ago] {'id': UUID('86b9fa51-0627-4cf2-b6fa-69e089f91fa6'), 'email': 'other_user_1e921f34@test.com', 'password_hash': '$2b$12$1RO3SWDx12tPnEBPKtAoBOlyM3yyWJzQEAaFHwqddsYZArXdA29K.', 'created_at': datetime.datetime(2025, 11, 21, 21, 49, 45, 549243), 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 45, 549245)}
+2025-11-21 15:49:45,619 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:45,689 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:45,689 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.created_at, users.updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+2025-11-21 15:49:45,689 INFO sqlalchemy.engine.Engine [cached since 3.503s ago] {'pk_1': UUID('86b9fa51-0627-4cf2-b6fa-69e089f91fa6')}
+2025-11-21 15:49:45,762 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE episodes.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:45,763 INFO sqlalchemy.engine.Engine [cached since 2.813s ago] {'id_1': UUID('02866633-7a7b-427c-8547-4f2f3015670f'), 'param_1': 1}
+2025-11-21 15:49:45,802 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE campaigns.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:45,802 INFO sqlalchemy.engine.Engine [generated in 0.00081s] {'id_1': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f'), 'param_1': 1}
+[PASS] Ownership verification working correctly
+  - Episode belongs to campaign: Test Campaign for Episodes
+  - Campaign owner is NOT the other user
+2025-11-21 15:49:45,839 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE %(param_1)s::UUID = campaigns.owner_id
+2025-11-21 15:49:45,840 INFO sqlalchemy.engine.Engine [generated in 0.00027s] {'param_1': UUID('86b9fa51-0627-4cf2-b6fa-69e089f91fa6')}
+2025-11-21 15:49:45,878 INFO sqlalchemy.engine.Engine DELETE FROM users WHERE users.id = %(id)s::UUID
+2025-11-21 15:49:45,878 INFO sqlalchemy.engine.Engine [generated in 0.00026s] {'id': UUID('86b9fa51-0627-4cf2-b6fa-69e089f91fa6')}
+2025-11-21 15:49:45,913 INFO sqlalchemy.engine.Engine COMMIT
+
+[TEST] 404 Handling
+2025-11-21 15:49:45,986 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:45,987 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE episodes.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:45,987 INFO sqlalchemy.engine.Engine [cached since 3.038s ago] {'id_1': UUID('1f1860cf-a169-4703-8318-409bf046f387'), 'param_1': 1}
+2025-11-21 15:49:46,058 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE events.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:46,058 INFO sqlalchemy.engine.Engine [cached since 2.199s ago] {'id_1': UUID('63c547cf-9d33-4524-b231-ec924bd63f32'), 'param_1': 1}
+[PASS] 404 handling working correctly
+  - Non-existent episode returns None
+  - Non-existent event returns None
+2025-11-21 15:49:46,093 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[TEST] Episode with Events
+2025-11-21 15:49:46,164 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:46,165 INFO sqlalchemy.engine.Engine INSERT INTO episodes (id, campaign_id, name, slug, episode_number, season, description, air_date, runtime, is_published, created_at, updated_at) VALUES (%(id)s::UUID, %(campaign_id)s::UUID, %(name)s, %(slug)s, %(episode_number)s, %(season)s, %(description)s, %(air_date)s, %(runtime)s, %(is_published)s, %(created_at)s, %(updated_at)s)
+2025-11-21 15:49:46,165 INFO sqlalchemy.engine.Engine [cached since 1.66s ago] {'id': UUID('3c5550b5-447f-404d-a090-46430adcb6a5'), 'campaign_id': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f'), 'name': 'Episode with Multiple Events', 'slug': 'episode-with-events', 'episode_number': 3, 'season': 1, 'description': None, 'air_date': None, 'runtime': None, 'is_published': False, 'created_at': datetime.datetime(2025, 11, 21, 21, 49, 46, 165142), 'updated_at': datetime.datetime(2025, 11, 21, 21, 49, 46, 165144)}
+2025-11-21 15:49:46,237 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:46,319 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:46,320 INFO sqlalchemy.engine.Engine SELECT episodes.id, episodes.campaign_id, episodes.name, episodes.slug, episodes.episode_number, episodes.season, episodes.description, episodes.air_date, episodes.runtime, episodes.is_published, episodes.created_at, episodes.updated_at 
+FROM episodes 
+WHERE episodes.id = %(pk_1)s::UUID
+2025-11-21 15:49:46,320 INFO sqlalchemy.engine.Engine [cached since 3.661s ago] {'pk_1': UUID('3c5550b5-447f-404d-a090-46430adcb6a5')}
+2025-11-21 15:49:46,395 INFO sqlalchemy.engine.Engine INSERT INTO events (id, episode_id, name, description, timestamp_in_episode, event_type, characters_involved, created_at, updated_at) VALUES (%(id__0)s::UUID, %(episode_id__0)s::UUID, %(name__0)s, %(description__0)s, %(timestamp_in_episode__0)s, %(ev ... 362 characters truncated ... n_episode__2)s, %(event_type__2)s, %(characters_involved__2)s, %(created_at__2)s, %(updated_at__2)s)
+2025-11-21 15:49:46,395 INFO sqlalchemy.engine.Engine [cached since 1.677s ago (insertmanyvalues) 1/1 (unordered)] {'timestamp_in_episode__0': 100, 'updated_at__0': datetime.datetime(2025, 11, 21, 21, 49, 46, 394875), 'episode_id__0': UUID('3c5550b5-447f-404d-a090-46430adcb6a5'), 'name__0': 'Event A', 'characters_involved__0': None, 'description__0': None, 'event_type__0': 'combat', 'id__0': UUID('71961e0a-548d-43ee-bf1e-58c485149dd0'), 'created_at__0': datetime.datetime(2025, 11, 21, 21, 49, 46, 394870), 'timestamp_in_episode__1': 500, 'updated_at__1': datetime.datetime(2025, 11, 21, 21, 49, 46, 394886), 'episode_id__1': UUID('3c5550b5-447f-404d-a090-46430adcb6a5'), 'name__1': 'Event B', 'characters_involved__1': None, 'description__1': None, 'event_type__1': 'roleplay', 'id__1': UUID('a70fcf4e-38f5-4312-987f-ef2ec43cc0af'), 'created_at__1': datetime.datetime(2025, 11, 21, 21, 49, 46, 394883), 'timestamp_in_episode__2': 1000, 'updated_at__2': datetime.datetime(2025, 11, 21, 21, 49, 46, 394896), 'episode_id__2': UUID('3c5550b5-447f-404d-a090-46430adcb6a5'), 'name__2': 'Event C', 'characters_involved__2': None, 'description__2': None, 'event_type__2': 'discovery', 'id__2': UUID('a00352cd-b2dc-4ab1-97a4-facc6c7ad131'), 'created_at__2': datetime.datetime(2025, 11, 21, 21, 49, 46, 394894)}
+2025-11-21 15:49:46,433 INFO sqlalchemy.engine.Engine COMMIT
+2025-11-21 15:49:46,505 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:46,505 INFO sqlalchemy.engine.Engine SELECT episodes.id, episodes.campaign_id, episodes.name, episodes.slug, episodes.episode_number, episodes.season, episodes.description, episodes.air_date, episodes.runtime, episodes.is_published, episodes.created_at, episodes.updated_at 
+FROM episodes 
+WHERE episodes.id = %(pk_1)s::UUID
+2025-11-21 15:49:46,505 INFO sqlalchemy.engine.Engine [cached since 3.847s ago] {'pk_1': UUID('3c5550b5-447f-404d-a090-46430adcb6a5')}
+2025-11-21 15:49:46,578 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE %(param_1)s::UUID = events.episode_id
+2025-11-21 15:49:46,578 INFO sqlalchemy.engine.Engine [cached since 1.607s ago] {'param_1': UUID('3c5550b5-447f-404d-a090-46430adcb6a5')}
+[PASS] Episode retrieved with 3 events
+  - Event A (100s)
+  - Event B (500s)
+  - Event C (1000s)
+2025-11-21 15:49:46,613 INFO sqlalchemy.engine.Engine ROLLBACK
+
+[CLEANUP] Removing test data...
+2025-11-21 15:49:46,685 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-11-21 15:49:46,685 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s
+2025-11-21 15:49:46,686 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'id_1': UUID('f52d854b-e201-431a-afc6-d36e417655cd'), 'param_1': 1}
+2025-11-21 15:49:46,757 INFO sqlalchemy.engine.Engine SELECT campaigns.id AS campaigns_id, campaigns.slug AS campaigns_slug, campaigns.name AS campaigns_name, campaigns.description AS campaigns_description, campaigns.owner_id AS campaigns_owner_id, campaigns.admin_token AS campaigns_admin_token, campaigns.settings AS campaigns_settings, campaigns.created_at AS campaigns_created_at, campaigns.updated_at AS campaigns_updated_at 
+FROM campaigns 
+WHERE %(param_1)s::UUID = campaigns.owner_id
+2025-11-21 15:49:46,758 INFO sqlalchemy.engine.Engine [cached since 0.9182s ago] {'param_1': UUID('f52d854b-e201-431a-afc6-d36e417655cd')}
+2025-11-21 15:49:46,795 INFO sqlalchemy.engine.Engine SELECT characters.id AS characters_id, characters.campaign_id AS characters_campaign_id, characters.name AS characters_name, characters.slug AS characters_slug, characters.class_name AS characters_class_name, characters.race AS characters_race, characters.player_name AS characters_player_name, characters.description AS characters_description, characters.backstory AS characters_backstory, characters.image_url AS characters_image_url, characters.image_r2_key AS characters_image_r2_key, characters.is_active AS characters_is_active, characters.level AS characters_level, characters.created_at AS characters_created_at, characters.updated_at AS characters_updated_at 
+FROM characters 
+WHERE %(param_1)s::UUID = characters.campaign_id
+2025-11-21 15:49:46,795 INFO sqlalchemy.engine.Engine [generated in 0.00016s] {'param_1': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f')}
+2025-11-21 15:49:46,835 INFO sqlalchemy.engine.Engine SELECT episodes.id AS episodes_id, episodes.campaign_id AS episodes_campaign_id, episodes.name AS episodes_name, episodes.slug AS episodes_slug, episodes.episode_number AS episodes_episode_number, episodes.season AS episodes_season, episodes.description AS episodes_description, episodes.air_date AS episodes_air_date, episodes.runtime AS episodes_runtime, episodes.is_published AS episodes_is_published, episodes.created_at AS episodes_created_at, episodes.updated_at AS episodes_updated_at 
+FROM episodes 
+WHERE %(param_1)s::UUID = episodes.campaign_id
+2025-11-21 15:49:46,835 INFO sqlalchemy.engine.Engine [generated in 0.00064s] {'param_1': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f')}
+2025-11-21 15:49:46,873 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE %(param_1)s::UUID = events.episode_id
+2025-11-21 15:49:46,874 INFO sqlalchemy.engine.Engine [cached since 1.902s ago] {'param_1': UUID('02866633-7a7b-427c-8547-4f2f3015670f')}
+2025-11-21 15:49:46,909 INFO sqlalchemy.engine.Engine SELECT events.id AS events_id, events.episode_id AS events_episode_id, events.name AS events_name, events.description AS events_description, events.timestamp_in_episode AS events_timestamp_in_episode, events.event_type AS events_event_type, events.characters_involved AS events_characters_involved, events.created_at AS events_created_at, events.updated_at AS events_updated_at 
+FROM events 
+WHERE %(param_1)s::UUID = events.episode_id
+2025-11-21 15:49:46,909 INFO sqlalchemy.engine.Engine [cached since 1.938s ago] {'param_1': UUID('3c5550b5-447f-404d-a090-46430adcb6a5')}
+2025-11-21 15:49:46,946 INFO sqlalchemy.engine.Engine SELECT rosters.campaign_id AS rosters_campaign_id, rosters.character_ids AS rosters_character_ids, rosters.updated_at AS rosters_updated_at 
+FROM rosters 
+WHERE rosters.campaign_id = %(pk_1)s::UUID
+2025-11-21 15:49:46,946 INFO sqlalchemy.engine.Engine [generated in 0.00018s] {'pk_1': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f')}
+2025-11-21 15:49:46,983 INFO sqlalchemy.engine.Engine SELECT layout_overrides.id AS layout_overrides_id, layout_overrides.campaign_id AS layout_overrides_campaign_id, layout_overrides.tier AS layout_overrides_tier, layout_overrides.badges AS layout_overrides_badges, layout_overrides.chips AS layout_overrides_chips, layout_overrides.updated_at AS layout_overrides_updated_at 
+FROM layout_overrides 
+WHERE %(param_1)s::UUID = layout_overrides.campaign_id
+2025-11-21 15:49:46,983 INFO sqlalchemy.engine.Engine [generated in 0.00018s] {'param_1': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f')}
+2025-11-21 15:49:47,019 INFO sqlalchemy.engine.Engine DELETE FROM events WHERE events.id = %(id)s::UUID
+2025-11-21 15:49:47,019 INFO sqlalchemy.engine.Engine [cached since 2.008s ago] [{'id': UUID('71961e0a-548d-43ee-bf1e-58c485149dd0')}, {'id': UUID('a00352cd-b2dc-4ab1-97a4-facc6c7ad131')}, {'id': UUID('a70fcf4e-38f5-4312-987f-ef2ec43cc0af')}]
+2025-11-21 15:49:47,125 INFO sqlalchemy.engine.Engine DELETE FROM episodes WHERE episodes.id = %(id)s::UUID
+2025-11-21 15:49:47,125 INFO sqlalchemy.engine.Engine [generated in 0.00014s] [{'id': UUID('02866633-7a7b-427c-8547-4f2f3015670f')}, {'id': UUID('3c5550b5-447f-404d-a090-46430adcb6a5')}]
+2025-11-21 15:49:47,197 INFO sqlalchemy.engine.Engine DELETE FROM campaigns WHERE campaigns.id = %(id)s::UUID
+2025-11-21 15:49:47,197 INFO sqlalchemy.engine.Engine [generated in 0.00014s] {'id': UUID('5a73b7ef-5b87-43e8-a3b7-368539bf380f')}
+2025-11-21 15:49:47,233 INFO sqlalchemy.engine.Engine DELETE FROM users WHERE users.id = %(id)s::UUID
+2025-11-21 15:49:47,233 INFO sqlalchemy.engine.Engine [cached since 1.355s ago] {'id': UUID('f52d854b-e201-431a-afc6-d36e417655cd')}
+2025-11-21 15:49:47,269 INFO sqlalchemy.engine.Engine COMMIT
+[PASS] Cleaned up test user and all related data
+
+================================================================================
+TEST SUMMARY
+================================================================================
+[PASS] PASS - test_create_episode
+[PASS] PASS - test_list_episodes
+[PASS] PASS - test_get_episode_detail
+[PASS] PASS - test_update_episode
+[PASS] PASS - test_create_event
+[PASS] PASS - test_list_events
+[PASS] PASS - test_update_event
+[PASS] PASS - test_delete_event
+[PASS] PASS - test_cascade_delete_episode
+[PASS] PASS - test_ownership_verification
+[PASS] PASS - test_404_handling
+[PASS] PASS - test_episode_with_events
+
+Total: 12 tests
+Passed: 12
+Failed: 0
+
+ ALL TESTS PASSED!

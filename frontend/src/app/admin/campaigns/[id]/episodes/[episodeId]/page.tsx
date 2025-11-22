@@ -23,8 +23,10 @@ import {
   UpdateEpisodeData,
   CreateEventData,
   UpdateEventData,
+  setAuthToken,
 } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
+import { getToken } from '@/lib/auth';
 import { EpisodeForm } from '@/components/EpisodeForm';
 import { EventTimeline } from '@/components/EventTimeline';
 import { EventForm } from '@/components/EventForm';
@@ -35,7 +37,7 @@ import { ConfirmDialog } from '@/components/ConfirmDialog';
 function EpisodeDetailPageContent() {
   const params = useParams<{ id: string; episodeId: string }>();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, campaigns } = useAuth();
 
   const campaignId = params.id;
   const episodeId = params.episodeId;
@@ -56,6 +58,15 @@ function EpisodeDetailPageContent() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Set campaign auth token on mount
+  useEffect(() => {
+    // Find the campaign's admin_token from the campaigns list
+    const campaign = campaigns.find((c) => c.id === campaignId);
+    if (campaign) {
+      setAuthToken(campaign.admin_token);
+    }
+  }, [campaignId, campaigns]);
+
   // Fetch episode, events, and characters on mount
   useEffect(() => {
     const fetchData = async () => {
@@ -67,7 +78,7 @@ function EpisodeDetailPageContent() {
 
         // Fetch episode, events, and characters in parallel
         const [episodeData, eventsData, charactersData] = await Promise.all([
-          getEpisode(episodeId),
+          getEpisode(campaignId, episodeId),
           getEvents(episodeId),
           getCharacters(campaignId),
         ]);
@@ -101,7 +112,7 @@ function EpisodeDetailPageContent() {
     setError(null);
 
     try {
-      const updatedEpisode = await updateEpisode(episodeId, data);
+      const updatedEpisode = await updateEpisode(campaignId, episodeId, data);
       setEpisode(updatedEpisode);
       setIsEditing(false);
     } catch (err: any) {
@@ -128,7 +139,7 @@ function EpisodeDetailPageContent() {
     setError(null);
 
     try {
-      await deleteEpisode(episodeId);
+      await deleteEpisode(campaignId, episodeId);
       // Redirect to episodes list
       router.push(`/admin/campaigns/${campaignId}/episodes`);
     } catch (err: any) {

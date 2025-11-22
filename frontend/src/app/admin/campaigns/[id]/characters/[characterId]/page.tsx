@@ -13,17 +13,19 @@ import {
   updateCharacter,
   deleteCharacter,
   UpdateCharacterData,
+  setAuthToken,
 } from '@/lib/api';
 import { CharacterForm } from '@/components/CharacterForm';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AdminHeader } from '@/components/AdminHeader';
 import { useAuth } from '@/hooks/useAuth';
+import { getToken } from '@/lib/auth';
 
 function CharacterDetailContent() {
   const router = useRouter();
   const params = useParams<{ id: string; characterId: string }>();
-  const { user } = useAuth();
+  const { user, campaigns } = useAuth();
   const campaignId = params.id;
   const characterId = params.characterId;
 
@@ -34,6 +36,15 @@ function CharacterDetailContent() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Set campaign auth token on mount
+  useEffect(() => {
+    // Find the campaign's admin_token from the campaigns list
+    const campaign = campaigns.find((c) => c.id === campaignId);
+    if (campaign) {
+      setAuthToken(campaign.admin_token);
+    }
+  }, [campaignId, campaigns]);
 
   // Fetch character on mount
   useEffect(() => {
@@ -47,7 +58,7 @@ function CharacterDetailContent() {
       try {
         setLoading(true);
         setError(null);
-        const data = await getCharacter(characterId);
+        const data = await getCharacter(campaignId, characterId);
         setCharacter(data);
       } catch (err: any) {
         const status = err.response?.status;
@@ -86,10 +97,10 @@ function CharacterDetailContent() {
         });
 
         formData.append('image', imageFile);
-        updatedCharacter = await updateCharacter(characterId, formData);
+        updatedCharacter = await updateCharacter(campaignId, characterId, formData);
       } else {
         // Otherwise use regular JSON data
-        updatedCharacter = await updateCharacter(characterId, data);
+        updatedCharacter = await updateCharacter(campaignId, characterId, data);
       }
 
       setCharacter(updatedCharacter);
@@ -115,7 +126,7 @@ function CharacterDetailContent() {
     setError(null);
 
     try {
-      await deleteCharacter(characterId);
+      await deleteCharacter(campaignId, characterId);
       // Redirect to characters list
       router.push(`/admin/campaigns/${campaignId}/characters`);
     } catch (err: any) {
@@ -135,18 +146,6 @@ function CharacterDetailContent() {
     }
   };
 
-  const handleToggleActive = async () => {
-    if (!character) return;
-
-    try {
-      const updatedCharacter = await updateCharacter(characterId, {
-        is_active: !character.is_active,
-      });
-      setCharacter(updatedCharacter);
-    } catch (err: any) {
-      setError(err.message || 'Failed to update character status');
-    }
-  };
 
   // Loading state
   if (loading) {
@@ -259,11 +258,6 @@ function CharacterDetailContent() {
                     target.src = placeholderImage;
                   }}
                 />
-                {!character.is_active && (
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-red-500 text-white text-sm font-medium rounded">
-                    Inactive
-                  </div>
-                )}
               </div>
               <div className="p-4">
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">
@@ -297,34 +291,6 @@ function CharacterDetailContent() {
                     </dd>
                   </div>
                 )}
-                {character.level !== undefined && character.level !== null && (
-                  <div>
-                    <dt className="text-sm text-gray-600">Level</dt>
-                    <dd className="text-base font-medium text-gray-900">
-                      {character.level}
-                    </dd>
-                  </div>
-                )}
-                <div>
-                  <dt className="text-sm text-gray-600">Status</dt>
-                  <dd className="flex items-center">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        character.is_active
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {character.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                    <button
-                      onClick={handleToggleActive}
-                      className="ml-2 text-xs text-blue-600 hover:text-blue-700"
-                    >
-                      Toggle
-                    </button>
-                  </dd>
-                </div>
               </dl>
             </div>
 
