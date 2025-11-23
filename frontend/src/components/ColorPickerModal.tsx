@@ -71,7 +71,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
                 value={selectedColor.toUpperCase()}
                 onChange={(e) => {
                   const value = e.target.value;
-                  if (/^#[0-9A-F]{6}$/i.test(value) || value === '') {
+                  if (/^#[0-9A-F]{0,6}$/i.test(value) || value === '') {
                     setSelectedColor(value === '' ? '#000000' : value);
                   }
                 }}
