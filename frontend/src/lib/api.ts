@@ -558,6 +558,103 @@ export const deleteEvent = async (episodeId: string, eventId: string, adminToken
 };
 
 // ============================================================================
+// PUBLIC ENDPOINTS (Phase 3 Tier 3 - Campaign Website Pages)
+// ============================================================================
+
+/**
+ * Get campaign by slug (public - no auth required)
+ */
+export const getPublicCampaign = async (slug: string): Promise<Campaign> => {
+  try {
+    const response = await apiClient.get(`/public/campaigns/${slug}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Campaign not found');
+    }
+    throw new Error('Failed to fetch campaign');
+  }
+};
+
+/**
+ * Get active characters for campaign by slug (public - no auth required)
+ */
+export const getPublicCharacters = async (campaignSlug: string): Promise<Character[]> => {
+  try {
+    const response = await apiClient.get(`/public/campaigns/${campaignSlug}/characters`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Campaign not found');
+    }
+    throw new Error('Failed to fetch characters');
+  }
+};
+
+/**
+ * Get character by slug for campaign (public - no auth required)
+ */
+export const getPublicCharacter = async (campaignSlug: string, characterSlug: string): Promise<Character> => {
+  try {
+    const response = await apiClient.get(`/public/campaigns/${campaignSlug}/characters/${characterSlug}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Character not found');
+    }
+    throw new Error('Failed to fetch character');
+  }
+};
+
+/**
+ * Get published episodes for campaign by slug (public - no auth required)
+ */
+export const getPublicEpisodes = async (campaignSlug: string): Promise<Episode[]> => {
+  try {
+    const response = await apiClient.get(`/public/campaigns/${campaignSlug}/episodes`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Campaign not found');
+    }
+    throw new Error('Failed to fetch episodes');
+  }
+};
+
+/**
+ * Get episode by slug for campaign (public - no auth required)
+ */
+export const getPublicEpisode = async (campaignSlug: string, episodeSlug: string): Promise<Episode> => {
+  try {
+    const response = await apiClient.get(`/public/campaigns/${campaignSlug}/episodes/${episodeSlug}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Episode not found');
+    }
+    throw new Error('Failed to fetch episode');
+  }
+};
+
+/**
+ * Get events for episode (public - no auth required)
+ */
+export const getPublicEvents = async (episodeId: string): Promise<Event[]> => {
+  try {
+    const response = await apiClient.get(`/public/episodes/${episodeId}/events`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Episode not found');
+    }
+    if (error.response?.status === 403) {
+      throw new Error('Episode is not published');
+    }
+    throw new Error('Failed to fetch events');
+  }
+};
+
+// ============================================================================
 // HEALTH & VERSION
 // ============================================================================
 
