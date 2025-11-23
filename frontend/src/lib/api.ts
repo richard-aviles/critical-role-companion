@@ -20,11 +20,11 @@ apiClient.interceptors.request.use((config) => {
  */
 export const setAuthToken = (token: string | null) => {
   if (token) {
-    apiClient.defaults.headers.common['X-Token'] = token;
-    console.log('API Client - X-Token header set');
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    console.log('API Client - Authorization header set');
   } else {
-    delete apiClient.defaults.headers.common['X-Token'];
-    console.log('API Client - X-Token header removed');
+    delete apiClient.defaults.headers.common['Authorization'];
+    console.log('API Client - Authorization header removed');
   }
 };
 
@@ -133,6 +133,29 @@ export const deleteCampaign = async (campaignId: string): Promise<void> => {
 // CHARACTERS
 // ============================================================================
 
+export interface ColorThemeOverride {
+  border_colors: string[];
+  text_color: string;
+  badge_interior_gradient: {
+    type: string;
+    colors: string[];
+  };
+  hp_color: {
+    border: string;
+    interior_gradient: {
+      type: string;
+      colors: string[];
+    };
+  };
+  ac_color: {
+    border: string;
+    interior_gradient: {
+      type: string;
+      colors: string[];
+    };
+  };
+}
+
 export interface Character {
   id: string;
   campaign_id: string;
@@ -147,6 +170,7 @@ export interface Character {
   image_r2_key?: string;
   level?: number;
   is_active?: boolean;
+  color_theme_override?: ColorThemeOverride | null;
   created_at: string;
   updated_at: string;
 }
@@ -169,6 +193,7 @@ export interface UpdateCharacterData {
   player_name?: string;
   description?: string;
   backstory?: string;
+  color_theme_override?: ColorThemeOverride | null;
 }
 
 /**
@@ -186,15 +211,19 @@ const generateSlug = (text: string): string => {
 /**
  * Create a new character
  */
-export const createCharacter = async (data: CreateCharacterData): Promise<Character> => {
+export const createCharacter = async (data: CreateCharacterData, adminToken?: string): Promise<Character> => {
   try {
     const { campaign_id, ...characterData } = data;
     // Generate slug from name
     const slug = generateSlug(data.name);
+
+    // Use campaign admin token for this request if provided
+    const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+
     const response = await apiClient.post(`/campaigns/${campaign_id}/characters`, {
       ...characterData,
       slug,
-    });
+    }, config);
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.detail) {
@@ -241,36 +270,42 @@ export const getCharacter = async (campaignId: string, characterId: string): Pro
 };
 
 /**
- * Update a character (supports both JSON and multipart/form-data for image uploads)
+ * Update a character - text fields via JSON, images via separate endpoint
  */
 export const updateCharacter = async (
   campaignId: string,
   characterId: string,
   data: UpdateCharacterData | FormData,
-  imageFile?: File
+  imageFile?: File,
+  adminToken?: string
 ): Promise<Character> => {
   try {
-    // Convert data to FormData for consistency with backend
-    let requestData: FormData;
+    // Use campaign admin token for this request if provided
+    const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
 
+    // If it's FormData, it's an image upload to the dedicated endpoint
     if (data instanceof FormData) {
-      requestData = data;
-    } else {
-      // Convert JSON data to FormData
-      requestData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          requestData.append(key, String(value));
-        }
-      });
+      console.log('[API] Uploading image to:', `/campaigns/${campaignId}/characters/${characterId}/image`);
+      const response = await apiClient.patch(
+        `/campaigns/${campaignId}/characters/${characterId}/image`,
+        data,
+        config
+      );
+      return response.data;
     }
 
-    // Add image if provided separately
-    if (imageFile) {
-      requestData.append('image', imageFile);
-    }
-
-    const response = await apiClient.patch(`/campaigns/${campaignId}/characters/${characterId}`, requestData);
+    // Otherwise, it's JSON data for text fields
+    console.log('[API] Updating character with JSON data:', {
+      endpoint: `/campaigns/${campaignId}/characters/${characterId}`,
+      data,
+      hasColorOverride: 'color_theme_override' in data,
+    });
+    const response = await apiClient.patch(
+      `/campaigns/${campaignId}/characters/${characterId}`,
+      data,
+      config
+    );
+    console.log('[API] Update response:', response.data);
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 404) {
@@ -289,9 +324,12 @@ export const updateCharacter = async (
 /**
  * Delete a character
  */
-export const deleteCharacter = async (campaignId: string, characterId: string): Promise<void> => {
+export const deleteCharacter = async (campaignId: string, characterId: string, adminToken?: string): Promise<void> => {
   try {
-    await apiClient.delete(`/campaigns/${campaignId}/characters/${characterId}`);
+    // Use campaign admin token for this request if provided
+    const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+
+    await apiClient.delete(`/campaigns/${campaignId}/characters/${characterId}`, config);
   } catch (error: any) {
     if (error.response?.status === 404) {
       throw new Error('Character not found');
@@ -303,6 +341,95 @@ export const deleteCharacter = async (campaignId: string, characterId: string): 
       throw new Error(error.response.data.detail);
     }
     throw new Error('Failed to delete character');
+  }
+};
+
+/**
+ * Set character color theme override
+ */
+export const setCharacterColorOverride = async (
+  campaignId: string,
+  characterId: string,
+  colors: ColorThemeOverride
+): Promise<Character> => {
+  try {
+    const response = await apiClient.post(
+      `/campaigns/${campaignId}/characters/${characterId}/color-theme`,
+      {
+        border_colors: colors.border_colors,
+        text_color: colors.text_color,
+        badge_interior_gradient: colors.badge_interior_gradient,
+        hp_color: colors.hp_color,
+        ac_color: colors.ac_color,
+      }
+    );
+    return response.data.character;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Character not found');
+    }
+    if (error.response?.status === 403) {
+      throw new Error('You do not have permission to update this character');
+    }
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
+    }
+    throw new Error('Failed to set color override');
+  }
+};
+
+/**
+ * Clear character color theme override
+ */
+export const clearCharacterColorOverride = async (
+  campaignId: string,
+  characterId: string
+): Promise<Character> => {
+  try {
+    const response = await apiClient.delete(
+      `/campaigns/${campaignId}/characters/${characterId}/color-theme`
+    );
+    return response.data.character;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Character not found');
+    }
+    if (error.response?.status === 403) {
+      throw new Error('You do not have permission to update this character');
+    }
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
+    }
+    throw new Error('Failed to clear color override');
+  }
+};
+
+/**
+ * Get resolved character colors (with fallback logic)
+ */
+export interface ResolvedColorsResponse {
+  character_id: string;
+  source: 'character_override' | 'campaign_default' | 'system_default';
+  colors: ColorThemeOverride;
+}
+
+export const getResolvedCharacterColors = async (
+  campaignId: string,
+  characterId: string
+): Promise<ResolvedColorsResponse> => {
+  try {
+    const response = await apiClient.get(
+      `/campaigns/${campaignId}/characters/${characterId}/resolved-colors`
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Character not found');
+    }
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
+    }
+    throw new Error('Failed to fetch resolved colors');
   }
 };
 

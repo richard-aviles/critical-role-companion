@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     R2_ACCESS_KEY_ID: str = ""
     R2_SECRET_ACCESS_KEY: str = ""
     R2_BUCKET_NAME: str = "critical-role-companion-images"
+    R2_PUBLIC_URL: str = "https://pub-855f8edfc401414b8f96c13867dff69d.r2.dev"
 
     class Config:
         env_file = ".env"

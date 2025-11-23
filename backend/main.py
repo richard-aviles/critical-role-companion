@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List, Set
 from io import BytesIO
 
-from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File, Header, Form
+from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File, Header, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -19,8 +19,10 @@ from pydantic import BaseModel
 from settings import settings
 from database import init_db, get_db, get_db_context, SessionLocal
 from models import (
-    Campaign, Character, Episode, Event, Roster, LayoutOverrides, User, Base
+    Campaign, Character, Episode, Event, Roster, LayoutOverrides, User, Base, CharacterLayout
 )
+from schemas import CharacterUpdateRequest, CharacterThemeOverrideInput, CharacterLayoutCreateRequest, CharacterLayoutUpdateRequest, CharacterLayoutResponse, PresetColorScheme
+from presets import get_all_presets, cycle_preset
 from s3_client import S3Client
 from auth import hash_password, verify_password, generate_campaign_token
 from episodes import router as episodes_router
@@ -51,6 +53,7 @@ s3_client = S3Client(
     access_key_id=settings.R2_ACCESS_KEY_ID,
     secret_access_key=settings.R2_SECRET_ACCESS_KEY,
     bucket_name=settings.R2_BUCKET_NAME,
+    public_url=settings.R2_PUBLIC_URL,
 )
 
 # ============================================================================
@@ -72,11 +75,15 @@ def startup():
 # AUTHENTICATION & HELPERS
 # ============================================================================
 
-def verify_campaign_token(campaign_id: str, token: str = Header(None, alias="X-Token"), db: Session = Depends(get_db)) -> Campaign:
+def verify_campaign_token(campaign_id: str, token: str = Header(None, alias="X-Token"), db: Session = Depends(get_db), request: Request = None) -> Campaign:
     """
     Verify admin token and return campaign
     Must be called on admin-only endpoints
     """
+    # Skip validation for OPTIONS preflight requests
+    if request and request.method == "OPTIONS":
+        return None
+
     if not token:
         raise HTTPException(status_code=401, detail="Missing X-Token header")
 
@@ -463,20 +470,57 @@ class CharacterUpdate(BaseModel):
     backstory: Optional[str] = None
 
 
+class EpisodeCreate(BaseModel):
+    name: str
+    slug: Optional[str] = None
+    episode_number: Optional[int] = None
+    season: Optional[int] = None
+    description: Optional[str] = None
+    air_date: Optional[str] = None
+    runtime: Optional[int] = None
+    is_published: Optional[bool] = False
+
+
+class EpisodeUpdate(BaseModel):
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    episode_number: Optional[int] = None
+    season: Optional[int] = None
+    description: Optional[str] = None
+    air_date: Optional[str] = None
+    runtime: Optional[int] = None
+    is_published: Optional[bool] = None
+
+
 @app.get("/campaigns/{campaign_id}/characters", response_model=List[Dict])
 def list_characters(campaign_id: str, db: Session = Depends(get_db)):
     """List all characters in campaign (public)"""
+    print("\n" + "="*80)
+    print("[LIST CHARACTERS - DETAILED LOG]")
+    print("="*80)
+    print(f"Timestamp: {datetime.utcnow().isoformat()}")
+    print(f"Campaign ID: {campaign_id}")
+
     try:
         campaign_uuid = uuid.UUID(campaign_id)
+        print(f"Campaign UUID: {campaign_uuid}")
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid campaign ID")
 
     campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
     if not campaign:
+        print(f"[ERROR] Campaign not found: {campaign_uuid}")
+        print("="*80 + "\n")
         raise HTTPException(status_code=404, detail="Campaign not found")
 
+    print(f"Campaign found: {campaign.name}")
     characters = db.query(Character).filter(Character.campaign_id == campaign_uuid).all()
-    return [c.to_dict() for c in characters]
+    result = [c.to_dict() for c in characters]
+    print(f"Found {len(result)} characters")
+    for char in result[:3]:  # Show first 3
+        print(f"  - {char.get('name')} (class: {char.get('class')})")
+    print("="*80 + "\n")
+    return result
 
 
 @app.post("/campaigns/{campaign_id}/characters", status_code=201)
@@ -536,22 +580,33 @@ def get_character(campaign_id: str, char_id: str, db: Session = Depends(get_db))
     return character.to_dict()
 
 
-@app.patch("/campaigns/{campaign_id}/characters/{char_id}")
-def update_character(
+@app.patch("/campaigns/{campaign_id}/characters/{char_id}/image")
+def update_character_image(
     campaign_id: str,
     char_id: str,
     campaign: Campaign = Depends(verify_campaign_token),
     db: Session = Depends(get_db),
-    # Form fields (for FormData uploads)
-    name: Optional[str] = Form(None),
-    player_name: Optional[str] = Form(None),
-    class_name: Optional[str] = Form(None),
-    race: Optional[str] = Form(None),
-    description: Optional[str] = Form(None),
-    backstory: Optional[str] = Form(None),
+    # Form fields for image upload
     image: Optional[UploadFile] = File(None),
 ):
-    """Update character (admin only) - supports JSON and FormData"""
+    """Upload/update character image only"""
+
+    # ===== DETAILED LOGGING =====
+    print("\n" + "="*80)
+    print("[CHARACTER IMAGE UPDATE - DETAILED LOG]")
+    print("="*80)
+    print(f"Timestamp: {datetime.utcnow().isoformat()}")
+    print(f"\nURL: PATCH /campaigns/{campaign_id}/characters/{char_id}/image")
+    print(f"Campaign ID: {campaign_id}")
+    print(f"Character ID: {char_id}")
+    print(f"\nIMAGE DATA:")
+    print(f"  Filename: {image.filename if image else 'None'}")
+    print(f"  Content-Type: {image.content_type if image else 'None'}")
+    print(f"  File size: {len(image.file.read()) if image else 0} bytes")
+    if image:
+        image.file.seek(0)  # Reset file pointer
+    # ===== END LOGGING =====
+
     try:
         char_uuid = uuid.UUID(char_id)
     except ValueError:
@@ -564,47 +619,54 @@ def update_character(
     if not character:
         raise HTTPException(status_code=404, detail="Character not found")
 
-    # Update fields from form data
-    if name:
-        character.name = name
-    if player_name is not None:
-        character.player_name = player_name
-    if class_name is not None:
-        character.class_name = class_name
-    if race is not None:
-        character.race = race
-    if description is not None:
-        character.description = description
-    if backstory is not None:
-        character.backstory = backstory
+    if not image or not image.filename:
+        print("[IMAGE UPLOAD ERROR] No image provided")
+        raise HTTPException(status_code=400, detail="No image provided")
 
-    # Handle image upload if provided
-    if image and image.filename:
-        try:
-            image_data = image.file.read()
-            # Upload to S3/R2
-            r2_key = f"characters/{campaign.id}/{character.id}/{image.filename}"
-            public_url = s3_client.upload_file(image_data, r2_key)
-            character.image_url = public_url
-            character.image_r2_key = r2_key
-        except Exception as e:
-            print(f"[IMAGE UPLOAD ERROR] {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
-
-    character.updated_at = datetime.utcnow()
-    db.commit()
-    db.refresh(character)
-
-    # Broadcast update
     try:
-        asyncio.create_task(broadcast_to_campaign(str(campaign.id), {
-            "type": "CHAR_UPDATED",
-            "character": character.to_dict()
-        }))
-    except Exception as e:
-        print(f"[BROADCAST ERROR] {str(e)}")
+        image_data = image.file.read()
+        print(f"[IMAGE UPLOAD] Read {len(image_data)} bytes from file")
 
-    return character.to_dict()
+        # Upload to S3/R2
+        r2_key = f"characters/{campaign.id}/{character.id}/{image.filename}"
+
+        # Determine content type from filename
+        content_type = "image/jpeg"
+        if image.filename.lower().endswith('.png'):
+            content_type = "image/png"
+        elif image.filename.lower().endswith('.webp'):
+            content_type = "image/webp"
+        elif image.filename.lower().endswith('.gif'):
+            content_type = "image/gif"
+
+        print(f"[IMAGE UPLOAD] Uploading to R2 with key: {r2_key}")
+        print(f"[IMAGE UPLOAD] Content-Type: {content_type}")
+
+        public_url = s3_client.upload_image(r2_key, image_data, content_type)
+        character.image_url = public_url
+        character.image_r2_key = r2_key
+        character.updated_at = datetime.utcnow()
+
+        db.commit()
+        db.refresh(character)
+
+        print(f"[IMAGE UPLOAD SUCCESS] URL: {public_url}")
+        print("="*80 + "\n")
+
+        # Broadcast update
+        try:
+            asyncio.create_task(broadcast_to_campaign(str(campaign.id), {
+                "type": "CHAR_UPDATED",
+                "character": character.to_dict()
+            }))
+        except Exception as e:
+            print(f"[BROADCAST ERROR] {str(e)}")
+
+        return character.to_dict()
+    except Exception as e:
+        print(f"[IMAGE UPLOAD ERROR] {str(e)}")
+        print("="*80 + "\n")
+        raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
 
 @app.delete("/campaigns/{campaign_id}/characters/{char_id}", status_code=204)
@@ -630,11 +692,151 @@ def delete_character(
     db.delete(character)
     db.commit()
 
-    # Broadcast deletion
-    asyncio.create_task(broadcast_to_campaign(str(campaign.id), {
-        "type": "CHAR_DELETED",
-        "character_id": str(character.id)
-    }))
+    # Broadcast deletion (best effort - don't fail if broadcast fails)
+    try:
+        asyncio.create_task(broadcast_to_campaign(str(campaign.id), {
+            "type": "CHAR_DELETED",
+            "character_id": str(character.id)
+        }))
+    except RuntimeError:
+        # No running event loop - broadcast is optional, deletion succeeded
+        pass
+
+    return None
+
+
+# ============================================================================
+# EPISODE ENDPOINTS
+# ============================================================================
+
+@app.post("/campaigns/{campaign_id}/episodes", status_code=201)
+def create_episode(
+    campaign_id: str,
+    payload: EpisodeCreate,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Create episode in campaign (admin only)"""
+    # Generate slug if not provided
+    slug = payload.slug or payload.name.lower().replace(" ", "-")
+
+    episode = Episode(
+        campaign_id=campaign.id,
+        name=payload.name,
+        slug=slug,
+        episode_number=payload.episode_number,
+        season=payload.season,
+        description=payload.description,
+        air_date=payload.air_date,
+        runtime=payload.runtime,
+        is_published=payload.is_published or False,
+    )
+    db.add(episode)
+    db.commit()
+    db.refresh(episode)
+
+    return episode.to_dict()
+
+
+@app.get("/campaigns/{campaign_id}/episodes", response_model=List[Dict])
+def list_episodes(campaign_id: str, db: Session = Depends(get_db)):
+    """List all episodes in campaign (public)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign ID")
+
+    episodes = db.query(Episode).filter(Episode.campaign_id == campaign_uuid).all()
+    return [ep.to_dict() for ep in episodes]
+
+
+@app.get("/campaigns/{campaign_id}/episodes/{episode_id}")
+def get_episode(campaign_id: str, episode_id: str, db: Session = Depends(get_db)):
+    """Get episode details (public)"""
+    try:
+        ep_uuid = uuid.UUID(episode_id)
+        campaign_uuid = uuid.UUID(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid ID")
+
+    episode = db.query(Episode).filter(
+        and_(Episode.id == ep_uuid, Episode.campaign_id == campaign_uuid)
+    ).first()
+
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    return episode.to_dict()
+
+
+@app.patch("/campaigns/{campaign_id}/episodes/{episode_id}")
+def update_episode(
+    campaign_id: str,
+    episode_id: str,
+    payload: EpisodeUpdate,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Update episode (admin only)"""
+    try:
+        ep_uuid = uuid.UUID(episode_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid episode ID")
+
+    episode = db.query(Episode).filter(
+        and_(Episode.id == ep_uuid, Episode.campaign_id == campaign.id)
+    ).first()
+
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # Update fields
+    if payload.name is not None:
+        episode.name = payload.name
+    if payload.slug is not None:
+        episode.slug = payload.slug
+    if payload.episode_number is not None:
+        episode.episode_number = payload.episode_number
+    if payload.season is not None:
+        episode.season = payload.season
+    if payload.description is not None:
+        episode.description = payload.description
+    if payload.air_date is not None:
+        episode.air_date = payload.air_date
+    if payload.runtime is not None:
+        episode.runtime = payload.runtime
+    if payload.is_published is not None:
+        episode.is_published = payload.is_published
+
+    episode.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(episode)
+
+    return episode.to_dict()
+
+
+@app.delete("/campaigns/{campaign_id}/episodes/{episode_id}", status_code=204)
+def delete_episode(
+    campaign_id: str,
+    episode_id: str,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Delete episode (admin only)"""
+    try:
+        ep_uuid = uuid.UUID(episode_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid episode ID")
+
+    episode = db.query(Episode).filter(
+        and_(Episode.id == ep_uuid, Episode.campaign_id == campaign.id)
+    ).first()
+
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    db.delete(episode)
+    db.commit()
 
     return None
 
@@ -841,9 +1043,11 @@ async def websocket_endpoint(websocket: WebSocket, campaign_id: str):
 # ============================================================================
 
 class EventCreate(BaseModel):
-    character_id: Optional[str] = None
-    event_type: str
-    data: Optional[Dict[str, Any]] = None
+    name: str
+    description: Optional[str] = None
+    timestamp_in_episode: Optional[int] = None
+    event_type: Optional[str] = None
+    characters_involved: Optional[List[str]] = None
 
 
 @app.post("/campaigns/{campaign_id}/events", status_code=201)
@@ -853,24 +1057,25 @@ async def create_event(
     campaign: Campaign = Depends(verify_campaign_token),
     db: Session = Depends(get_db)
 ):
-    """Create event (HP change, condition, etc.) and broadcast to WebSocket clients"""
+    """Create event and broadcast to WebSocket clients"""
     try:
         campaign_uuid = uuid.UUID(campaign_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid campaign ID")
 
-    char_id = None
-    if payload.character_id:
-        try:
-            char_id = uuid.UUID(payload.character_id)
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid character ID")
+    # Convert characters_involved array to comma-separated string if provided
+    characters_involved_str = None
+    if payload.characters_involved:
+        characters_involved_str = ",".join(payload.characters_involved)
 
+    # Note: This endpoint creates events without an episode context
+    # For episode-specific events, use POST /episodes/{episode_id}/events instead
     event = Event(
-        campaign_id=campaign_uuid,
-        character_id=char_id,
+        name=payload.name,
+        description=payload.description,
+        timestamp_in_episode=payload.timestamp_in_episode,
         event_type=payload.event_type,
-        data=payload.data or {},
+        characters_involved=characters_involved_str,
     )
     db.add(event)
     db.commit()
@@ -902,6 +1107,214 @@ def list_events(
     ).order_by(Event.timestamp.desc()).limit(limit).all()
 
     return [e.to_dict() for e in events]
+
+
+@app.get("/episodes/{episode_id}/events")
+def list_episode_events(
+    episode_id: str,
+    token: str = Header(None, alias="X-Token"),
+    db: Session = Depends(get_db)
+):
+    """List all events in an episode (requires campaign authorization)"""
+    try:
+        ep_uuid = uuid.UUID(episode_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid episode ID")
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing X-Token header")
+
+    # Get the episode to verify it exists
+    episode = db.query(Episode).filter(Episode.id == ep_uuid).first()
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # Verify the user has access to this episode's campaign
+    campaign = db.query(Campaign).filter(Campaign.id == episode.campaign_id).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    if campaign.admin_token != token:
+        raise HTTPException(status_code=403, detail="Invalid admin token")
+
+    # Fetch all events for this episode
+    events = db.query(Event).filter(
+        Event.episode_id == ep_uuid
+    ).order_by(Event.created_at.desc()).all()
+
+    return [e.to_dict() for e in events]
+
+
+@app.post("/episodes/{episode_id}/events", status_code=201)
+async def create_episode_event(
+    episode_id: str,
+    payload: EventCreate,
+    token: str = Header(None, alias="X-Token"),
+    db: Session = Depends(get_db)
+):
+    """Create an event in an episode (requires campaign authorization)"""
+    try:
+        ep_uuid = uuid.UUID(episode_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid episode ID")
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing X-Token header")
+
+    # Get the episode to verify it exists
+    episode = db.query(Episode).filter(Episode.id == ep_uuid).first()
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # Verify the user has access to this episode's campaign
+    campaign = db.query(Campaign).filter(Campaign.id == episode.campaign_id).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    if campaign.admin_token != token:
+        raise HTTPException(status_code=403, detail="Invalid admin token")
+
+    # Convert characters_involved array to comma-separated string if provided
+    characters_involved_str = None
+    if payload.characters_involved:
+        characters_involved_str = ",".join(payload.characters_involved)
+
+    # Create the event
+    event = Event(
+        episode_id=ep_uuid,
+        name=payload.name,
+        description=payload.description,
+        timestamp_in_episode=payload.timestamp_in_episode,
+        event_type=payload.event_type,
+        characters_involved=characters_involved_str,
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+
+    # Broadcast to WebSocket clients
+    await broadcast_to_campaign(str(episode.campaign_id), {
+        "type": "EVENT",
+        "event": event.to_dict()
+    })
+
+    return event.to_dict()
+
+
+@app.patch("/episodes/{episode_id}/events/{event_id}")
+async def update_episode_event(
+    episode_id: str,
+    event_id: str,
+    payload: EventCreate,
+    token: str = Header(None, alias="X-Token"),
+    db: Session = Depends(get_db)
+):
+    """Update an event in an episode (requires campaign authorization)"""
+    try:
+        ep_uuid = uuid.UUID(episode_id)
+        ev_uuid = uuid.UUID(event_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid episode or event ID")
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing X-Token header")
+
+    # Get the episode to verify it exists
+    episode = db.query(Episode).filter(Episode.id == ep_uuid).first()
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # Get the event to verify it exists
+    event = db.query(Event).filter(Event.id == ev_uuid).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Verify the event belongs to this episode
+    if event.episode_id != ep_uuid:
+        raise HTTPException(status_code=400, detail="Event does not belong to this episode")
+
+    # Verify the user has access to this episode's campaign
+    campaign = db.query(Campaign).filter(Campaign.id == episode.campaign_id).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    if campaign.admin_token != token:
+        raise HTTPException(status_code=403, detail="Invalid admin token")
+
+    # Update the event fields
+    if payload.name:
+        event.name = payload.name
+    if payload.description is not None:
+        event.description = payload.description
+    if payload.timestamp_in_episode is not None:
+        event.timestamp_in_episode = payload.timestamp_in_episode
+    if payload.event_type is not None:
+        event.event_type = payload.event_type
+    if payload.characters_involved is not None:
+        event.characters_involved = ",".join(payload.characters_involved) if payload.characters_involved else None
+
+    db.commit()
+    db.refresh(event)
+
+    # Broadcast to WebSocket clients
+    await broadcast_to_campaign(str(episode.campaign_id), {
+        "type": "EVENT_UPDATED",
+        "event": event.to_dict()
+    })
+
+    return event.to_dict()
+
+
+@app.delete("/episodes/{episode_id}/events/{event_id}")
+async def delete_episode_event(
+    episode_id: str,
+    event_id: str,
+    token: str = Header(None, alias="X-Token"),
+    db: Session = Depends(get_db)
+):
+    """Delete an event from an episode (requires campaign authorization)"""
+    try:
+        ep_uuid = uuid.UUID(episode_id)
+        ev_uuid = uuid.UUID(event_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid episode or event ID")
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Missing X-Token header")
+
+    # Get the episode to verify it exists
+    episode = db.query(Episode).filter(Episode.id == ep_uuid).first()
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # Get the event to verify it exists
+    event = db.query(Event).filter(Event.id == ev_uuid).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    # Verify the event belongs to this episode
+    if event.episode_id != ep_uuid:
+        raise HTTPException(status_code=400, detail="Event does not belong to this episode")
+
+    # Verify the user has access to this episode's campaign
+    campaign = db.query(Campaign).filter(Campaign.id == episode.campaign_id).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    if campaign.admin_token != token:
+        raise HTTPException(status_code=403, detail="Invalid admin token")
+
+    # Delete the event
+    db.delete(event)
+    db.commit()
+
+    # Broadcast to WebSocket clients
+    await broadcast_to_campaign(str(episode.campaign_id), {
+        "type": "EVENT_DELETED",
+        "event_id": str(event_id)
+    })
+
+    return {"message": "Event deleted successfully"}
 
 
 # ============================================================================
@@ -961,6 +1374,443 @@ async def update_roster(
     })
 
     return roster.to_dict()
+
+
+# ============================================================================
+# PHASE 3: CHARACTER LAYOUT & STATS ENDPOINTS
+# ============================================================================
+
+@app.get("/presets")
+def get_color_presets():
+    """Get all available color presets (public endpoint)"""
+    return {"presets": get_all_presets()}
+
+
+@app.post("/campaigns/{campaign_id}/character-layouts", response_model=CharacterLayoutResponse)
+async def create_character_layout(
+    campaign_id: str,
+    payload: CharacterLayoutCreateRequest,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Create a new character layout for a campaign (admin only)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign ID")
+
+    # Verify campaign ownership
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this campaign")
+
+    # If this layout is set as default, unset other defaults
+    if payload.is_default:
+        db.query(CharacterLayout).filter(
+            and_(CharacterLayout.campaign_id == campaign_uuid, CharacterLayout.is_default == True)
+        ).update({"is_default": False})
+
+    layout = CharacterLayout(
+        campaign_id=campaign_uuid,
+        name=payload.name,
+        is_default=payload.is_default,
+        stats_to_display=payload.stats_to_display,
+        border_color_count=payload.border_color_count,
+        border_colors=payload.border_colors,
+        text_color=payload.text_color,
+        badge_interior_gradient=payload.badge_interior_gradient,
+        hp_color=payload.hp_color,
+        ac_color=payload.ac_color,
+        badge_layout=[b.dict() for b in payload.badge_layout],
+        color_preset=payload.color_preset,
+    )
+
+    db.add(layout)
+    db.commit()
+    db.refresh(layout)
+
+    return layout.to_dict()
+
+
+@app.get("/campaigns/{campaign_id}/character-layouts")
+def list_character_layouts(
+    campaign_id: str,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """List all character layouts for a campaign (admin only)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign ID")
+
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to view this campaign")
+
+    layouts = db.query(CharacterLayout).filter(
+        CharacterLayout.campaign_id == campaign_uuid
+    ).all()
+
+    return {"layouts": [layout.to_dict() for layout in layouts]}
+
+
+@app.get("/campaigns/{campaign_id}/character-layouts/{layout_id}", response_model=CharacterLayoutResponse)
+def get_character_layout(
+    campaign_id: str,
+    layout_id: str,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Get a specific character layout (admin only)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        layout_uuid = uuid.UUID(layout_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or layout ID")
+
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to view this campaign")
+
+    layout = db.query(CharacterLayout).filter(
+        and_(CharacterLayout.id == layout_uuid, CharacterLayout.campaign_id == campaign_uuid)
+    ).first()
+
+    if not layout:
+        raise HTTPException(status_code=404, detail="Layout not found")
+
+    return layout.to_dict()
+
+
+@app.patch("/campaigns/{campaign_id}/character-layouts/{layout_id}", response_model=CharacterLayoutResponse)
+async def update_character_layout(
+    campaign_id: str,
+    layout_id: str,
+    payload: CharacterLayoutUpdateRequest,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Update a character layout (admin only)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        layout_uuid = uuid.UUID(layout_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or layout ID")
+
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this campaign")
+
+    layout = db.query(CharacterLayout).filter(
+        and_(CharacterLayout.id == layout_uuid, CharacterLayout.campaign_id == campaign_uuid)
+    ).first()
+
+    if not layout:
+        raise HTTPException(status_code=404, detail="Layout not found")
+
+    # Handle updates
+    if payload.name is not None:
+        layout.name = payload.name
+    if payload.is_default is not None:
+        if payload.is_default:
+            db.query(CharacterLayout).filter(
+                and_(CharacterLayout.campaign_id == campaign_uuid, CharacterLayout.is_default == True, CharacterLayout.id != layout_uuid)
+            ).update({"is_default": False})
+        layout.is_default = payload.is_default
+    if payload.stats_to_display is not None:
+        layout.stats_to_display = payload.stats_to_display
+    if payload.border_color_count is not None:
+        layout.border_color_count = payload.border_color_count
+    if payload.border_colors is not None:
+        layout.border_colors = payload.border_colors
+    if payload.text_color is not None:
+        layout.text_color = payload.text_color
+    if payload.badge_interior_gradient is not None:
+        layout.badge_interior_gradient = payload.badge_interior_gradient
+    if payload.hp_color is not None:
+        layout.hp_color = payload.hp_color
+    if payload.ac_color is not None:
+        layout.ac_color = payload.ac_color
+    if payload.badge_layout is not None:
+        layout.badge_layout = [b.dict() for b in payload.badge_layout]
+    if payload.color_preset is not None:
+        layout.color_preset = payload.color_preset
+
+    layout.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(layout)
+
+    return layout.to_dict()
+
+
+@app.delete("/campaigns/{campaign_id}/character-layouts/{layout_id}")
+async def delete_character_layout(
+    campaign_id: str,
+    layout_id: str,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Delete a character layout (admin only)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        layout_uuid = uuid.UUID(layout_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or layout ID")
+
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this campaign")
+
+    layout = db.query(CharacterLayout).filter(
+        and_(CharacterLayout.id == layout_uuid, CharacterLayout.campaign_id == campaign_uuid)
+    ).first()
+
+    if not layout:
+        raise HTTPException(status_code=404, detail="Layout not found")
+
+    db.delete(layout)
+    db.commit()
+
+    return {"message": "Layout deleted successfully"}
+
+
+@app.patch("/campaigns/{campaign_id}/characters/{character_id}/stats")
+async def update_character_stats(
+    campaign_id: str,
+    character_id: str,
+    stats: Dict[str, Any],
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Update character stats (admin only)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        character_uuid = uuid.UUID(character_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or character ID")
+
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this campaign")
+
+    character = db.query(Character).filter(
+        and_(Character.id == character_uuid, Character.campaign_id == campaign_uuid)
+    ).first()
+
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    # Update stats - validate only known stat keys
+    allowed_stats = {"str", "dex", "con", "int", "wis", "cha", "hp", "ac"}
+    character.stats = {k: v for k, v in stats.items() if k in allowed_stats}
+    character.updated_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(character)
+
+    return character.to_dict()
+
+
+@app.patch("/campaigns/{campaign_id}/characters/{character_id}")
+async def update_character(
+    campaign_id: str,
+    character_id: str,
+    payload: CharacterUpdateRequest,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Update character info and stats (admin only)"""
+
+    # DEBUG: Log incoming color override data
+    print(f"\n[UPDATE_CHAR] Received payload")
+    print(f"  Fields set: {payload.__fields_set__}")
+    print(f"  color_theme_override in fields_set: {'color_theme_override' in payload.__fields_set__}")
+    print(f"  color_theme_override value: {payload.color_theme_override}")
+    print(f"  color_theme_override type: {type(payload.color_theme_override)}")
+
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        character_uuid = uuid.UUID(character_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or character ID")
+
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this campaign")
+
+    character = db.query(Character).filter(
+        and_(Character.id == character_uuid, Character.campaign_id == campaign_uuid)
+    ).first()
+
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    # Update fields if provided
+    if payload.name is not None:
+        character.name = payload.name
+    if payload.class_name is not None:
+        character.class_name = payload.class_name
+    if payload.race is not None:
+        character.race = payload.race
+    if payload.player_name is not None:
+        character.player_name = payload.player_name
+    if payload.description is not None:
+        character.description = payload.description
+    if payload.backstory is not None:
+        character.backstory = payload.backstory
+    if payload.image_url is not None:
+        character.image_url = payload.image_url
+    if payload.background_image_url is not None:
+        character.background_image_url = payload.background_image_url
+    if payload.level is not None:
+        character.level = payload.level
+    if payload.is_active is not None:
+        character.is_active = payload.is_active
+    if payload.stats is not None:
+        allowed_stats = {"str", "dex", "con", "int", "wis", "cha", "hp", "ac"}
+        stats_dict = payload.stats.dict(exclude_none=True)
+        character.stats = {k: v for k, v in stats_dict.items() if k in allowed_stats}
+
+    # Update color theme override if provided in the request
+    # Check if the field was explicitly set (either to a value or to null)
+    if 'color_theme_override' in payload.__fields_set__:
+        if payload.color_theme_override is not None:
+            character.color_theme_override = payload.color_theme_override.dict()
+        else:
+            # Explicitly null means clear the override
+            character.color_theme_override = None
+            print(f"[DEBUG] Clearing color_theme_override for character {character.id}")
+
+    character.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(character)
+
+    return character.to_dict()
+
+
+@app.post("/campaigns/{campaign_id}/characters/{character_id}/color-theme")
+async def set_character_color_override(
+    campaign_id: str,
+    character_id: str,
+    payload: CharacterThemeOverrideInput,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Set character color theme override (admin only)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        character_uuid = uuid.UUID(character_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or character ID")
+
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this campaign")
+
+    character = db.query(Character).filter(
+        and_(Character.id == character_uuid, Character.campaign_id == campaign_uuid)
+    ).first()
+
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    # Set color theme override
+    character.color_theme_override = payload.dict()
+    character.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(character)
+
+    return {"message": "Color theme override set", "character": character.to_dict()}
+
+
+@app.delete("/campaigns/{campaign_id}/characters/{character_id}/color-theme")
+async def clear_character_color_override(
+    campaign_id: str,
+    character_id: str,
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Clear character color theme override to use campaign default (admin only)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        character_uuid = uuid.UUID(character_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or character ID")
+
+    if campaign.id != campaign_uuid:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this campaign")
+
+    character = db.query(Character).filter(
+        and_(Character.id == character_uuid, Character.campaign_id == campaign_uuid)
+    ).first()
+
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    # Clear color theme override (set to None)
+    character.color_theme_override = None
+    character.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(character)
+
+    return {"message": "Color theme override cleared, using campaign default", "character": character.to_dict()}
+
+
+@app.get("/campaigns/{campaign_id}/characters/{character_id}/resolved-colors")
+async def get_resolved_character_colors(
+    campaign_id: str,
+    character_id: str,
+    db: Session = Depends(get_db)
+):
+    """Get resolved colors for character (character override if set, else campaign layout) - Public endpoint"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        character_uuid = uuid.UUID(character_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or character ID")
+
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    character = db.query(Character).filter(
+        and_(Character.id == character_uuid, Character.campaign_id == campaign_uuid)
+    ).first()
+
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    # If character has color override, return that
+    if character.color_theme_override:
+        return {
+            "character_id": str(character.id),
+            "source": "character_override",
+            "colors": character.color_theme_override
+        }
+
+    # Otherwise, get campaign's default layout colors
+    layout = db.query(CharacterLayout).filter(
+        and_(CharacterLayout.campaign_id == campaign_uuid, CharacterLayout.is_default == True)
+    ).first()
+
+    if layout:
+        return {
+            "character_id": str(character.id),
+            "source": "campaign_default",
+            "colors": {
+                "border_colors": layout.border_colors,
+                "text_color": layout.text_color,
+                "badge_interior_gradient": layout.badge_interior_gradient,
+                "hp_color": layout.hp_color,
+                "ac_color": layout.ac_color
+            }
+        }
+
+    # Fallback: return Option A (Gold & Warmth) preset if no default layout
+    return {
+        "character_id": str(character.id),
+        "source": "system_default",
+        "colors": {
+            "border_colors": ["#FFD700", "#FFA500", "#FF8C00", "#DC7F2E"],
+            "text_color": "#FFFFFF",
+            "badge_interior_gradient": {"type": "radial", "colors": ["#FFE4B5", "#DAA520"]},
+            "hp_color": {"border": "#FF0000", "interior_gradient": {"type": "radial", "colors": ["#FF6B6B", "#CC0000"]}},
+            "ac_color": {"border": "#808080", "interior_gradient": {"type": "radial", "colors": ["#A9A9A9", "#696969"]}}
+        }
+    }
 
 
 # ============================================================================

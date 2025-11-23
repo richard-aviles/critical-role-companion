@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { createCharacter, CreateCharacterData, UpdateCharacterData, Character, updateCharacter, setAuthToken } from '@/lib/api';
+import { createCharacter, CreateCharacterData, UpdateCharacterData, Character, updateCharacter } from '@/lib/api';
 import { CharacterForm } from '@/components/CharacterForm';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AdminHeader } from '@/components/AdminHeader';
@@ -23,17 +23,14 @@ function NewCharacterContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [adminToken, setAdminToken] = useState<string | null>(null);
 
-  // Set campaign auth token on mount
+  // Get campaign's admin token on mount
   useEffect(() => {
     // Find the campaign's admin_token from the campaigns list
     const campaign = campaigns.find((c) => c.id === campaignId);
     if (campaign) {
-      console.log('Campaign admin_token found:', campaign.admin_token ? 'Token exists' : 'No token');
-      setAuthToken(campaign.admin_token);
-      console.log('Campaign admin_token set in API client');
-    } else {
-      console.warn('Campaign not found in campaigns list');
+      setAdminToken(campaign.admin_token);
     }
   }, [campaignId, campaigns]);
 
@@ -57,7 +54,7 @@ function NewCharacterContent() {
 
     try {
       // First, create the character with basic data
-      const character = await createCharacter(data as CreateCharacterData);
+      const character = await createCharacter(data as CreateCharacterData, adminToken || undefined);
 
       // If there's an image file, upload it separately
       if (imageFile) {
@@ -65,7 +62,7 @@ function NewCharacterContent() {
           const formData = new FormData();
           formData.append('image', imageFile);
 
-          await updateCharacter(campaignId, character.id, formData);
+          await updateCharacter(campaignId, character.id, formData, undefined, adminToken || undefined);
         } catch (imageErr: any) {
           // Character was created but image upload failed
           console.error('Image upload failed:', imageErr);

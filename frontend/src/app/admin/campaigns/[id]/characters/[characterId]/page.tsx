@@ -13,7 +13,6 @@ import {
   updateCharacter,
   deleteCharacter,
   UpdateCharacterData,
-  setAuthToken,
 } from '@/lib/api';
 import { CharacterForm } from '@/components/CharacterForm';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
@@ -36,18 +35,26 @@ function CharacterDetailContent() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [adminToken, setAdminToken] = useState<string | null>(null);
 
-  // Set campaign auth token on mount
+  // Get campaign's admin token on mount
   useEffect(() => {
     // Find the campaign's admin_token from the campaigns list
     const campaign = campaigns.find((c) => c.id === campaignId);
     if (campaign) {
-      setAuthToken(campaign.admin_token);
+      setAdminToken(campaign.admin_token);
     }
   }, [campaignId, campaigns]);
 
   // Fetch character on mount
   useEffect(() => {
+    // Don't fetch if character is being deleted
+    if (isDeleting) {
+      return;
+    }
+
+    let isMounted = true;
+
     const fetchCharacter = async () => {
       if (!characterId) {
         setError('Character ID is missing');
@@ -59,8 +66,15 @@ function CharacterDetailContent() {
         setLoading(true);
         setError(null);
         const data = await getCharacter(campaignId, characterId);
-        setCharacter(data);
+        if (isMounted && !isDeleting) {
+          setCharacter(data);
+        }
       } catch (err: any) {
+        // Don't set error if we're in the process of deleting
+        if (isDeleting || !isMounted) {
+          return;
+        }
+
         const status = err.response?.status;
 
         if (status === 404) {
@@ -71,12 +85,18 @@ function CharacterDetailContent() {
           setError(err.message || 'Failed to load character');
         }
       } finally {
-        setLoading(false);
+        if (isMounted && !isDeleting) {
+          setLoading(false);
+        }
       }
     };
 
     fetchCharacter();
-  }, [characterId]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [characterId, isDeleting]);
 
   const handleUpdate = async (data: UpdateCharacterData, imageFile?: File) => {
     setIsUpdating(true);
@@ -85,22 +105,14 @@ function CharacterDetailContent() {
     try {
       let updatedCharacter: Character;
 
-      // If there's an image file, use FormData
+      // First, update text fields via JSON
+      updatedCharacter = await updateCharacter(campaignId, characterId, data, undefined, adminToken || undefined);
+
+      // Then, if there's an image, upload it separately
       if (imageFile) {
         const formData = new FormData();
-
-        // Append all character data fields to FormData
-        Object.entries(data).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            formData.append(key, String(value));
-          }
-        });
-
         formData.append('image', imageFile);
-        updatedCharacter = await updateCharacter(campaignId, characterId, formData);
-      } else {
-        // Otherwise use regular JSON data
-        updatedCharacter = await updateCharacter(campaignId, characterId, data);
+        updatedCharacter = await updateCharacter(campaignId, characterId, formData, imageFile, adminToken || undefined);
       }
 
       setCharacter(updatedCharacter);
@@ -126,7 +138,7 @@ function CharacterDetailContent() {
     setError(null);
 
     try {
-      await deleteCharacter(campaignId, characterId);
+      await deleteCharacter(campaignId, characterId, adminToken || undefined);
       // Redirect to characters list
       router.push(`/admin/campaigns/${campaignId}/characters`);
     } catch (err: any) {
@@ -147,19 +159,19 @@ function CharacterDetailContent() {
   };
 
 
-  // Loading state
-  if (loading) {
+  // Loading state or deleting
+  if (loading || isDeleting) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading character...</p>
+          <p className="mt-4 text-gray-600">{isDeleting ? 'Deleting character...' : 'Loading character...'}</p>
         </div>
       </div>
     );
   }
 
-  // Error state or character not found
+  // Error state or character not found (but not if deleting)
   if (error || !character) {
     return (
       <div className="min-h-screen bg-gray-50">

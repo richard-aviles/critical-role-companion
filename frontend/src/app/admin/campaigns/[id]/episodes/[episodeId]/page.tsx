@@ -72,6 +72,10 @@ function EpisodeDetailPageContent() {
     const fetchData = async () => {
       if (!episodeId || !campaignId) return;
 
+      // Wait for campaign to be loaded so auth token is set
+      const campaign = campaigns.find((c) => c.id === campaignId);
+      if (!campaign) return;
+
       try {
         setLoading(true);
         setError(null);
@@ -102,7 +106,7 @@ function EpisodeDetailPageContent() {
     };
 
     fetchData();
-  }, [episodeId, campaignId]);
+  }, [episodeId, campaignId, campaigns]);
 
   // Handle episode update
   const handleUpdateEpisode = async (data: UpdateEpisodeData) => {

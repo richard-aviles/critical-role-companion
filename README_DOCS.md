@@ -25,12 +25,14 @@
 - **`PROJECT_STATUS.md`** - High-level overview, quick reference
 - **`ARCHITECTURE.md`** - Technical design, how things fit together
 - **`DECISIONS.md`** - Why we chose each technology/approach
+- **`SESSION_8_STARTUP.md`** - What was just completed in Phase 3 Tiers 1 & 2
 
 ### Getting Things Done
 
-- **`NEXT_ACTIONS.md`** - What to do today, step-by-step
-- **`PHASE_0_PROGRESS.md`** - Detailed status of current phase
+- **`NEXT_ACTIONS.md`** - What to do today, step-by-step (Phase 3 Tier 3 tasks)
+- **`PHASE_0_PROGRESS.md`** - Phase 0 completion details
 - **`TROUBLESHOOTING.md`** - Common issues and solutions
+- **`KNOWN_ISSUES.md`** - Documented issues and workarounds
 
 ### Technical Reference (Coming Soon)
 
@@ -78,25 +80,41 @@
 **Time:** 5-20 minutes (depends on problem)
 **Contains:** Common issues, diagnosis steps, solutions
 
+### KNOWN_ISSUES.md
+**Purpose:** Understand documented issues and workarounds
+**When to read:** When encountering known issues, or before starting work
+**Time:** 5-10 minutes
+**Contains:** Known bugs, their impact, workarounds, when they'll be fixed
+
+### SESSION_8_STARTUP.md
+**Purpose:** Quick reference for Session 8 context and status
+**When to read:** Starting Session 8+ to understand what was completed
+**Time:** 5 minutes
+**Contains:** Session 8 completion summary, current status, next steps
+
+### PHASE_3_TIER_2_TEST_REPORT.md
+**Purpose:** Detailed report of Phase 3 Tier 2 (Admin UI Color Override) implementation
+**When to read:** To understand color override UI components, or as reference for similar work
+**Time:** 15-20 minutes
+**Contains:** Component specifications, API integration details, test coverage, code examples
+
 ---
 
 ## 🗓️ Reading Schedule by Session
 
-### Session 1 (Past - You are here!)
-- ✅ Read PROJECT_STATUS.md
-- ✅ Follow NEXT_ACTIONS.md (Phase 0.1)
-- ✅ Refer to TROUBLESHOOTING.md as needed
+### Session 8 (Just Completed!)
+- ✅ Completed Phase 3 Tier 1 (Backend Color Override Endpoints)
+- ✅ Completed Phase 3 Tier 2 (Admin UI Color Override Components)
+- ✅ Created PHASE_3_TIER_2_TEST_REPORT.md
+- ✅ Created SESSION_8_STARTUP.md
+- ✅ Updated PROJECT_STATUS.md
 
-### Session 2 (Future)
-- Read PROJECT_STATUS.md (5 min refresh)
-- Read NEXT_ACTIONS.md (follow Phase 0.2-3)
-- Reference TROUBLESHOOTING.md if needed
-
-### Session 3+
-- Skim PROJECT_STATUS.md
-- Follow NEXT_ACTIONS.md
-- Read ARCHITECTURE.md when building features
-- Reference TROUBLESHOOTING.md for problems
+### Session 9+ (Coming Next!)
+- Read SESSION_8_STARTUP.md (5 min) - Understand what just completed
+- Read PROJECT_STATUS.md (5 min) - Quick refresh
+- Read PHASE_3_TIER_2_TEST_REPORT.md (15 min) - See completed work as reference
+- Read NEXT_ACTIONS.md (follow Phase 3 Tier 3 tasks)
+- Reference TROUBLESHOOTING.md and KNOWN_ISSUES.md as needed
 
 ---
 
@@ -107,11 +125,13 @@
 | Task | Document | Section |
 |------|----------|---------|
 | Understand what we're building | PROJECT_STATUS.md | 📊 Project Overview |
-| Know where we are in Phase 0 | PHASE_0_PROGRESS.md | 📍 Current Location |
-| See what to do today | NEXT_ACTIONS.md | 📋 Session 2 Task List |
+| Know where we are now | SESSION_8_STARTUP.md | 📍 Session 8 Completion |
+| Know what was just done | PHASE_3_TIER_2_TEST_REPORT.md | Executive Summary |
+| See what to do next | NEXT_ACTIONS.md | 📋 Session 9 Task List |
 | Understand the architecture | ARCHITECTURE.md | 🏗️ System Architecture |
 | Know why we chose X | DECISIONS.md | Each decision header |
 | Fix a broken thing | TROUBLESHOOTING.md | Search your error |
+| Understand known issues | KNOWN_ISSUES.md | Issue list & workarounds |
 | See the roadmap | PROJECT_STATUS.md | 🚀 High-Level Roadmap |
 | Deploy to production | DEPLOYMENT.md | (Coming soon) |
 | Understand the database | DATABASE_SCHEMA.md | (Coming soon) |
@@ -119,20 +139,27 @@
 
 ---
 
-## 📋 Files Created in Phase 0
+## 📋 Documentation Files
 
 ```
 critical-role-companion/
-├── PROJECT_STATUS.md           ← Start here
-├── NEXT_ACTIONS.md             ← Your TODO list
-├── PHASE_0_PROGRESS.md         ← Current phase status
-├── ARCHITECTURE.md             ← Technical design
-├── DECISIONS.md                ← Why we chose things
-├── TROUBLESHOOTING.md          ← Fix problems
-├── README_DOCS.md              ← You are here
-├── API_DESIGN.md               (Coming soon)
-├── DATABASE_SCHEMA.md          (Coming soon)
-└── DEPLOYMENT.md               (Coming soon)
+├── PROJECT_STATUS.md                      ← Start here
+├── NEXT_ACTIONS.md                        ← Your TODO list
+├── PHASE_0_PROGRESS.md                    ← Phase 0 status (completed)
+├── PHASE_1_PROGRESS.md                    ← Phase 1 status (completed)
+├── PHASE_1_COMPLETION_SUMMARY.md          ← Phase 1 detailed summary
+├── PHASE_2_PLANNING.md                    ← Phase 2 architecture (completed)
+├── PHASE_3_TIER_1_COMPLETION_SUMMARY.md   ← Phase 3 Tier 1 summary (backend colors)
+├── PHASE_3_TIER_2_TEST_REPORT.md          ← Phase 3 Tier 2 (admin UI colors) [NEW]
+├── ARCHITECTURE.md                        ← Technical design
+├── DECISIONS.md                           ← Why we chose things
+├── TROUBLESHOOTING.md                     ← Fix problems
+├── KNOWN_ISSUES.md                        ← Documented issues [NEW]
+├── SESSION_8_STARTUP.md                   ← Session 8 quick start [NEW]
+├── README_DOCS.md                         ← You are here
+├── API_DESIGN.md                          (Coming soon)
+├── DATABASE_SCHEMA.md                     (Coming soon)
+└── DEPLOYMENT.md                          (Coming soon)
 ```
 
 ---
@@ -212,48 +239,70 @@ When we need new documentation:
 - [x] PROJECT_STATUS.md - Project overview
 - [x] NEXT_ACTIONS.md - What to do next
 - [x] PHASE_0_PROGRESS.md - Phase 0 status
+- [x] PHASE_1_PROGRESS.md - Phase 1 status
+- [x] PHASE_1_COMPLETION_SUMMARY.md - Phase 1 detailed summary
+- [x] PHASE_2_PLANNING.md - Phase 2 architecture
+- [x] PHASE_3_TIER_1_COMPLETION_SUMMARY.md - Phase 3 Tier 1 summary
+- [x] PHASE_3_TIER_2_TEST_REPORT.md - Phase 3 Tier 2 report [NEW - Session 8]
+- [x] SESSION_8_STARTUP.md - Session 8 context [NEW - Session 8]
+- [x] KNOWN_ISSUES.md - Known issues [NEW - Session 8]
 - [x] ARCHITECTURE.md - Technical design
 - [x] DECISIONS.md - Why we chose things
 - [x] TROUBLESHOOTING.md - Common issues
 - [x] README_DOCS.md - This file
-- [ ] API_DESIGN.md - (Phase 0.3)
-- [ ] DATABASE_SCHEMA.md - (Phase 0.3)
-- [ ] DEPLOYMENT.md - (Phase 0.4+)
+- [ ] API_DESIGN.md - (Phase 3 Tier 3+)
+- [ ] DATABASE_SCHEMA.md - (Phase 3 Tier 3+)
+- [ ] DEPLOYMENT.md - (Phase 3 Tier 4+)
 
 ---
 
 ## 🎓 Example: Using These Docs
 
-### Scenario: You're ready for Phase 0.2
+### Scenario: You're starting Session 9 and want to continue from where Session 8 left off
 
-1. Open NEXT_ACTIONS.md
-2. Go to "Priority 2: Cloudflare R2 Setup"
-3. Follow the steps
-4. If something breaks, check TROUBLESHOOTING.md
-5. If you want to understand WHY R2, read DECISIONS.md → "Decision 4"
+1. Open SESSION_8_STARTUP.md (5 min) - See what was just completed
+2. Read PHASE_3_TIER_2_TEST_REPORT.md (15 min) - Understand the color override components
+3. Open NEXT_ACTIONS.md - Go to "Session 9 Task List"
+4. Start Phase 3 Tier 3: Public Campaign Pages
 
-### Scenario: You're confused about multi-tenant architecture
+### Scenario: You need to understand how character color overrides work
 
-1. Open ARCHITECTURE.md
-2. Go to "🏢 Multi-Tenant Data Model"
-3. Look at entity relationship diagram
-4. If you want to know WHY we chose this, open DECISIONS.md → "Decision 1"
+1. Open PHASE_3_TIER_2_TEST_REPORT.md
+2. Go to "Component Implementation Details"
+3. Read ColorPickerModal, ColorPresetSelector, CharacterColorOverrideForm specs
+4. Look at "ColorPreset Interface" to understand data structure
+5. See "API Client Updates" for integration details
 
-### Scenario: You can't connect to Neon
+### Scenario: You encounter a known issue
 
-1. Open TROUBLESHOOTING.md
-2. Find "Connection fails"
-3. Follow diagnosis steps
-4. Try the solutions
-5. If still stuck, reference PROJECT_STATUS.md for support links
+1. Open KNOWN_ISSUES.md
+2. Search for your issue
+3. Read the description and workaround
+4. If it needs to be fixed, note it in the issue
+5. File a note for next session if it affects your work
+
+### Scenario: You're building public campaign pages
+
+1. Open NEXT_ACTIONS.md → "Phase 3 Tier 3 Task List"
+2. Read PHASE_3_TIER_2_TEST_REPORT.md to see how color overrides work
+3. For examples of component patterns, see PHASE_1_COMPLETION_SUMMARY.md
+4. Reference ARCHITECTURE.md for system design
+5. If something breaks, check TROUBLESHOOTING.md
 
 ---
 
 ## 📝 Last Updated
 
-**Overall Docs Version:** 1.0
-**Last Updated:** 2025-11-20
-**Status:** Phase 0.1 Complete, Phase 0.2+ Pending
+**Overall Docs Version:** 3.0
+**Last Updated:** 2025-11-22 (Session 8)
+**Status:** Phase 3 Tiers 1 & 2 Complete, Phase 3 Tier 3 Ready to Begin
+
+**Recent Updates (Session 8):**
+- ✅ Phase 3 Tier 2 Admin UI Components completed
+- ✅ PHASE_3_TIER_2_TEST_REPORT.md created with full component documentation
+- ✅ SESSION_8_STARTUP.md created for context handoff
+- ✅ KNOWN_ISSUES.md created documenting SQLAlchemy issue
+- ✅ NEXT_ACTIONS.md updated with Phase 3 Tier 3 (Public Campaign Pages) planning
 
 ---
 

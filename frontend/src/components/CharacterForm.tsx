@@ -1,13 +1,94 @@
 /**
  * Character Form Component
- * Reusable form for creating and editing characters
+ * Reusable form for creating and editing characters with optional color overrides
  */
 
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Character, CreateCharacterData, UpdateCharacterData } from '@/lib/api';
+import { Character, CreateCharacterData, UpdateCharacterData, ColorThemeOverride } from '@/lib/api';
 import { ImageUploadField } from './ImageUploadField';
+import { CharacterColorOverrideForm } from './CharacterColorOverrideForm';
+import { ColorPreset } from './ColorPresetSelector';
+
+// Default color presets
+const COLOR_PRESETS: ColorPreset[] = [
+  {
+    id: 'option_a',
+    name: 'Gold & Warmth',
+    description: 'Warm gold tones with rich accents',
+    borderColors: ['#FFD700', '#FFA500', '#FF8C00', '#DC7F2E'],
+    textColor: '#FFFFFF',
+    badgeInteriorGradient: {
+      type: 'radial',
+      colors: ['#FFE4B5', '#DAA520'],
+    },
+    hpColor: {
+      border: '#FF0000',
+      interiorGradient: {
+        type: 'radial',
+        colors: ['#FF6B6B', '#CC0000'],
+      },
+    },
+    acColor: {
+      border: '#808080',
+      interiorGradient: {
+        type: 'radial',
+        colors: ['#A9A9A9', '#696969'],
+      },
+    },
+  },
+  {
+    id: 'option_b',
+    name: 'Twilight & Mystique',
+    description: 'Cool purples and deep blues',
+    borderColors: ['#9370DB', '#6A5ACD', '#483D8B', '#36213E'],
+    textColor: '#E6E6FA',
+    badgeInteriorGradient: {
+      type: 'radial',
+      colors: ['#B19CD9', '#6A5ACD'],
+    },
+    hpColor: {
+      border: '#DC143C',
+      interiorGradient: {
+        type: 'radial',
+        colors: ['#FF69B4', '#C71585'],
+      },
+    },
+    acColor: {
+      border: '#4B0082',
+      interiorGradient: {
+        type: 'radial',
+        colors: ['#9370DB', '#6A5ACD'],
+      },
+    },
+  },
+  {
+    id: 'option_c',
+    name: 'Emerald & Silver',
+    description: 'Fresh greens with silvery accents',
+    borderColors: ['#50C878', '#3CB371', '#228B22', '#1B4D2C'],
+    textColor: '#F0FFF0',
+    badgeInteriorGradient: {
+      type: 'radial',
+      colors: ['#90EE90', '#3CB371'],
+    },
+    hpColor: {
+      border: '#FF1744',
+      interiorGradient: {
+        type: 'radial',
+        colors: ['#FF5252', '#D32F2F'],
+      },
+    },
+    acColor: {
+      border: '#C0C0C0',
+      interiorGradient: {
+        type: 'radial',
+        colors: ['#E8E8E8', '#A9A9A9'],
+      },
+    },
+  },
+];
 
 interface CharacterFormProps {
   mode: 'create' | 'edit';
@@ -37,6 +118,10 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [nameTouched, setNameTouched] = useState(false);
+  const [useColorOverride, setUseColorOverride] = useState(!!initialData?.color_theme_override);
+  const [colorOverride, setColorOverride] = useState<ColorThemeOverride | undefined>(
+    initialData?.color_theme_override || undefined
+  );
 
   // Validate form
   const isFormValid = formData.name.trim().length > 0;
@@ -76,24 +161,37 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
 
     try {
       // Prepare data for submission
+      const baseData = {
+        name: formData.name.trim(),
+        class_name: formData.class_name.trim() || undefined,
+        race: formData.race.trim() || undefined,
+        player_name: formData.player_name.trim() || undefined,
+        description: formData.description.trim() || undefined,
+        backstory: formData.backstory.trim() || undefined,
+      };
+
+      // Handle color override: explicitly send null if unchecked, or the colors if checked
+      const colorThemeData = useColorOverride && colorOverride
+        ? { color_theme_override: colorOverride }
+        : { color_theme_override: null };
+
       const submitData: CreateCharacterData | UpdateCharacterData = mode === 'create'
         ? {
             campaign_id: campaignId!,
-            name: formData.name.trim(),
-            class_name: formData.class_name.trim() || undefined,
-            race: formData.race.trim() || undefined,
-            player_name: formData.player_name.trim() || undefined,
-            description: formData.description.trim() || undefined,
-            backstory: formData.backstory.trim() || undefined,
+            ...baseData,
+            ...colorThemeData,
           }
         : {
-            name: formData.name.trim(),
-            class_name: formData.class_name.trim() || undefined,
-            race: formData.race.trim() || undefined,
-            player_name: formData.player_name.trim() || undefined,
-            description: formData.description.trim() || undefined,
-            backstory: formData.backstory.trim() || undefined,
+            ...baseData,
+            ...colorThemeData,
           };
+
+      console.log('[CharacterForm] Submitting data:', {
+        mode,
+        useColorOverride,
+        colorOverride,
+        submitData,
+      });
 
       await onSubmit(submitData, selectedImage || undefined);
     } catch (err: any) {
@@ -214,6 +312,46 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
           rows={3}
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
         />
+      </div>
+
+      {/* Color Theme Override Toggle */}
+      <div className="border-t pt-6">
+        <div className="flex items-center gap-3 mb-4">
+          <input
+            id="use_color_override"
+            type="checkbox"
+            checked={useColorOverride}
+            onChange={(e) => {
+              setUseColorOverride(e.target.checked);
+              if (!e.target.checked) {
+                setColorOverride(undefined);
+              }
+            }}
+            disabled={isLoading}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:bg-gray-50"
+          />
+          <label htmlFor="use_color_override" className="text-sm font-medium text-gray-700">
+            Use custom color theme for this character
+          </label>
+        </div>
+
+        {/* Color Override Form */}
+        {useColorOverride && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <CharacterColorOverrideForm
+              presets={COLOR_PRESETS}
+              initialColors={colorOverride}
+              isLoading={isLoading}
+              onSubmit={async (colors) => {
+                setColorOverride(colors);
+              }}
+              onCancel={() => {
+                setUseColorOverride(false);
+                setColorOverride(undefined);
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Image Upload */}

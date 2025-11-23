@@ -1,15 +1,33 @@
-# Next Actions - What To Do In Session 5 (Phase 2: Character & Episode Management)
+# Next Actions - Session 9 (Phase 3 Tier 3: Public Campaign Pages)
 
-**When you log in next session, Phase 1 will be 100% complete and tested. You're ready to begin Phase 2!**
+**Phase 3 Tier 1 & 2 (Backend + Admin UI) are COMPLETE!**
+
+Phase 3 Tier 1 delivered:
+- ✅ Character Layout System with per-character color overrides
+- ✅ Database migration (005) applied
+- ✅ 4 new API endpoints for color management
+- ✅ Three-tier color fallback resolution logic
+
+Phase 3 Tier 2 delivered:
+- ✅ ColorPickerModal component for individual color selection
+- ✅ ColorPresetSelector component for theme selection
+- ✅ CharacterColorOverrideForm component for comprehensive color editing
+- ✅ CharacterForm integration with color override support
+- ✅ 3 predefined color themes (Gold & Warmth, Twilight & Mystique, Emerald & Silver)
+- ✅ Full TypeScript type safety (0 compilation errors)
+- ✅ Complete API client integration (3 new functions)
+- ✅ Full documentation (PHASE_3_TIER_2_TEST_REPORT.md)
+
+**NOW: Begin Phase 3 Tier 3 (Public Campaign Pages)**
 
 ---
 
 ## 🎯 Start Here
 
-1. Read `SESSION_5_STARTUP.md` (5 min) - Quick start checklist
+1. Read `SESSION_8_STARTUP.md` (5 min) - Quick start checklist for this session
 2. Read `PROJECT_STATUS.md` (5 min) - Quick refresh on project status
-3. Skim `PHASE_2_PLANNING.md` (15 min) - See the full Phase 2 architecture
-4. Review this document for specific action items
+3. Read `PHASE_3_TIER_2_TEST_REPORT.md` (10 min) - Review what was just completed
+4. Review this document for Phase 3 Tier 3 action items
 5. Follow the steps below in order
 
 **Total time commitment: 2-3 sessions of work**
@@ -19,15 +37,19 @@
 - ✅ Session 2: Cloudflare R2 setup complete
 - ✅ Session 3: Backend refactoring, Frontend setup, Full-stack testing
 - ✅ Session 4: Phase 1 Campaign Management - Complete with 7 issues fixed
-- ⏳ Session 5+: Phase 2 Character & Episode Management
+- ✅ Session 5: Phase 2 Character & Episode Management - Complete
+- ✅ Session 6: Phase 2 cont'd - Character Pages complete
+- ✅ Session 7: Phase 2 cont'd - Episode Pages complete
+- ✅ Session 8: Phase 3 Tier 1 (Backend) + Phase 3 Tier 2 (Admin UI) complete
+- ⏳ Session 9+: Phase 3 Tier 3 Public Campaign Pages
 
 ---
 
-## ⚡ Session 5 Task List - Phase 2: Character & Episode Management
+## ⚡ Session 9 Task List - Phase 3 Tier 3: Public Campaign Pages
 
 ### Priority 0: Quick Verification (5 minutes)
 
-Before starting Phase 2, verify Phase 1 is still working:
+Before starting Phase 3 Tier 3, verify Phase 1 & 2 are still working:
 
 #### Task 0A: Start Backend
 ```bash
@@ -43,330 +65,275 @@ npm run dev
 ```
 Expected output: `Ready in X.XXs` on port 3000
 
-#### Task 0C: Verify Connection
+#### Task 0C: Verify Admin Pages Work
 Open http://localhost:3000 in browser:
 - Navigate to http://localhost:3000/admin
 - Login with a test account (create one if needed)
 - Verify you can see the campaign list
-- Try creating/editing/deleting a test campaign
+- Navigate to a campaign and verify you can view/create characters with color overrides
+- Verify you can view/create episodes
 
 **If any of these fail, refer to TROUBLESHOOTING.md**
 
 ---
 
-## 📋 Phase 2: Character & Episode Management Tasks
+## 📋 Phase 3 Tier 3: Public Campaign Pages Tasks
 
-### Task 1: Backend - Character Model & Endpoints (2-3 hours)
+### Overview
+Phase 3 Tier 3 focuses on building the **PUBLIC-FACING** campaign pages that viewers can access to learn about campaigns and characters without authentication. These pages will showcase campaign information, character rosters, episode guides, and story timelines.
 
-**Goal:** Complete character CRUD with image upload to R2
+**Key Differences from Admin Pages:**
+- ✅ No authentication required
+- ✅ Read-only access (no editing)
+- ✅ Optimized for public viewing
+- ✅ Character styling uses color overrides
+- ✅ Episode/event timeline visualization
+- ✅ Character relationship mapping
+- ✅ Campaign story progress indicator
 
-#### 1.1: Create Database Migration
-- File: `backend/alembic/versions/003_add_characters_episodes.py`
-- Add `characters` table with fields: id, campaign_id, name, slug, class, race, player_name, description, backstory, image_url, image_r2_key, level, is_active
-- Add indexes on campaign_id and slug
-- Test migration: `alembic upgrade head`
+### Task 1: Public Campaign Detail Page (2-3 hours)
 
-**Expected Result:** `characters` table exists in Neon database
+**Goal:** Build public-facing campaign overview page
 
-#### 1.2: Update Character Model in models.py
-- Update `Character` model class (already exists)
-- Add relationships to Campaign
-- Add image_url and image_r2_key fields
-- Add validation for required fields
+#### 1.1: Create Public Campaign Page Route
+- File: `frontend/src/app/campaigns/[slug]/page.tsx`
+- Route accepts campaign slug (not ID)
+- Fetch campaign data from public API
+- Display campaign title, description, image
+- Show quick stats: # of characters, # of episodes, current status
+- Navigation to character roster and episode guide
 
-**Expected Result:** SQLAlchemy model ready for CRUD operations
+**Expected Result:** Public campaign page displays with all basic info
 
-#### 1.3: Create characters.py Endpoints Module
-- POST /characters - Create character
-- GET /campaigns/{id}/characters - List campaign characters
-- GET /characters/{id} - Get character detail
-- PATCH /characters/{id} - Update character
-- DELETE /characters/{id} - Delete character (+ delete image from R2)
+#### 1.2: Create Campaign Stats Component
+- File: `frontend/src/components/CampaignStats.tsx`
+- Display key metrics: Characters, Episodes, Sessions, Story Progress
+- Show timeline (when campaign started/ended)
+- Links to related content sections
 
-**Each endpoint must:**
-- [ ] Require Bearer token authentication
-- [ ] Verify campaign ownership
-- [ ] Return appropriate status codes (201, 200, 404, 403)
-- [ ] Include proper error messages
+**Expected Result:** Stats section displays with navigation
 
-**Expected Result:** 5 fully functional character endpoints
+#### 1.3: Create Campaign Hero Section Component
+- File: `frontend/src/components/CampaignHeroSection.tsx`
+- Large banner with campaign name, tagline, image
+- Quick action buttons: View Characters, View Episodes
+- Social sharing buttons (optional)
 
-#### 1.4: Image Upload Support
-- Create image_upload.py helper module
-- Function to upload character image to R2
-- Path format: `campaigns/{campaign_id}/characters/{character_id}/{filename}`
-- Store R2 key in database for later deletion
-- Return public URL for display
-
-**Expected Result:** Image uploads working with proper R2 integration
-
-#### 1.5: Test Character Endpoints
-- Create test_characters.py
-- Test create character (with and without image)
-- Test list characters
-- Test update character
-- Test delete character (verify image deleted from R2)
-
-**Expected Result:** All tests pass ✓
+**Expected Result:** Hero section displays prominently
 
 ---
 
-### Task 2: Backend - Episode & Event Endpoints (2 hours)
+### Task 2: Public Character Roster Page (3-4 hours)
 
-**Goal:** Complete episode and event CRUD operations
+**Goal:** Build searchable/filterable character roster with color styling
 
-#### 2.1: Create Database Migration (if needed)
-- Verify `episodes` and `events` tables exist
-- Add indexes on campaign_id and episode_id
+#### 2.1: Create Public Character Roster Page
+- File: `frontend/src/app/campaigns/[slug]/characters/page.tsx`
+- List all active characters for campaign
+- Apply character color overrides from database
+- Character cards show: name, class, race, player name, image
+- Search and filter options (by class, race, name)
 
-**Expected Result:** Tables exist with proper indexes
+**Expected Result:** Character roster displays with all characters
 
-#### 2.2: Update Episode & Event Models
-- Update `Episode` model with all fields
-- Update `Event` model with all fields
-- Add relationships between tables
+#### 2.2: Enhance CharacterCard for Public View
+- Update/create `frontend/src/components/PublicCharacterCard.tsx`
+- Display character with color override styling
+- Border colors from color_theme_override
+- Text color styling
+- Badge styling for stats (HP, AC if available)
+- Click to view character detail page
 
-**Expected Result:** SQLAlchemy models ready
+**Expected Result:** Character cards display with custom colors
 
-#### 2.3: Create episodes.py Endpoints Module
-- POST /episodes - Create episode
-- GET /campaigns/{id}/episodes - List episodes
-- GET /episodes/{id} - Get episode detail (include events)
-- PATCH /episodes/{id} - Update episode
-- DELETE /episodes/{id} - Delete episode (cascades to events)
+#### 2.3: Create Character Search Component
+- File: `frontend/src/components/CharacterSearch.tsx`
+- Search by name, class, race
+- Filter by status (active/inactive)
+- Sort options (alphabetical, by class, by race)
+- Mobile-responsive design
 
-**Expected Result:** 5 fully functional episode endpoints
+**Expected Result:** Search/filter functionality works
 
-#### 2.4: Create events.py Endpoints Module (or add to episodes.py)
-- POST /episodes/{id}/events - Create event
-- GET /episodes/{id}/events - List events
-- PATCH /episodes/{id}/events/{event_id} - Update event
-- DELETE /episodes/{id}/events/{event_id} - Delete event
+#### 2.4: Create Public Character Detail Page
+- File: `frontend/src/app/campaigns/[slug]/characters/[characterSlug]/page.tsx`
+- Large character image (left sidebar)
+- Character details: class, race, player name, backstory, description
+- Visual styling with character color overrides
+- Related episodes (events this character was involved in)
+- Back to roster link
 
-**Expected Result:** 4 fully functional event endpoints
-
-#### 2.5: Test Episode & Event Endpoints
-- Create test_episodes.py
-- Test full episode CRUD flow
-- Test event creation within episodes
-- Test cascading deletes
-
-**Expected Result:** All tests pass ✓
-
----
-
-### Task 3: Frontend - Character Components (3-4 hours)
-
-**Goal:** Build reusable character management components
-
-#### 3.1: Create image_upload.ts Helper
-- File: `frontend/src/lib/image_upload.ts`
-- Function to preview image before upload
-- Function to upload to backend endpoint
-- Handle errors gracefully
-
-**Expected Result:** Image upload utility ready
-
-#### 3.2: Create CharacterCard Component
-- File: `frontend/src/components/CharacterCard.tsx`
-- Display character in grid format
-- Show image, name, class, race
-- "View" and "Edit" buttons
-
-**Expected Result:** Reusable card component
-
-#### 3.3: Create CharacterForm Component
-- File: `frontend/src/components/CharacterForm.tsx`
-- Form for create/edit modes
-- Fields: name (auto-slug), class, race, player, description, backstory, image, level
-- Auto-slug generation from name
-- Image preview before save
-
-**Expected Result:** Form component works in both modes
-
-#### 3.4: Create ImageUploadField Component
-- File: `frontend/src/components/ImageUploadField.tsx`
-- File input with preview
-- Drop zone support
-- File type/size validation
-- Progress indicator
-
-**Expected Result:** Reusable image upload field
-
-#### 3.5: Update API Client
-- File: `frontend/src/lib/api.ts`
-- Add character endpoints: createCharacter, getCharacters, getCharacter, updateCharacter, deleteCharacter
-- Add uploadCharacterImage function
-- Proper error handling
-
-**Expected Result:** API functions ready for components
+**Expected Result:** Character detail page displays with all info
 
 ---
 
-### Task 4: Frontend - Character Pages (2-3 hours)
+### Task 3: Public Episode Guide Page (2-3 hours)
 
-**Goal:** Build UI pages for character management
+**Goal:** Build episode guide with story timeline
 
-#### 4.1: Create Character List Page
-- File: `frontend/src/app/admin/campaigns/[id]/characters/page.tsx`
-- Display grid of character cards
-- "Add Character" button
-- Navigation back to campaign
-
-**Expected Result:** Character list displays properly
-
-#### 4.2: Create Create Character Page
-- File: `frontend/src/app/admin/campaigns/[id]/characters/new/page.tsx`
-- CharacterForm in create mode
-- On success, redirect to character detail
-- On cancel, go back to list
-
-**Expected Result:** Can create characters with all fields
-
-#### 4.3: Create Character Detail Page
-- File: `frontend/src/app/admin/campaigns/[id]/characters/[characterId]/page.tsx`
-- Large image display (left sidebar)
-- Character details (main content)
-- Edit form with save/cancel
-- Delete button in danger zone
-
-**Expected Result:** Can view, edit, and delete characters
-
----
-
-### Task 5: Frontend - Episode Components (2-3 hours)
-
-**Goal:** Build episode management components
-
-#### 5.1: Create EpisodeCard Component
-- File: `frontend/src/components/EpisodeCard.tsx`
-- Display episode in list format
+#### 3.1: Create Public Episode Guide Page
+- File: `frontend/src/app/campaigns/[slug]/episodes/page.tsx`
+- List all published episodes for campaign
+- Timeline view (vertical or horizontal)
+- Filter by season
 - Show episode number, name, air date, runtime
-- "View" and "Edit" buttons
+- Summary/description for each episode
 
-**Expected Result:** Reusable episode card
+**Expected Result:** Episode guide displays all published episodes
 
-#### 5.2: Create EpisodeForm Component
-- File: `frontend/src/components/EpisodeForm.tsx`
-- Form for create/edit modes
-- Fields: name (auto-slug), episode_number, season, description, air_date, runtime, is_published
+#### 3.2: Create Public Episode Timeline Component
+- File: `frontend/src/components/PublicEpisodeTimeline.tsx`
+- Vertical or horizontal timeline layout
+- Episode cards with: number, title, date, runtime
+- Season headers/separators
+- Click to view episode detail
+- Visual progression indicator (current/past/upcoming)
 
-**Expected Result:** Form works in both modes
+**Expected Result:** Timeline component renders correctly
 
-#### 5.3: Create EpisodeTimeline Component
-- File: `frontend/src/components/EpisodeTimeline.tsx`
-- Vertical timeline view of episodes
-- Ordered by episode number
-- Links to detail pages
+#### 3.3: Create Public Episode Detail Page
+- File: `frontend/src/app/campaigns/[slug]/episodes/[episodeSlug]/page.tsx`
+- Episode title, air date, runtime, description
+- Events timeline (character-driven events)
+- Character involvement indicator
+- Links to related characters
+- Back to guide link
 
-**Expected Result:** Timeline displays properly
-
-#### 5.4: Create EventCard Component
-- File: `frontend/src/components/EventCard.tsx`
-- Display event in timeline
-- Show name, timestamp, event_type
-- Edit/delete buttons
-
-**Expected Result:** Event cards display in episodes
-
-#### 5.5: Update API Client
-- Add episode endpoints: createEpisode, getEpisodes, getEpisode, updateEpisode, deleteEpisode
-- Add event endpoints: createEvent, getEvents, deleteEvent
-
-**Expected Result:** API functions ready
+**Expected Result:** Episode detail page displays all info
 
 ---
 
-### Task 6: Frontend - Episode Pages (2-3 hours)
+### Task 4: Frontend API Updates (1 hour)
 
-**Goal:** Build UI pages for episode management
+**Goal:** Add public API endpoints to API client
 
-#### 6.1: Create Episode List Page
-- File: `frontend/src/app/admin/campaigns/[id]/episodes/page.tsx`
-- EpisodeTimeline component
-- "Add Episode" button
-- Navigation back to campaign
+#### 4.1: Update API Client with Public Endpoints
+- File: `frontend/src/lib/api.ts`
+- Add: `getPublicCampaign(slug)` - Get campaign by slug (no auth)
+- Add: `getPublicCharacters(campaignSlug)` - Get active characters (no auth)
+- Add: `getPublicCharacter(campaignSlug, characterSlug)` - Get character detail (no auth)
+- Add: `getPublicEpisodes(campaignSlug)` - Get published episodes (no auth)
+- Add: `getPublicEpisode(campaignSlug, episodeSlug)` - Get episode detail (no auth)
+- Add: `getPublicEvents(episodeId)` - Get events for episode (no auth)
 
-**Expected Result:** Episode list displays
-
-#### 6.2: Create Create Episode Page
-- File: `frontend/src/app/admin/campaigns/[id]/episodes/new/page.tsx`
-- EpisodeForm in create mode
-- Redirect to episode detail on success
-
-**Expected Result:** Can create episodes
-
-#### 6.3: Create Episode Detail Page
-- File: `frontend/src/app/admin/campaigns/[id]/episodes/[episodeId]/page.tsx`
-- Episode info (main content)
-- Events timeline (below)
-- "Add Event" button
-- Edit/delete episode
-
-**Expected Result:** Can view, edit, delete episodes and manage events
+**Expected Result:** 6 new API functions ready
 
 ---
 
-### Task 7: Integration Testing (2 hours)
+### Task 5: Responsive Design & Styling (2 hours)
 
-**Goal:** Test full Phase 2 workflow end-to-end
+**Goal:** Ensure all public pages are mobile-responsive and visually appealing
 
-#### 7.1: Create Test Campaign
-- Use existing Phase 1 campaign or create new one
+#### 5.1: Mobile Optimization
+- Test all pages on mobile devices
+- Character cards stack properly
+- Episode timeline readable on small screens
+- Navigation works on mobile
+- Images load efficiently
 
-#### 7.2: Test Character Management
-- [ ] Create character with image
-- [ ] List characters
-- [ ] Edit character (update name, description, image)
-- [ ] Verify image appears in list and detail
-- [ ] Delete character
-- [ ] Verify image deleted from R2
+**Expected Result:** All pages look good on mobile
 
-#### 7.3: Test Episode Management
-- [ ] Create episode
-- [ ] List episodes in timeline
-- [ ] Create event in episode
-- [ ] Edit event
-- [ ] Delete event
-- [ ] Delete episode (verify events cascade deleted)
+#### 5.2: Character Color Styling Implementation
+- Ensure character color overrides display correctly:
+  - Border colors applied to character cards
+  - Text color used for character names/text
+  - Badge colors for HP/AC (if displayed)
+  - Gradient colors rendered properly
 
-#### 7.4: Test Cross-Feature Integration
-- [ ] Create campaign with multiple characters and episodes
-- [ ] Verify all data displays correctly
-- [ ] Test navigation between related pages
-- [ ] Verify campaign deletion cascades to characters and episodes
+**Expected Result:** Character styling matches admin UI
 
-#### 7.5: Test Error Handling
-- [ ] Try operations without auth token (should fail)
-- [ ] Try operations on other user's campaign (should fail)
-- [ ] Try invalid file uploads (should fail gracefully)
-- [ ] Test network error scenarios
+#### 5.3: Accessibility
+- [ ] Alt text for images
+- [ ] Proper heading hierarchy
+- [ ] Keyboard navigation support
+- [ ] Color contrast compliance (WCAG AA)
+- [ ] ARIA labels for interactive elements
+
+**Expected Result:** Pages are accessible
+
+---
+
+### Task 6: Character Relationship & Network (Optional - Phase 3.5)
+
+**Goal:** Build interactive character relationship visualization
+
+#### 6.1: Create Character Network Component (OPTIONAL)
+- File: `frontend/src/components/CharacterNetwork.tsx`
+- Visual network graph of character relationships
+- Connect characters who appear in same episodes
+- Filter by type of relationship (party members, allies, enemies, etc.)
+
+**Expected Result:** Relationship graph displays (optional feature)
+
+---
+
+### Task 7: Integration Testing (2-3 hours)
+
+**Goal:** Test full Phase 3 Tier 3 workflow end-to-end
+
+#### 7.1: Test Public Campaign Pages
+- [ ] Navigate to /campaigns/campaign-slug
+- [ ] Verify campaign data displays
+- [ ] Click to character roster
+- [ ] Click to episode guide
+
+#### 7.2: Test Character Roster
+- [ ] All active characters display
+- [ ] Color overrides show correctly
+- [ ] Search/filter works
+- [ ] Click character to view detail
+- [ ] Detail page shows all info
+
+#### 7.3: Test Episode Guide
+- [ ] All published episodes display
+- [ ] Timeline renders properly
+- [ ] Click episode to view detail
+- [ ] Events display in episode detail
+- [ ] Character mentions link correctly
+
+#### 7.4: Test Public API Endpoints
+- [ ] All GET endpoints return correct data
+- [ ] Endpoints don't require auth
+- [ ] Error handling works (404 for missing campaign/character/episode)
+- [ ] Data filtering works (active characters, published episodes)
+
+#### 7.5: Test Cross-Device Experience
+- [ ] Desktop (1920x1080)
+- [ ] Tablet (768x1024)
+- [ ] Mobile (375x667)
+- [ ] All content visible and usable
 
 **Expected Result:** All integration tests pass ✓
 
 ---
 
-### Task 8: Documentation & Polish (1-2 hours)
+### Task 8: Documentation & Polish (2-3 hours)
+
+**Goal:** Update documentation and clean up code
 
 #### 8.1: Update Documentation Files
-- Update PROJECT_STATUS.md with Phase 2 completion
-- Update API_DESIGN.md with new endpoints
-- Update ARCHITECTURE.md if needed
-- Create PHASE_2_COMPLETION_SUMMARY.md
+- Update PROJECT_STATUS.md with Phase 3 Tier 3 completion
+- Update ARCHITECTURE.md if public routes need documenting
+- Create PHASE_3_TIER_3_COMPLETION_SUMMARY.md
+- Update NEXT_ACTIONS.md for Phase 3 Tier 4 (optional enhancements)
 
-#### 8.2: Code Quality
+**Expected Result:** All docs updated and consistent
+
+#### 8.2: Code Quality Review
 - [ ] Remove console.log statements
-- [ ] Add error handling comments
-- [ ] Verify all endpoints have JSDoc comments
-- [ ] Check TypeScript types are correct
+- [ ] Verify all new components have JSDoc comments
+- [ ] Check TypeScript types are correct on public pages
+- [ ] Verify no auth tokens leak to client-side code
+
+**Expected Result:** Code is clean and documented
 
 #### 8.3: Performance Optimization
 - [ ] Check bundle size
-- [ ] Optimize images (consider lazy loading)
-- [ ] Verify database queries are efficient
-- [ ] Add caching if needed
+- [ ] Optimize images with next/image
+- [ ] Add lazy loading for component lists
+- [ ] Implement caching headers on public API responses
 
-**Expected Result:** Code is clean, documented, and optimized
+**Expected Result:** Pages load quickly
 
 ---
 
@@ -374,17 +341,14 @@ Open http://localhost:3000 in browser:
 
 **Recommended sequence (follow dependencies):**
 
-1. ✅ Backend: Migration & Models (Task 1.1-1.2)
-2. ✅ Backend: Character Endpoints (Task 1.3-1.5)
-3. ✅ Backend: Episode Endpoints (Task 2.1-2.5)
-4. ✅ Frontend: API Client (Task 3.5 + 5.5)
-5. ✅ Frontend: Image Upload (Task 3.1)
-6. ✅ Frontend: Character Components (Task 3.2-3.4)
-7. ✅ Frontend: Character Pages (Task 4.1-4.3)
-8. ✅ Frontend: Episode Components (Task 5.1-5.4)
-9. ✅ Frontend: Episode Pages (Task 6.1-6.3)
-10. ✅ Integration Testing (Task 7)
-11. ✅ Documentation & Polish (Task 8)
+1. Frontend: API Client - Public Endpoints (Task 4)
+2. Frontend: Campaign Detail Page (Task 1)
+3. Frontend: Character Roster + Detail (Task 2)
+4. Frontend: Episode Guide + Detail (Task 3)
+5. Frontend: Responsive Design & Styling (Task 5)
+6. Integration Testing (Task 7)
+7. Documentation & Polish (Task 8)
+8. Optional: Character Relationship Network (Task 6)
 
 ---
 
@@ -392,125 +356,133 @@ Open http://localhost:3000 in browser:
 
 **If working 4-6 hour sessions:**
 
-**Session 5:**
-- Task 0: Verification (5 min)
-- Task 1: Backend Character Model & Endpoints (2-3 hours)
-- Start Task 2: Backend Episode Endpoints (1-2 hours)
-
-**Session 6:**
-- Finish Task 2: Backend Episode Endpoints (1 hour)
-- Task 3: Frontend Character Components (3 hours)
-
-**Session 7:**
-- Task 4: Frontend Character Pages (2-3 hours)
-- Start Task 5: Frontend Episode Components (1-2 hours)
-
-**Session 8:**
-- Finish Task 5: Episode Components (1 hour)
-- Task 6: Episode Pages (2-3 hours)
-- Start Task 7: Testing (1 hour)
-
 **Session 9:**
-- Finish Task 7: Integration Testing (1-2 hours)
-- Task 8: Documentation & Polish (1-2 hours)
-- **Phase 2 Complete!**
+- Task 0: Verification (5 min)
+- Task 4: Frontend API Client Updates (1 hour)
+- Task 1: Campaign Detail Page (2-3 hours)
+- Start Task 2: Character Roster (1-2 hours)
+
+**Session 10:**
+- Finish Task 2: Character Roster & Detail Pages (2-3 hours)
+- Task 3: Episode Guide Pages (2-3 hours)
+- Start Task 5: Responsive Design (30 min)
+
+**Session 11:**
+- Finish Task 5: Responsive Design & Styling (1-2 hours)
+- Task 7: Integration Testing (2-3 hours)
+- Start Task 8: Documentation (30 min)
+
+**Session 12:**
+- Finish Task 8: Documentation & Polish (1-2 hours)
+- **Phase 3 Tier 3 Complete!**
+- **Discuss Phase 3 Tier 4+ or other enhancements**
 
 ---
 
 ## 🔗 Key Reference Files
 
 **For Architecture & Design:**
-- `PHASE_2_PLANNING.md` - Detailed Phase 2 architecture (READ THIS FIRST)
 - `ARCHITECTURE.md` - Overall system architecture
-- `DATABASE_SCHEMA.md` - Database design details
 - `DECISIONS.md` - Design rationale
+- `DATABASE_SCHEMA.md` - Database design details
 
 **For Implementation Examples:**
+- `PHASE_3_TIER_2_TEST_REPORT.md` - Completed color override UI implementation
+- `PHASE_1_COMPLETION_SUMMARY.md` - Phase 1 reference patterns
 - `FINAL_ISSUE_FIXES.md` - How to fix bugs (Phase 1 patterns)
-- `PHASE_1_PROGRESS.md` - Phase 1 implementation details
-- `PHASE_1_COMPLETION_SUMMARY.md` - Complete Phase 1 reference
 
-**For Troubleshooting:**
+**For Troubleshooting & Startup:**
 - `TROUBLESHOOTING.md` - Common issues & solutions
-- `SESSION_5_STARTUP.md` - Quick start checklist
+- `SESSION_8_STARTUP.md` - Session 8 quick start checklist
+- `KNOWN_ISSUES.md` - Documented issues from previous sessions
 
 ---
 
-## 📚 Code Patterns to Follow (from Phase 1)
+## 📚 Code Patterns to Follow
 
-### Character CRUD Pattern (follow like Campaign CRUD)
+### Public Page Pattern (new for Phase 3 Tier 3)
 ```typescript
-// Backend: Characters endpoints follow same pattern as Campaigns
-POST /characters
-GET /campaigns/{id}/characters
-GET /characters/{id}
-PATCH /characters/{id}
-DELETE /characters/{id}
+// Public pages DO NOT require authentication
+// Data is fetched from public API endpoints
+// Components are read-only (no editing)
+// Character color overrides are displayed
 
-// Frontend: Components follow same pattern
-useAuth → useCharacters hook
-CharacterForm (create/edit modes)
-CharacterCard (list items)
-Protected routes
-localStorage caching
+// Example route structure
+/campaigns/[slug]                    // Campaign overview
+/campaigns/[slug]/characters         // Character roster
+/campaigns/[slug]/characters/[slug]  // Character detail
+/campaigns/[slug]/episodes          // Episode guide
+/campaigns/[slug]/episodes/[slug]   // Episode detail
 ```
 
-### Image Upload Pattern (new for Phase 2)
+### Public API Pattern
 ```typescript
-// Frontend
-SelectFile → Preview → Upload → Get URL from Backend
-Store URL in database
-Delete image from R2 on character delete
+// Public API functions (no auth required)
+getPublicCampaign(slug)
+getPublicCharacters(campaignSlug)
+getPublicCharacter(campaignSlug, characterSlug)
+getPublicEpisodes(campaignSlug)
+getPublicEpisode(campaignSlug, episodeSlug)
+getPublicEvents(episodeId)
 
-// Backend
-Receive File → Upload to R2
-Store R2 key + public URL in database
-Return data to frontend
+// These endpoints should be fast and cacheable
+// Use HTTP caching headers for performance
 ```
 
-### Form Component Pattern
+### Color Styling Pattern
 ```typescript
-// Create Mode
-- Initialize with empty fields
-- On submit, POST to create endpoint
-- On success, redirect to detail page
+// Character color overrides should be applied to:
+// - Border colors (card borders, accents)
+// - Text color (character name, text)
+// - Badge colors (HP/AC if displayed)
+// - Gradient colors (background gradients)
 
-// Edit Mode
-- Initialize with existing data
-- On submit, PATCH to update endpoint
-- On success, stay on page with updated data
-- Show loading state during submission
+// Example implementation:
+<div style={{
+  borderColor: character.color_theme_override?.border_colors[0],
+  color: character.color_theme_override?.text_color,
+}}>
+  {character.name}
+</div>
 ```
 
 ---
 
-## ✅ Success Criteria for Phase 2
+## ✅ Success Criteria for Phase 3 Tier 3
 
-**Backend Complete When:**
-- [ ] Character endpoints working (create, read, update, delete)
-- [ ] Character image uploads to R2 working
-- [ ] Episode endpoints working
-- [ ] Event endpoints working
-- [ ] All tests passing
-- [ ] No critical bugs
+**Public API Complete When:**
+- [ ] getPublicCampaign endpoint works
+- [ ] getPublicCharacters endpoint works
+- [ ] getPublicEpisodes endpoint works
+- [ ] getPublicEvents endpoint works
+- [ ] All endpoints return only published/active data
+- [ ] No auth token required for these endpoints
 
 **Frontend Complete When:**
-- [ ] Character list page displaying
-- [ ] Create character page working
-- [ ] Character detail page with edit/delete working
-- [ ] Episode list page displaying
-- [ ] Episode detail page with events working
+- [ ] Campaign detail page displays
+- [ ] Character roster page displays with search/filter
+- [ ] Character detail page displays with color styling
+- [ ] Episode guide page displays
+- [ ] Episode detail page displays with event timeline
 - [ ] All navigation working correctly
-- [ ] All CRUD operations working
-- [ ] Responsive design looks good
-- [ ] Error handling works properly
+- [ ] Character color overrides display correctly
+- [ ] Responsive design looks good on mobile/tablet/desktop
+- [ ] Error handling works (404, network errors, etc.)
 - [ ] No critical bugs
 
+**Testing Complete When:**
+- [ ] Can navigate all public pages
+- [ ] Character color styling displays correctly
+- [ ] Search and filters work
+- [ ] All data displays correctly
+- [ ] Tested on multiple devices/browsers
+
 **Documentation Complete When:**
-- [ ] All new endpoints documented
-- [ ] Phase 2 completion summary written
-- [ ] Architecture updated if needed
+- [ ] PHASE_3_TIER_3_COMPLETION_SUMMARY.md written
+- [ ] Public routes documented in ARCHITECTURE.md
+- [ ] API_DESIGN.md updated with public endpoints
 - [ ] Code comments added where needed
+- [ ] Phase 3 progress updated in PROJECT_STATUS.md
 
 ---
 
@@ -551,17 +523,26 @@ node --version
 
 ## 🚀 You're Ready!
 
-Phase 1 is complete and tested. Phase 2 is fully planned and documented.
+Phase 1 & 2 are complete and tested. Phase 3 Tiers 1 & 2 are complete. Phase 3 Tier 3 is fully planned.
 
 Everything you need is in:
-- PHASE_2_PLANNING.md (architecture & detailed design)
-- This file (action items & schedule)
-- SESSION_5_STARTUP.md (quick start)
+- This file (action items & schedule for Tier 3)
+- SESSION_8_STARTUP.md (quick start reference)
+- PHASE_3_TIER_2_TEST_REPORT.md (reference for color override implementation)
+- PROJECT_STATUS.md (overall project status)
 - Previous phase docs (reference & patterns)
+
+**Key Points for Phase 3 Tier 3:**
+- Public pages require NO authentication
+- Character color overrides should display with styling
+- Use `/campaigns/[slug]` format for public routes (not `/campaigns/[id]`)
+- Episode guide and character roster should be searchable/filterable
+- Responsive design is critical for public pages
+- All color override styling should match admin UI
 
 **Start whenever you're ready. Happy coding! 🎉**
 
 ---
 
-**Last updated:** 2025-11-21 (Session 5 Preparation)
-**Status:** Ready to Begin Phase 2
+**Last updated:** 2025-11-22 (Session 8 Completion - Phase 3 Tier 2 Done)
+**Status:** Ready to Begin Phase 3 Tier 3

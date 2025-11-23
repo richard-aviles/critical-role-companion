@@ -53,7 +53,9 @@ export const useAuth = (): UseAuthReturn => {
     const currentUser = getCurrentUser();
 
     if (token && currentUser) {
-      // Don't set a global token - each page will set its own campaign's admin_token
+      // Set the Authorization header for authenticated requests
+      // The backend needs this to verify campaign ownership and return admin_token
+      setAuthToken(token);
       setUser(currentUser);
       setCampaigns(currentUser.campaigns || []);
       setIsLoggedIn(true);
@@ -75,8 +77,9 @@ export const useAuth = (): UseAuthReturn => {
         saveUserEmail(response.email);
         saveCampaigns(response.campaigns);
 
-        // Note: We don't set auth token here because each campaign has its own admin_token
-        // The token will be set per-campaign when needed
+        // Set the Authorization header for authenticated requests
+        // The backend needs this to verify campaign ownership and return admin_token
+        setAuthToken(response.user_id);
 
         // Update state
         setUser({

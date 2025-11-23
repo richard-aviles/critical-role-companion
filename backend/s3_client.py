@@ -10,7 +10,7 @@ from botocore.exceptions import ClientError
 class S3Client:
     """Client for uploading images to Cloudflare R2"""
 
-    def __init__(self, account_id: str, access_key_id: str, secret_access_key: str, bucket_name: str):
+    def __init__(self, account_id: str, access_key_id: str, secret_access_key: str, bucket_name: str, public_url: str = None):
         """
         Initialize R2 client
 
@@ -19,9 +19,11 @@ class S3Client:
             access_key_id: R2 API Token Access Key ID
             secret_access_key: R2 API Token Secret Access Key
             bucket_name: R2 Bucket name
+            public_url: Public base URL for accessing uploaded files (e.g., https://pub-xxx.r2.dev)
         """
         self.bucket_name = bucket_name
         self.account_id = account_id
+        self.public_url = public_url
 
         # Create S3 client configured for R2
         self.client = boto3.client(
@@ -55,9 +57,13 @@ class S3Client:
                 ContentType=content_type,
             )
 
-            # Return public URL (assuming bucket is public)
-            # Format: https://cdn.example.com/{key} or https://{bucket}.{account}.r2.cloudflarestorage.com/{key}
-            url = f"https://{self.bucket_name}.{self.account_id}.r2.cloudflarestorage.com/{key}"
+            # Return public URL
+            if self.public_url:
+                # Use public development URL if provided
+                url = f"{self.public_url}/{key}"
+            else:
+                # Fallback to private endpoint URL
+                url = f"https://{self.bucket_name}.{self.account_id}.r2.cloudflarestorage.com/{key}"
             return url
 
         except ClientError as e:

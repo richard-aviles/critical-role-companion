@@ -61,6 +61,7 @@ class Campaign(Base):
     episodes = relationship("Episode", back_populates="campaign", cascade="all, delete-orphan")
     roster = relationship("Roster", back_populates="campaign", uselist=False, cascade="all, delete-orphan")
     layout_overrides = relationship("LayoutOverrides", back_populates="campaign", cascade="all, delete-orphan")
+    character_layouts = relationship("CharacterLayout", back_populates="campaign", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -93,12 +94,20 @@ class Character(Base):
     backstory = Column(Text, nullable=True)
 
     # Image/Media
-    image_url = Column(String(500), nullable=True)  # Public R2 URL
+    image_url = Column(String(500), nullable=True)  # Public R2 URL (portrait)
     image_r2_key = Column(String(255), nullable=True)  # R2 storage key for deletion
+    background_image_url = Column(String(500), nullable=True)  # Background image URL
 
     # Status & Metadata
     is_active = Column(Boolean, default=True)
     level = Column(Integer, default=1)
+
+    # Character Stats (Phase 3)
+    stats = Column(JSONB, nullable=True, default={})  # {str, dex, con, int, wis, cha, hp, ac}
+
+    # Character Color Theme Override (Phase 3)
+    # When set, overrides campaign's default color theme for this character
+    color_theme_override = Column(JSONB, nullable=True)  # {border_colors, text_color, badge_interior_gradient, hp_color, ac_color}
 
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
@@ -113,14 +122,17 @@ class Character(Base):
             "campaign_id": str(self.campaign_id),
             "name": self.name,
             "slug": self.slug,
-            "class": self.class_name,
+            "class_name": self.class_name,
             "race": self.race,
             "player_name": self.player_name,
             "description": self.description,
             "backstory": self.backstory,
             "image_url": self.image_url,
+            "background_image_url": self.background_image_url,
             "level": self.level,
             "is_active": self.is_active,
+            "stats": self.stats or {},
+            "color_theme_override": self.color_theme_override,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
@@ -265,5 +277,66 @@ class LayoutOverrides(Base):
             "tier": self.tier,
             "badges": self.badges or {},
             "chips": self.chips or {},
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class CharacterLayout(Base):
+    """
+    Character card layout and styling configuration for a campaign (Phase 3)
+    Defines which stats display, their positions, shapes, and color scheme
+    Applied campaign-wide: all characters in campaign use the same layout
+    """
+    __tablename__ = "character_layouts"
+
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    campaign_id = Column(PG_UUID(as_uuid=True), ForeignKey("campaigns.id", ondelete="CASCADE"), nullable=False, index=True)
+
+    # Layout metadata
+    name = Column(String(100), nullable=False, default="Default")  # User-friendly name
+    is_default = Column(Boolean, default=False)  # Whether this is the default layout
+
+    # Stat configuration
+    stats_to_display = Column(JSONB, nullable=False, default=["str", "dex", "con", "int", "wis", "cha"])  # Array of stat keys
+
+    # Color scheme
+    border_color_count = Column(Integer, default=2, nullable=False)  # 2 or 4 colors for gradient
+    border_colors = Column(JSONB, nullable=False, default={})  # {count: [colors]} or list of hex codes
+    text_color = Column(String(7), nullable=False, default="#FFFFFF")  # Hex color
+    badge_interior_gradient = Column(JSONB, nullable=False, default={})  # {type, start, end} for radial
+
+    # HP & AC colors (fixed)
+    hp_color = Column(JSONB, nullable=False, default={})  # {border, interior: {start, end}}
+    ac_color = Column(JSONB, nullable=False, default={})  # {border, interior: {start, end}}
+
+    # Badge layout (positions & shapes)
+    badge_layout = Column(JSONB, nullable=False, default=[])  # Array of {stat, shape, x, y, ...}
+
+    # Color preset (if using preset)
+    color_preset = Column(String(50), nullable=True)  # "option_a", "option_b", "option_c", or null for custom
+
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    # Relationships
+    campaign = relationship("Campaign", back_populates="character_layouts")
+
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "campaign_id": str(self.campaign_id),
+            "name": self.name,
+            "is_default": self.is_default,
+            "stats_to_display": self.stats_to_display or [],
+            "border_color_count": self.border_color_count,
+            "border_colors": self.border_colors or {},
+            "text_color": self.text_color,
+            "badge_interior_gradient": self.badge_interior_gradient or {},
+            "hp_color": self.hp_color or {},
+            "ac_color": self.ac_color or {},
+            "badge_layout": self.badge_layout or [],
+            "color_preset": self.color_preset,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
