@@ -86,7 +86,7 @@ function EpisodeDetailPageContent() {
         // Fetch episode, events, and characters in parallel
         const [episodeData, eventsData, charactersData] = await Promise.all([
           getEpisode(campaignId, episodeId),
-          getEvents(episodeId, adminToken || undefined),
+          getEvents(episodeId, campaign.admin_token || undefined),
           getCharacters(campaignId),
         ]);
 
