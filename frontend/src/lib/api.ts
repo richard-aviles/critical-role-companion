@@ -53,11 +53,14 @@ interface LoginPayload {
   password: string;
 }
 
-interface Campaign {
+export interface Campaign {
   id: string;
   slug: string;
   name: string;
   admin_token: string;
+  description?: string;
+  character_count?: number;
+  episode_count?: number;
 }
 
 interface LoginResponse {
