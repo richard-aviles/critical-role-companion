@@ -1877,6 +1877,140 @@ async def update_layout(
 
 
 # ============================================================================
+# PUBLIC ENDPOINTS (Phase 3 Tier 3: Campaign Website Pages)
+# ============================================================================
+
+@app.get("/public/campaigns/{slug}")
+def get_public_campaign(slug: str, db: Session = Depends(get_db)):
+    """
+    Get campaign details by slug (public - no auth required)
+    Returns: Campaign object with stats
+    """
+    campaign = db.query(Campaign).filter(Campaign.slug == slug).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    # Count active characters and published episodes
+    active_chars = db.query(Character).filter(
+        and_(Character.campaign_id == campaign.id, Character.is_active == True)
+    ).count()
+    published_eps = db.query(Episode).filter(
+        and_(Episode.campaign_id == campaign.id, Episode.is_published == True)
+    ).count()
+
+    return {
+        **campaign.to_dict(),
+        "character_count": active_chars,
+        "episode_count": published_eps
+    }
+
+
+@app.get("/public/campaigns/{slug}/characters")
+def get_public_characters(slug: str, db: Session = Depends(get_db)):
+    """
+    Get all active characters for a campaign (public - no auth required)
+    Returns: List[Character] with color_theme_override
+    """
+    campaign = db.query(Campaign).filter(Campaign.slug == slug).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    characters = db.query(Character).filter(
+        and_(Character.campaign_id == campaign.id, Character.is_active == True)
+    ).all()
+
+    return [c.to_dict() for c in characters]
+
+
+@app.get("/public/campaigns/{slug}/characters/{character_slug}")
+def get_public_character(slug: str, character_slug: str, db: Session = Depends(get_db)):
+    """
+    Get character details by slug (public - no auth required)
+    Returns: Character object with full details and color_theme_override
+    """
+    campaign = db.query(Campaign).filter(Campaign.slug == slug).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    character = db.query(Character).filter(
+        and_(
+            Character.campaign_id == campaign.id,
+            Character.slug == character_slug,
+            Character.is_active == True
+        )
+    ).first()
+
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    return character.to_dict()
+
+
+@app.get("/public/campaigns/{slug}/episodes")
+def get_public_episodes(slug: str, db: Session = Depends(get_db)):
+    """
+    Get all published episodes for a campaign (public - no auth required)
+    Returns: List[Episode] ordered by season/episode number
+    """
+    campaign = db.query(Campaign).filter(Campaign.slug == slug).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    episodes = db.query(Episode).filter(
+        and_(Episode.campaign_id == campaign.id, Episode.is_published == True)
+    ).order_by(Episode.season.desc(), Episode.episode_number.asc()).all()
+
+    return [e.to_dict() for e in episodes]
+
+
+@app.get("/public/campaigns/{slug}/episodes/{episode_slug}")
+def get_public_episode(slug: str, episode_slug: str, db: Session = Depends(get_db)):
+    """
+    Get episode details by slug with all events (public - no auth required)
+    Returns: Episode object with events included
+    """
+    campaign = db.query(Campaign).filter(Campaign.slug == slug).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    episode = db.query(Episode).filter(
+        and_(
+            Episode.campaign_id == campaign.id,
+            Episode.slug == episode_slug,
+            Episode.is_published == True
+        )
+    ).first()
+
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    return episode.to_dict(include_events=True)
+
+
+@app.get("/public/episodes/{episode_id}/events")
+def get_public_episode_events(episode_id: str, db: Session = Depends(get_db)):
+    """
+    Get all events for an episode (public - no auth required)
+    Returns: List[Event] for the episode
+    """
+    try:
+        episode_uuid = uuid.UUID(episode_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid episode ID format")
+
+    episode = db.query(Episode).filter(Episode.id == episode_uuid).first()
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # Only return events if episode is published
+    if not episode.is_published:
+        raise HTTPException(status_code=403, detail="Episode is not published")
+
+    events = db.query(Event).filter(Event.episode_id == episode_uuid).all()
+    return [e.to_dict() for e in events]
+
+
+# ============================================================================
 # INCLUDE EPISODE & EVENT ROUTERS
 # ============================================================================
 
