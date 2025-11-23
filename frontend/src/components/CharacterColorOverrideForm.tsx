@@ -96,6 +96,7 @@ export const CharacterColorOverrideForm: React.FC<
   );
 
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [customColors, setCustomColors] = useState<ColorThemeOverride>(
     initialColors || presetToColorThemeOverride(selectedPreset || DEFAULT_PRESET)
@@ -384,10 +385,14 @@ export const CharacterColorOverrideForm: React.FC<
           type="button"
           onClick={async () => {
             setIsSaving(true);
+            setSaveSuccess(false);
             try {
               console.log('[ColorOverride] Saving colors:', customColors);
               await onSubmit(customColors);
               console.log('[ColorOverride] Colors saved successfully');
+              setSaveSuccess(true);
+              // Reset success state after 2 seconds
+              setTimeout(() => setSaveSuccess(false), 2000);
             } catch (error) {
               console.error('[ColorOverride] Error saving colors:', error);
             } finally {
@@ -395,12 +400,21 @@ export const CharacterColorOverrideForm: React.FC<
             }
           }}
           disabled={isLoading || isSaving}
-          className="flex-1 rounded-md bg-blue-600 py-2 px-4 text-white font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className={`flex-1 rounded-md py-2 px-4 text-white font-medium transition-all ${
+            saveSuccess
+              ? 'bg-green-600 hover:bg-green-700'
+              : 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed'
+          }`}
         >
           {isSaving ? (
             <span className="flex items-center justify-center">
               <span className="animate-spin mr-2">◌</span>
               Saving...
+            </span>
+          ) : saveSuccess ? (
+            <span className="flex items-center justify-center">
+              <span className="mr-2">✓</span>
+              Saved!
             </span>
           ) : (
             'Save Color Override'
