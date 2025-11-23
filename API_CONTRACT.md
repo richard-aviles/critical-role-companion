@@ -184,6 +184,41 @@ const [adminToken, setAdminToken] = useState(null);
 const episode = await createEpisode(data); // ← Token not passed!
 ```
 
+### ❌ Mistake 4: Using State Token in useEffect (Timing Issue)
+```typescript
+// STATE MIGHT NOT BE UPDATED YET - WILL FAIL
+const [adminToken, setAdminToken] = useState(null);
+
+useEffect(() => {
+  const campaign = campaigns.find((c) => c.id === campaignId);
+  if (campaign) setAdminToken(campaign.admin_token); // ← Async state update
+}, [campaignId, campaigns]);
+
+useEffect(() => {
+  const fetchData = async () => {
+    // adminToken might still be null here because state updates are async!
+    await getEvents(episodeId, adminToken || undefined); // ← RACE CONDITION
+  };
+  fetchData();
+}, [episodeId, adminToken]); // ← Depends on adminToken state
+```
+
+**Why it fails:** React state updates are asynchronous. The `adminToken` state might not be updated yet when your effect runs.
+
+**✅ Fix: Use the campaign object directly**
+```typescript
+useEffect(() => {
+  const fetchData = async () => {
+    const campaign = campaigns.find((c) => c.id === campaignId);
+    if (!campaign) return;
+
+    // Use campaign.admin_token directly instead of state
+    await getEvents(episodeId, campaign.admin_token || undefined); // ← CORRECT
+  };
+  fetchData();
+}, [episodeId, campaignId, campaigns]); // ← No adminToken dependency
+```
+
 ### ✅ Correct Pattern
 ```typescript
 // All three parts working together

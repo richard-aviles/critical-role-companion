@@ -254,19 +254,6 @@ function EpisodeDetailPageContent() {
       <AdminHeader title={episode.name} />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation back to episodes list */}
-        <div className="mb-6">
-          <Link
-            href={`/admin/campaigns/${campaignId}/episodes`}
-            className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Episodes
-          </Link>
-        </div>
-
         {/* Error Message */}
         {error && (
           <div className="mb-6 rounded-md border border-red-300 bg-red-50 p-4">
@@ -332,12 +319,20 @@ function EpisodeDetailPageContent() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                >
-                  Edit
-                </button>
+                <div className="flex gap-3 items-center">
+                  <Link
+                    href={`/admin/campaigns/${campaignId}/episodes`}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                  >
+                    Back to Episodes
+                  </Link>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Edit
+                  </button>
+                </div>
               </div>
             </div>
           )}
