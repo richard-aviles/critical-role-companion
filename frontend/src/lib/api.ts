@@ -475,8 +475,9 @@ export interface UpdateEpisodeData {
   is_published?: boolean;
 }
 
-export const createEpisode = async (data: CreateEpisodeData): Promise<Episode> => {
-  const response = await apiClient.post(`/campaigns/${data.campaign_id}/episodes`, data);
+export const createEpisode = async (data: CreateEpisodeData, adminToken?: string): Promise<Episode> => {
+  const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+  const response = await apiClient.post(`/campaigns/${data.campaign_id}/episodes`, data, config);
   return response.data;
 };
 
@@ -490,13 +491,15 @@ export const getEpisode = async (campaignId: string, episodeId: string): Promise
   return response.data;
 };
 
-export const updateEpisode = async (campaignId: string, episodeId: string, data: UpdateEpisodeData): Promise<Episode> => {
-  const response = await apiClient.patch(`/campaigns/${campaignId}/episodes/${episodeId}`, data);
+export const updateEpisode = async (campaignId: string, episodeId: string, data: UpdateEpisodeData, adminToken?: string): Promise<Episode> => {
+  const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+  const response = await apiClient.patch(`/campaigns/${campaignId}/episodes/${episodeId}`, data, config);
   return response.data;
 };
 
-export const deleteEpisode = async (campaignId: string, episodeId: string): Promise<void> => {
-  await apiClient.delete(`/campaigns/${campaignId}/episodes/${episodeId}`);
+export const deleteEpisode = async (campaignId: string, episodeId: string, adminToken?: string): Promise<void> => {
+  const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+  await apiClient.delete(`/campaigns/${campaignId}/episodes/${episodeId}`, config);
 };
 
 // ============================================================================

@@ -58,11 +58,14 @@ function EpisodeDetailPageContent() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Set campaign auth token on mount
+  const [adminToken, setAdminToken] = useState<string | null>(null);
+
+  // Get campaign admin token on mount
   useEffect(() => {
     // Find the campaign's admin_token from the campaigns list
     const campaign = campaigns.find((c) => c.id === campaignId);
     if (campaign) {
+      setAdminToken(campaign.admin_token);
       setAuthToken(campaign.admin_token);
     }
   }, [campaignId, campaigns]);
@@ -116,7 +119,7 @@ function EpisodeDetailPageContent() {
     setError(null);
 
     try {
-      const updatedEpisode = await updateEpisode(campaignId, episodeId, data);
+      const updatedEpisode = await updateEpisode(campaignId, episodeId, data, adminToken || undefined);
       setEpisode(updatedEpisode);
       setIsEditing(false);
     } catch (err: any) {
@@ -143,7 +146,7 @@ function EpisodeDetailPageContent() {
     setError(null);
 
     try {
-      await deleteEpisode(campaignId, episodeId);
+      await deleteEpisode(campaignId, episodeId, adminToken || undefined);
       // Redirect to episodes list
       router.push(`/admin/campaigns/${campaignId}/episodes`);
     } catch (err: any) {

@@ -22,14 +22,16 @@ function NewEpisodePageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [adminToken, setAdminToken] = useState<string | null>(null);
 
   const campaignId = params.id;
 
-  // Set campaign auth token on mount
+  // Get campaign admin token on mount
   useEffect(() => {
     // Find the campaign's admin_token from the campaigns list
     const campaign = campaigns.find((c) => c.id === campaignId);
     if (campaign) {
+      setAdminToken(campaign.admin_token);
       setAuthToken(campaign.admin_token);
     }
   }, [campaignId, campaigns]);
@@ -53,7 +55,7 @@ function NewEpisodePageContent() {
     setError(null);
 
     try {
-      const episode = await createEpisode(data as CreateEpisodeData);
+      const episode = await createEpisode(data as CreateEpisodeData, adminToken || undefined);
 
       // Redirect to episode detail page on success
       router.push(`/admin/campaigns/${campaignId}/episodes/${episode.id}`);
