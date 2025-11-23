@@ -534,23 +534,27 @@ export interface UpdateEventData {
   characters_involved?: string[];
 }
 
-export const createEvent = async (episodeId: string, data: CreateEventData): Promise<Event> => {
-  const response = await apiClient.post(`/episodes/${episodeId}/events`, data);
+export const createEvent = async (episodeId: string, data: CreateEventData, adminToken?: string): Promise<Event> => {
+  const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+  const response = await apiClient.post(`/episodes/${episodeId}/events`, data, config);
   return response.data;
 };
 
-export const getEvents = async (episodeId: string): Promise<Event[]> => {
-  const response = await apiClient.get(`/episodes/${episodeId}/events`);
+export const getEvents = async (episodeId: string, adminToken?: string): Promise<Event[]> => {
+  const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+  const response = await apiClient.get(`/episodes/${episodeId}/events`, config);
   return response.data;
 };
 
-export const updateEvent = async (episodeId: string, eventId: string, data: UpdateEventData): Promise<Event> => {
-  const response = await apiClient.patch(`/episodes/${episodeId}/events/${eventId}`, data);
+export const updateEvent = async (episodeId: string, eventId: string, data: UpdateEventData, adminToken?: string): Promise<Event> => {
+  const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+  const response = await apiClient.patch(`/episodes/${episodeId}/events/${eventId}`, data, config);
   return response.data;
 };
 
-export const deleteEvent = async (episodeId: string, eventId: string): Promise<void> => {
-  await apiClient.delete(`/episodes/${episodeId}/events/${eventId}`);
+export const deleteEvent = async (episodeId: string, eventId: string, adminToken?: string): Promise<void> => {
+  const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+  await apiClient.delete(`/episodes/${episodeId}/events/${eventId}`, config);
 };
 
 // ============================================================================

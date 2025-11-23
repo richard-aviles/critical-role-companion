@@ -86,7 +86,7 @@ function EpisodeDetailPageContent() {
         // Fetch episode, events, and characters in parallel
         const [episodeData, eventsData, charactersData] = await Promise.all([
           getEpisode(campaignId, episodeId),
-          getEvents(episodeId),
+          getEvents(episodeId, adminToken || undefined),
           getCharacters(campaignId),
         ]);
 
@@ -174,12 +174,12 @@ function EpisodeDetailPageContent() {
     try {
       if (editingEvent) {
         // Update existing event
-        const updatedEvent = await updateEvent(episodeId, editingEvent.id, data as UpdateEventData);
+        const updatedEvent = await updateEvent(episodeId, editingEvent.id, data as UpdateEventData, adminToken || undefined);
         setEvents(events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)));
         setEditingEvent(null);
       } else {
         // Create new event
-        const newEvent = await createEvent(episodeId, data as CreateEventData);
+        const newEvent = await createEvent(episodeId, data as CreateEventData, adminToken || undefined);
         setEvents([...events, newEvent]);
         setShowEventForm(false);
       }
@@ -200,7 +200,7 @@ function EpisodeDetailPageContent() {
     }
 
     try {
-      await deleteEvent(episodeId, eventId);
+      await deleteEvent(episodeId, eventId, adminToken || undefined);
       setEvents(events.filter((e) => e.id !== eventId));
     } catch (err: any) {
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to delete event';

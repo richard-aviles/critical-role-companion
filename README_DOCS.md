@@ -34,7 +34,14 @@
 - **`TROUBLESHOOTING.md`** - Common issues and solutions
 - **`KNOWN_ISSUES.md`** - Documented issues and workarounds
 
-### Technical Reference (Coming Soon)
+### Technical Reference
+
+- **`API_CONTRACT.md`** - ⭐ **CRITICAL: Read this before adding/modifying API calls**
+  - Authentication patterns (Authorization vs X-Token)
+  - Endpoint reference tables
+  - Implementation patterns for new pages
+  - Common mistakes and how to avoid them
+  - Testing checklist
 
 - **`API_DESIGN.md`** - REST API endpoint specifications
 - **`DATABASE_SCHEMA.md`** - Database table structures
@@ -97,6 +104,25 @@
 **When to read:** To understand color override UI components, or as reference for similar work
 **Time:** 15-20 minutes
 **Contains:** Component specifications, API integration details, test coverage, code examples
+
+### API_CONTRACT.md ⭐ CRITICAL
+**Purpose:** Single source of truth for API authentication and endpoint contracts
+**When to read:**
+  - BEFORE adding any new API functions
+  - BEFORE creating pages that call admin APIs
+  - When debugging "Missing X-Token header" errors
+  - Every session (quickly) if you're doing API work
+**Time:** 5-10 minutes to reference, 20 minutes for first deep read
+**Contains:**
+  - Two authentication systems explained
+  - Complete endpoint reference table
+  - Frontend implementation patterns with code examples
+  - Checklist for new API functions
+  - Checklist for new admin pages
+  - Common mistakes and how to fix them
+  - Network tab testing verification steps
+
+**FOR WORKER AGENTS:** This document is the enforcement mechanism to prevent repeated "Missing X-Token header" errors. All API modifications MUST follow the patterns in this document. Before making ANY changes to API calls, check API_CONTRACT.md.
 
 ---
 
