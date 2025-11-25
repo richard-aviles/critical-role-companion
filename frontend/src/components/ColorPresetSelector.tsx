@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 export interface ColorPreset {
   id: string;
   name: string;
@@ -32,6 +30,7 @@ interface ColorPresetSelectorProps {
   presets: ColorPreset[];
   selectedPresetId?: string;
   onPresetSelect: (preset: ColorPreset) => void;
+  onCustomSelect?: () => void;
   showCustomOption?: boolean;
 }
 
@@ -39,9 +38,9 @@ export const ColorPresetSelector: React.FC<ColorPresetSelectorProps> = ({
   presets,
   selectedPresetId,
   onPresetSelect,
+  onCustomSelect,
   showCustomOption = true,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className="space-y-3">
@@ -124,7 +123,7 @@ export const ColorPresetSelector: React.FC<ColorPresetSelectorProps> = ({
         {showCustomOption && (
           <button
             type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() => onCustomSelect?.()}
             className={`rounded-lg border-2 p-4 transition-all text-left ${
               selectedPresetId === 'custom'
                 ? 'border-purple-500 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20'

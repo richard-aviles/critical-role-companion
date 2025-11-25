@@ -112,6 +112,11 @@ export const CharacterColorOverrideForm: React.FC<
     setCustomColors(presetToColorThemeOverride(preset));
   };
 
+  const handleCustomSelect = () => {
+    setSelectedPreset(null);
+    // Don't change customColors, keep current values
+  };
+
   const handleColorEdit = (field: string, currentColor: string) => {
     setEditingColorField(field);
     setEditingColor(currentColor);
@@ -159,8 +164,9 @@ export const CharacterColorOverrideForm: React.FC<
       {/* Preset Selector */}
       <ColorPresetSelector
         presets={presets}
-        selectedPresetId={selectedPreset?.id}
+        selectedPresetId={selectedPreset?.id || 'custom'}
         onPresetSelect={handlePresetSelect}
+        onCustomSelect={handleCustomSelect}
         showCustomOption
       />
 
