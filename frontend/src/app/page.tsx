@@ -1,84 +1,63 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { healthCheck, getVersion } from '@/lib/api';
+import { CampaignBrowser } from '@/components/CampaignBrowser';
+import Link from 'next/link';
 
 export default function Home() {
-  const [health, setHealth] = useState<any>(null);
-  const [version, setVersion] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        setLoading(true);
-        const healthData = await healthCheck();
-        const versionData = await getVersion();
-
-        setHealth(healthData);
-        setVersion(versionData);
-        setError(null);
-      } catch (err: any) {
-        setError(err.message || 'Failed to connect to backend');
-        setHealth(null);
-        setVersion(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    testConnection();
-  }, []);
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="w-full max-w-md rounded-lg border border-gray-300 p-8 shadow-lg">
-        <h1 className="mb-8 text-3xl font-bold">Critical Role Companion</h1>
-
-        {loading && <p className="text-gray-500">Testing backend connection...</p>}
-
-        {error && (
-          <div className="rounded-md border border-red-300 bg-red-50 p-4">
-            <p className="text-red-800">
-              <strong>Error:</strong> {error}
-            </p>
-            <p className="text-sm text-red-700 mt-2">
-              Make sure the backend is running on port 8001
-            </p>
-          </div>
-        )}
-
-        {health && !error && (
-          <div className="space-y-4">
-            <div className="rounded-md border border-green-300 bg-green-50 p-4">
-              <p className="text-green-800">
-                ✅ <strong>Backend Connected!</strong>
-              </p>
-            </div>
-
-            <div className="rounded-md bg-gray-50 p-4">
-              <h2 className="font-semibold mb-2">API Status</h2>
-              <p className="text-sm text-gray-600">
-                Health: <strong>{health.ok ? 'OK' : 'Error'}</strong>
-              </p>
-              <p className="text-sm text-gray-600">
-                Version: <strong>{health.version}</strong>
-              </p>
-            </div>
-
-            <div className="rounded-md bg-gray-50 p-4">
-              <h2 className="font-semibold mb-2">Backend Info</h2>
-              <p className="text-sm text-gray-600">
-                Environment: <strong>{version.env}</strong>
-              </p>
-              <p className="text-sm text-gray-600">
-                Timestamp: <strong>{new Date(version.timestamp).toLocaleString()}</strong>
-              </p>
-            </div>
-          </div>
-        )}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      {/* Header - Phase 3: Dark Mode - FIXED: Removed dark:text-gray-900 causing invisibility */}
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-lg">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 animate-fade-in">
+          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
+            Critical Role Companion
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
+            Explore campaigns, characters, and episodes from your favorite stories
+          </p>
+        </div>
       </div>
-    </main>
+
+      {/* Campaign Browser */}
+      <CampaignBrowser />
+
+      {/* Footer - Phase 3: Dark Mode */}
+      <footer className="bg-gray-900 dark:bg-gray-950 text-gray-300 dark:text-gray-400 py-16 sm:py-20 mt-16 sm:mt-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+            <div className="animate-fade-in-stagger">
+              <h3 className="text-white font-bold text-lg mb-4">About</h3>
+              <p className="text-base leading-relaxed text-gray-400">
+                Critical Role Companion is a campaign hub for exploring characters, episodes, and stories.
+              </p>
+            </div>
+            <div className="animate-fade-in-stagger delay-100">
+              <h3 className="text-white font-bold text-lg mb-4">Quick Links</h3>
+              <ul className="text-base space-y-3">
+                <li>
+                  <Link href="/" className="text-gray-400 hover:text-white transition-colors duration-200">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/admin" className="text-gray-400 hover:text-white transition-colors duration-200">
+                    Admin Dashboard
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div className="animate-fade-in-stagger delay-200">
+              <h3 className="text-white font-bold text-lg mb-4">Info</h3>
+              <p className="text-base leading-relaxed text-gray-400">
+                Created with care for campaign creators and storytellers.
+              </p>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 pt-8 text-center text-base text-gray-400">
+            <p>&copy; {new Date().getFullYear()} Critical Role Companion. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }

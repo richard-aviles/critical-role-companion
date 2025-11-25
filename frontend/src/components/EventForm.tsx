@@ -127,14 +127,14 @@ export const EventForm: React.FC<EventFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-4">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="rounded-md border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700 p-4">
+          <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
         </div>
       )}
 
       {/* Event Name */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Event Name *
         </label>
         <input
@@ -145,14 +145,14 @@ export const EventForm: React.FC<EventFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., Battle with the Glabrezu"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
           required
         />
       </div>
 
       {/* Event Type */}
       <div>
-        <label htmlFor="event_type" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="event_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Event Type
         </label>
         <select
@@ -161,7 +161,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           value={formData.event_type}
           onChange={handleChange}
           disabled={isLoading}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
         >
           <option value="">Select event type...</option>
           {EVENT_TYPES.map((type) => (
@@ -174,7 +174,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
       {/* Timestamp */}
       <div>
-        <label htmlFor="timestamp_in_episode" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="timestamp_in_episode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Timestamp (seconds)
         </label>
         <input
@@ -186,16 +186,16 @@ export const EventForm: React.FC<EventFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., 3600 (1 hour)"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
         />
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
           Time in seconds from the start of the episode (e.g., 3600 = 1 hour)
         </p>
       </div>
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Description
         </label>
         <textarea
@@ -206,35 +206,35 @@ export const EventForm: React.FC<EventFormProps> = ({
           disabled={isLoading}
           placeholder="What happened during this event..."
           rows={4}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
         />
       </div>
 
       {/* Characters Involved */}
       {availableCharacters.length > 0 && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Characters Involved
           </label>
-          <div className="border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto space-y-2">
+          <div className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md p-3 max-h-48 overflow-y-auto space-y-2">
             {availableCharacters.map((character) => (
               <label
                 key={character.id}
-                className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-600 rounded cursor-pointer"
               >
                 <input
                   type="checkbox"
                   checked={formData.characters_involved.includes(character.id)}
                   onChange={() => handleCharacterToggle(character.id)}
                   disabled={isLoading}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:bg-gray-50"
+                  className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800"
                 />
                 <div className="flex-1">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {character.name}
                   </span>
                   {character.class_name && (
-                    <span className="ml-2 text-xs text-gray-500">
+                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
                       ({character.class_name})
                     </span>
                   )}
@@ -242,7 +242,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               </label>
             ))}
           </div>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             Select all characters involved in this event
           </p>
         </div>
@@ -253,11 +253,11 @@ export const EventForm: React.FC<EventFormProps> = ({
         <button
           type="submit"
           disabled={isLoading}
-          className="flex-1 rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 rounded-md bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 py-2 text-white font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
-              <span className="animate-spin mr-2">◌</span>
+              <span className="animate-spin mr-2 border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block"></span>
               Saving...
             </span>
           ) : mode === 'create' ? (
@@ -271,7 +271,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="px-6 rounded-md border border-gray-300 py-2 text-gray-700 font-medium hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors"
+            className="px-6 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
           >
             Cancel
           </button>

@@ -5,7 +5,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { checkSlugAvailability } from '@/lib/api';
 
 interface Campaign {
   id?: string;
@@ -23,6 +24,12 @@ interface CampaignFormProps {
   onCancel: () => void;
 }
 
+interface SlugCheckState {
+  checking: boolean;
+  available: boolean | null;
+  suggestions: string[];
+}
+
 export const CampaignForm: React.FC<CampaignFormProps> = ({
   mode,
   initialData,
@@ -38,6 +45,12 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
   });
   const [localError, setLocalError] = useState<string | null>(null);
   const [slugTouched, setSlugTouched] = useState(false);
+  const [slugCheck, setSlugCheck] = useState<SlugCheckState>({
+    checking: false,
+    available: null,
+    suggestions: [],
+  });
+  const slugCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Auto-generate slug from name
   useEffect(() => {
@@ -50,7 +63,53 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
     }
   }, [formData.name, slugTouched]);
 
-  const isFormValid = formData.slug && formData.name;
+  // Check slug availability (debounced) - only in create mode
+  useEffect(() => {
+    if (mode !== 'create' || !formData.slug || !slugTouched) {
+      return;
+    }
+
+    // Immediately show checking state
+    setSlugCheck({
+      checking: true,
+      available: null,
+      suggestions: [],
+    });
+
+    // Clear existing timeout
+    if (slugCheckTimeoutRef.current) {
+      clearTimeout(slugCheckTimeoutRef.current);
+    }
+
+    // Set new timeout for debouncing (300ms)
+    slugCheckTimeoutRef.current = setTimeout(async () => {
+      try {
+        console.log(`[Slug Check] Checking availability for: ${formData.slug}`);
+        const result = await checkSlugAvailability(formData.slug);
+        console.log(`[Slug Check] Result for ${formData.slug}:`, result);
+        setSlugCheck({
+          checking: false,
+          available: result.available,
+          suggestions: result.suggestions,
+        });
+      } catch (err) {
+        console.error(`[Slug Check] Error checking ${formData.slug}:`, err);
+        setSlugCheck({
+          checking: false,
+          available: null,
+          suggestions: [],
+        });
+      }
+    }, 300);
+
+    return () => {
+      if (slugCheckTimeoutRef.current) {
+        clearTimeout(slugCheckTimeoutRef.current);
+      }
+    };
+  }, [formData.slug, slugTouched, mode]);
+
+  const isFormValid = formData.slug && formData.name && (mode === 'edit' || slugCheck.available);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -98,17 +157,17 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Error Message */}
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Error Message - Phase 3: Error animations */}
       {(error || localError) && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-4">
-          <p className="text-sm text-red-800">{error || localError}</p>
+        <div className="error-message rounded-lg border p-5">
+          <p className="text-base font-medium">{error || localError}</p>
         </div>
       )}
 
-      {/* Campaign Name */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+      {/* Campaign Name - Phase 3: Dark Mode */}
+      <div className="animate-fade-in">
+        <label htmlFor="name" className="block text-base font-semibold text-gray-900 dark:text-white mb-2">
           Campaign Name *
         </label>
         <input
@@ -119,36 +178,98 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., Exandria Campaign"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 focus:border-transparent transition-all disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base"
           required
         />
       </div>
 
       {/* Campaign Slug */}
-      <div>
-        <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
+      <div className="animate-fade-in delay-100">
+        <label htmlFor="slug" className="block text-base font-semibold text-gray-900 dark:text-white mb-2">
           Campaign Slug *
         </label>
-        <input
-          id="slug"
-          name="slug"
-          type="text"
-          value={formData.slug}
-          onChange={handleSlugChange}
-          disabled={isLoading}
-          placeholder="e.g., exandria-campaign"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
-          pattern="^[a-z0-9-]+$"
-          required
-        />
+        <div className="mt-2 flex gap-3">
+          <input
+            id="slug"
+            name="slug"
+            type="text"
+            value={formData.slug}
+            onChange={handleSlugChange}
+            disabled={isLoading}
+            placeholder="e.g., exandria-campaign"
+            className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 focus:border-transparent transition-all disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base"
+            pattern="^[a-z0-9-]+$"
+            required
+          />
+          {mode === 'create' && slugTouched && formData.slug && (
+            <div className="flex items-center">
+              {slugCheck.checking ? (
+                <div className="text-yellow-600 text-2xl animate-spin">⟳</div>
+              ) : slugCheck.available ? (
+                <div className="text-green-600 text-3xl font-bold" title="Slug is available">
+                  ✓
+                </div>
+              ) : (
+                <div className="text-red-600 text-3xl font-bold" title="Slug is taken">
+                  ✕
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         <p className="mt-1 text-xs text-gray-500">
           URL-friendly identifier (lowercase, numbers, hyphens only)
         </p>
+
+        {/* Slug Availability Status */}
+        {mode === 'create' && slugTouched && formData.slug && (
+          <div className="mt-2 space-y-2">
+            {slugCheck.checking && (
+              <p className="text-sm text-yellow-600">Checking availability...</p>
+            )}
+            {!slugCheck.checking && slugCheck.available === false && (
+              <>
+                <p className="text-sm text-red-600 font-medium">
+                  This slug is already taken.
+                </p>
+                {slugCheck.suggestions.length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-600 mb-2">Try one of these:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {slugCheck.suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          onClick={() => {
+                            setFormData((prev) => ({ ...prev, slug: suggestion }));
+                            setSlugCheck({
+                              checking: false,
+                              available: true,
+                              suggestions: [],
+                            });
+                          }}
+                          className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded hover:bg-gray-200 transition-colors border border-gray-300"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            {!slugCheck.checking && slugCheck.available === true && (
+              <p className="text-sm text-green-600 font-medium">
+                ✓ This slug is available!
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Campaign Description */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+      {/* Campaign Description - Phase 3: Dark Mode */}
+      <div className="animate-fade-in delay-200">
+        <label htmlFor="description" className="block text-base font-semibold text-gray-900 dark:text-white mb-2">
           Description
         </label>
         <textarea
@@ -158,17 +279,17 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., A campaign set in the world of Exandria..."
-          rows={4}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          rows={5}
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 focus:border-transparent transition-all disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base resize-none"
         />
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-3">
+      <div className="flex gap-4 pt-4 animate-fade-in delay-300">
         <button
           type="submit"
           disabled={!isFormValid || isLoading}
-          className="flex-1 rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 rounded-lg bg-blue-600 py-3 text-white font-semibold hover:bg-blue-700 active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 min-h-[44px] focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-base"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -185,7 +306,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
           type="button"
           onClick={onCancel}
           disabled={isLoading}
-          className="px-6 rounded-md border border-gray-300 py-2 text-gray-700 font-medium hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors"
+          className="px-8 rounded-lg border-2 border-gray-300 py-3 text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 active:scale-95 disabled:bg-gray-50 disabled:text-gray-400 disabled:border-gray-200 transition-all duration-200 min-h-[44px] focus:ring-4 focus:ring-gray-300 focus:ring-opacity-50 text-base"
         >
           Cancel
         </button>

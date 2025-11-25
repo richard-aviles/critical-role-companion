@@ -15,7 +15,7 @@ export function PublicEpisodeTimeline({ episodes, campaignSlug }: PublicEpisodeT
   if (episodes.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">No episodes available yet.</p>
+        <p className="text-gray-700 dark:text-gray-400">No episodes available yet.</p>
       </div>
     );
   }
@@ -42,8 +42,8 @@ export function PublicEpisodeTimeline({ episodes, campaignSlug }: PublicEpisodeT
         <div key={season}>
           {/* Season Header */}
           {season > 0 && (
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-              <span className="h-1 w-12 bg-blue-600 rounded"></span>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
+              <span className="h-1 w-12 bg-purple-600 dark:bg-purple-500 rounded"></span>
               Season {season}
             </h2>
           )}
@@ -55,12 +55,12 @@ export function PublicEpisodeTimeline({ episodes, campaignSlug }: PublicEpisodeT
                 key={episode.id}
                 href={`/campaigns/${campaignSlug}/episodes/${episode.slug}`}
               >
-                <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 cursor-pointer group">
+                <div className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-lg hover:shadow-lg dark:hover:shadow-2xl transition-shadow p-6 cursor-pointer group dark:border dark:border-gray-800">
                   <div className="flex items-start gap-4">
                     {/* Episode Number */}
                     <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
-                        <span className="text-sm font-bold text-blue-600">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/20 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/30 transition-colors">
+                        <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
                           {episode.episode_number || index + 1}
                         </span>
                       </div>
@@ -68,18 +68,18 @@ export function PublicEpisodeTimeline({ episodes, campaignSlug }: PublicEpisodeT
 
                     {/* Episode Info */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors truncate">
                         {episode.name}
                       </h3>
 
                       {episode.description && (
-                        <p className="mt-2 text-gray-600 text-sm line-clamp-2">
+                        <p className="mt-2 text-gray-800 dark:text-gray-400 text-sm line-clamp-2">
                           {episode.description}
                         </p>
                       )}
 
                       {/* Episode Meta */}
-                      <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-800 dark:text-gray-400">
                         {episode.air_date && (
                           <span>
                             📅{' '}
@@ -97,7 +97,7 @@ export function PublicEpisodeTimeline({ episodes, campaignSlug }: PublicEpisodeT
                     </div>
 
                     {/* Arrow Icon */}
-                    <div className="flex-shrink-0 text-blue-600 group-hover:translate-x-1 transition-transform">
+                    <div className="flex-shrink-0 text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform">
                       →
                     </div>
                   </div>

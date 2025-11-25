@@ -43,14 +43,14 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-blue-100 px-4 py-12">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-purple-500 to-purple-700 dark:from-purple-900 dark:via-purple-800 dark:to-purple-950 px-4 py-12">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold text-white mb-2">
             Critical Role Companion
           </h1>
-          <p className="text-gray-600">
+          <p className="text-purple-100">
             {mode === 'login'
               ? 'Welcome back, Dungeon Master'
               : 'Create your admin account'}
@@ -58,14 +58,14 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8">
           {/* Loading State */}
           {isLoading && (
             <div className="text-center py-8">
               <div className="inline-block">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+                <div className="animate-spin h-8 w-8 border-4 border-purple-600 dark:border-purple-500 border-t-transparent rounded-full"></div>
               </div>
-              <p className="mt-4 text-gray-600">Loading...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
             </div>
           )}
 
@@ -82,8 +82,8 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-600">
+        <div className="text-center mt-8">
+          <p className="text-sm text-purple-100">
             This is the admin control center for managing D&D campaigns.
             <br />
             Only for authorized streamers and dungeon masters.

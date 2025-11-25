@@ -22,9 +22,9 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
   const placeholderImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E';
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg overflow-hidden hover:shadow-lg dark:hover:shadow-primary transition-all duration-200 hover:-translate-y-1">
       {/* Character Image */}
-      <div className="relative w-full h-64 bg-gray-200">
+      <div className="relative w-full h-64 bg-gray-200 dark:bg-gray-700">
         <img
           src={character.image_url || placeholderImage}
           alt={character.name}
@@ -39,29 +39,29 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
 
       {/* Character Info */}
       <div className="p-4">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
           {character.name}
         </h3>
 
         <div className="space-y-1 mb-4">
           {character.class_name && (
             <div className="flex items-center text-sm">
-              <span className="text-gray-600 font-medium mr-2">Class:</span>
-              <span className="text-gray-900">{character.class_name}</span>
+              <span className="text-gray-600 dark:text-gray-400 font-medium mr-2">Class:</span>
+              <span className="text-gray-900 dark:text-gray-300">{character.class_name}</span>
             </div>
           )}
 
           {character.race && (
             <div className="flex items-center text-sm">
-              <span className="text-gray-600 font-medium mr-2">Race:</span>
-              <span className="text-gray-900">{character.race}</span>
+              <span className="text-gray-600 dark:text-gray-400 font-medium mr-2">Race:</span>
+              <span className="text-gray-900 dark:text-gray-300">{character.race}</span>
             </div>
           )}
 
           {character.player_name && (
             <div className="flex items-center text-sm">
-              <span className="text-gray-600 font-medium mr-2">Player:</span>
-              <span className="text-gray-900">{character.player_name}</span>
+              <span className="text-gray-600 dark:text-gray-400 font-medium mr-2">Player:</span>
+              <span className="text-gray-900 dark:text-gray-300">{character.player_name}</span>
             </div>
           )}
         </div>
@@ -70,13 +70,13 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
         <div className="flex gap-2">
           <button
             onClick={onView}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+            className="flex-1 px-4 py-2 bg-sapphire dark:bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 dark:hover:bg-blue-700 active:scale-95 transition-all duration-200 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50"
           >
             View
           </button>
           <button
             onClick={onEdit}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition-all duration-200 focus:ring-4 focus:ring-gray-300 focus:ring-opacity-50"
           >
             Edit
           </button>

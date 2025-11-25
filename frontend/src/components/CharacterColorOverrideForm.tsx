@@ -165,25 +165,25 @@ export const CharacterColorOverrideForm: React.FC<
       />
 
       {/* Custom Color Editor */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Customize Colors
         </h3>
 
         {/* Text Color */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Text Color
           </label>
           <div className="flex items-center gap-3">
             <div
-              className="h-10 w-10 rounded-md border-2 border-gray-300 cursor-pointer hover:border-blue-500"
+              className="h-10 w-10 rounded-md border-2 border-gray-300 dark:border-gray-600 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500"
               style={{ backgroundColor: customColors.text_color }}
               onClick={() =>
                 handleColorEdit('text_color', customColors.text_color)
               }
             />
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
               {customColors.text_color}
             </div>
             <button
@@ -191,7 +191,7 @@ export const CharacterColorOverrideForm: React.FC<
               onClick={() =>
                 handleColorEdit('text_color', customColors.text_color)
               }
-              className="ml-auto text-sm text-blue-600 hover:text-blue-700"
+              className="ml-auto text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
             >
               Edit
             </button>
@@ -199,30 +199,30 @@ export const CharacterColorOverrideForm: React.FC<
         </div>
 
         {/* Border Colors */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             Border Colors (Gradient)
           </label>
           <div className="grid grid-cols-2 gap-3">
             {customColors.border_colors.map((color, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 p-3 bg-white rounded border border-gray-200"
+                className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
               >
                 <div
-                  className="h-8 w-8 rounded border-2 border-gray-300 cursor-pointer hover:border-blue-500"
+                  className="h-8 w-8 rounded border-2 border-gray-300 dark:border-gray-600 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500"
                   style={{ backgroundColor: color }}
                   onClick={() =>
                     handleColorEdit(`border_colors_${idx}`, color)
                   }
                 />
-                <div className="text-sm text-gray-600 font-mono">{color}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 font-mono">{color}</div>
                 <button
                   type="button"
                   onClick={() =>
                     handleColorEdit(`border_colors_${idx}`, color)
                   }
-                  className="ml-auto text-xs text-blue-600 hover:text-blue-700"
+                  className="ml-auto text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
                 >
                   Edit
                 </button>
@@ -232,26 +232,26 @@ export const CharacterColorOverrideForm: React.FC<
         </div>
 
         {/* Badge Interior Gradient */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             Badge Interior Colors
           </label>
           <div className="grid grid-cols-2 gap-3">
             {customColors.badge_interior_gradient.colors.map((color, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 p-3 bg-white rounded border border-gray-200"
+                className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600"
               >
                 <div
-                  className="h-8 w-8 rounded border-2 border-gray-300 cursor-pointer hover:border-blue-500"
+                  className="h-8 w-8 rounded border-2 border-gray-300 dark:border-gray-600 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500"
                   style={{ backgroundColor: color }}
                   onClick={() => handleColorEdit(`badge_${idx}`, color)}
                 />
-                <div className="text-sm text-gray-600 font-mono">{color}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 font-mono">{color}</div>
                 <button
                   type="button"
                   onClick={() => handleColorEdit(`badge_${idx}`, color)}
-                  className="ml-auto text-xs text-blue-600 hover:text-blue-700"
+                  className="ml-auto text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
                 >
                   Edit
                 </button>
@@ -261,23 +261,23 @@ export const CharacterColorOverrideForm: React.FC<
         </div>
 
         {/* HP Color */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             HP Badge Colors
           </label>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-600 w-16">
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 w-16">
                 Border:
               </span>
               <div
-                className="h-6 w-6 rounded border-2 border-gray-300 cursor-pointer hover:border-blue-500"
+                className="h-6 w-6 rounded border-2 border-gray-300 dark:border-gray-600 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500"
                 style={{ backgroundColor: customColors.hp_color.border }}
                 onClick={() =>
                   handleColorEdit('hp_border', customColors.hp_color.border)
                 }
               />
-              <div className="text-xs text-gray-600 font-mono">
+              <div className="text-xs text-gray-600 dark:text-gray-300 font-mono">
                 {customColors.hp_color.border}
               </div>
               <button
@@ -285,13 +285,13 @@ export const CharacterColorOverrideForm: React.FC<
                 onClick={() =>
                   handleColorEdit('hp_border', customColors.hp_color.border)
                 }
-                className="ml-auto text-xs text-blue-600 hover:text-blue-700"
+                className="ml-auto text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
               >
                 Edit
               </button>
             </div>
             <div className="flex gap-2">
-              <span className="text-xs font-medium text-gray-600 w-16">
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 w-16">
                 Gradient:
               </span>
               <div className="flex gap-2">
@@ -305,10 +305,10 @@ export const CharacterColorOverrideForm: React.FC<
                       }
                     >
                       <div
-                        className="h-6 w-6 rounded border-2 border-gray-300 cursor-pointer hover:border-blue-500"
+                        className="h-6 w-6 rounded border-2 border-gray-300 dark:border-gray-600 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500"
                         style={{ backgroundColor: color }}
                       />
-                      <div className="hidden group-hover:block absolute bottom-full left-0 bg-gray-900 text-white text-xs p-1 rounded mb-1 whitespace-nowrap">
+                      <div className="hidden group-hover:block absolute bottom-full left-0 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs p-1 rounded mb-1 whitespace-nowrap">
                         {color}
                       </div>
                     </div>
@@ -320,23 +320,23 @@ export const CharacterColorOverrideForm: React.FC<
         </div>
 
         {/* AC Color */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             AC Badge Colors
           </label>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-600 w-16">
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 w-16">
                 Border:
               </span>
               <div
-                className="h-6 w-6 rounded border-2 border-gray-300 cursor-pointer hover:border-blue-500"
+                className="h-6 w-6 rounded border-2 border-gray-300 dark:border-gray-600 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500"
                 style={{ backgroundColor: customColors.ac_color.border }}
                 onClick={() =>
                   handleColorEdit('ac_border', customColors.ac_color.border)
                 }
               />
-              <div className="text-xs text-gray-600 font-mono">
+              <div className="text-xs text-gray-600 dark:text-gray-300 font-mono">
                 {customColors.ac_color.border}
               </div>
               <button
@@ -344,13 +344,13 @@ export const CharacterColorOverrideForm: React.FC<
                 onClick={() =>
                   handleColorEdit('ac_border', customColors.ac_color.border)
                 }
-                className="ml-auto text-xs text-blue-600 hover:text-blue-700"
+                className="ml-auto text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
               >
                 Edit
               </button>
             </div>
             <div className="flex gap-2">
-              <span className="text-xs font-medium text-gray-600 w-16">
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 w-16">
                 Gradient:
               </span>
               <div className="flex gap-2">
@@ -364,10 +364,10 @@ export const CharacterColorOverrideForm: React.FC<
                       }
                     >
                       <div
-                        className="h-6 w-6 rounded border-2 border-gray-300 cursor-pointer hover:border-blue-500"
+                        className="h-6 w-6 rounded border-2 border-gray-300 dark:border-gray-600 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500"
                         style={{ backgroundColor: color }}
                       />
-                      <div className="hidden group-hover:block absolute bottom-full left-0 bg-gray-900 text-white text-xs p-1 rounded mb-1 whitespace-nowrap">
+                      <div className="hidden group-hover:block absolute bottom-full left-0 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-200 text-xs p-1 rounded mb-1 whitespace-nowrap">
                         {color}
                       </div>
                     </div>
@@ -380,7 +380,7 @@ export const CharacterColorOverrideForm: React.FC<
       </div>
 
       {/* Form Actions */}
-      <div className="flex gap-3 pt-4 border-t">
+      <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           type="button"
           onClick={async () => {
@@ -400,15 +400,15 @@ export const CharacterColorOverrideForm: React.FC<
             }
           }}
           disabled={isLoading || isSaving}
-          className={`flex-1 rounded-md py-2 px-4 text-white font-medium transition-all ${
+          className={`flex-1 rounded-md py-2 px-4 text-white font-semibold transition-all ${
             saveSuccess
-              ? 'bg-green-600 hover:bg-green-700'
-              : 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed'
+              ? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
+              : 'bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 disabled:bg-gray-400 disabled:cursor-not-allowed'
           }`}
         >
           {isSaving ? (
             <span className="flex items-center justify-center">
-              <span className="animate-spin mr-2">◌</span>
+              <span className="animate-spin mr-2 border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block"></span>
               Saving...
             </span>
           ) : saveSuccess ? (
@@ -425,7 +425,7 @@ export const CharacterColorOverrideForm: React.FC<
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="flex-1 rounded-md border border-gray-300 py-2 px-4 text-gray-700 font-medium hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors"
+            className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-4 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
           >
             Cancel
           </button>

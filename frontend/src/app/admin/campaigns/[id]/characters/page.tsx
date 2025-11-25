@@ -66,12 +66,12 @@ function CharacterListContent() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AdminHeader title="Characters" />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <p className="text-gray-700">Loading characters...</p>
+              <p className="text-gray-700 dark:text-gray-300">Loading characters...</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -87,24 +87,24 @@ function CharacterListContent() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AdminHeader title="Characters" />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <h3 className="text-lg font-semibold text-red-900 mb-2">
+          <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold text-red-900 dark:text-red-300 mb-2">
               Error Loading Characters
             </h3>
-            <p className="text-red-700 mb-4">{error}</p>
+            <p className="text-red-700 dark:text-red-400 mb-4">{error}</p>
             <div className="flex gap-3 justify-center">
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold transition-colors"
               >
                 Try Again
               </button>
               <button
                 onClick={() => router.push(`/admin/campaigns/${campaignId}`)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium transition-colors"
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 font-medium transition-colors"
               >
                 Back to Campaign
               </button>
@@ -118,14 +118,14 @@ function CharacterListContent() {
   const hasCharacters = characters.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <AdminHeader title="Characters" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with count and actions */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <p className="text-gray-700">
+            <p className="text-gray-700 dark:text-gray-300">
               {hasCharacters
                 ? `${characters.length} character${characters.length > 1 ? 's' : ''}`
                 : 'No characters yet'}
@@ -134,13 +134,13 @@ function CharacterListContent() {
           <div className="flex gap-3">
             <button
               onClick={() => router.push(`/admin/campaigns/${campaignId}`)}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-medium transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 font-medium transition-colors"
             >
               Back to Campaign
             </button>
             <button
               onClick={() => router.push(`/admin/campaigns/${campaignId}/characters/new`)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold transition-colors"
             >
               + Add Character
             </button>
@@ -160,16 +160,16 @@ function CharacterListContent() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-12 text-center">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
               No characters yet
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               Create your first character to start tracking the party members and their adventures.
             </p>
             <button
               onClick={() => router.push(`/admin/campaigns/${campaignId}/characters/new`)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+              className="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold transition-colors"
             >
               Add Character
             </button>

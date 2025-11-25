@@ -181,8 +181,8 @@ function CampaignDetailContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading campaign...</p>
+          <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading campaign...</p>
         </div>
       </div>
     );
@@ -208,23 +208,23 @@ function CampaignDetailContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Campaign Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Campaign Not Found</h1>
           {localCampaign ? (
             <>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
                 This campaign was deleted on the server, but it's still showing in your list.
                 Would you like to remove it from your campaigns?
               </p>
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={handleRemoveFromList}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold"
                 >
                   Remove from List
                 </button>
                 <button
                   onClick={() => router.push('/admin/campaigns')}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500"
                 >
                   Back
                 </button>
@@ -232,10 +232,10 @@ function CampaignDetailContent() {
             </>
           ) : (
             <>
-              <p className="text-gray-600 mb-4">The campaign you're looking for doesn't exist.</p>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">The campaign you're looking for doesn't exist.</p>
               <button
                 onClick={() => router.push('/admin/campaigns')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold"
               >
                 Back to Campaigns
               </button>
@@ -253,21 +253,21 @@ function CampaignDetailContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <AdminHeader title={campaign?.name} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="mb-8 border-b border-gray-200">
+        <div className="mb-8 border-b border-gray-200 dark:border-gray-700">
           <div className="flex gap-8">
-            <button className="px-4 py-3 border-b-2 border-blue-600 text-blue-600 font-medium">
+            <button className="px-4 py-3 border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 font-medium">
               Details
             </button>
-            <a href={`/admin/campaigns/${campaign.id}/characters`} className="px-4 py-3 border-b-2 border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300">
+            <a href={`/admin/campaigns/${campaign.id}/characters`} className="px-4 py-3 border-b-2 border-transparent text-gray-600 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600">
               Characters
             </a>
-            <a href={`/admin/campaigns/${campaign.id}/episodes`} className="px-4 py-3 border-b-2 border-transparent text-gray-600 font-medium hover:text-gray-900 hover:border-gray-300">
+            <a href={`/admin/campaigns/${campaign.id}/episodes`} className="px-4 py-3 border-b-2 border-transparent text-gray-600 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600">
               Episodes
             </a>
           </div>
@@ -276,8 +276,8 @@ function CampaignDetailContent() {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Edit Form */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
                 Campaign Details
               </h2>
               <CampaignForm
@@ -299,10 +299,10 @@ function CampaignDetailContent() {
           {/* Sidebar */}
           <aside>
             {/* Admin Token */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Admin Token</h3>
-              <div className="bg-gray-100 rounded p-3 mb-3">
-                <code className="text-xs text-gray-700 break-all font-mono">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Admin Token</h3>
+              <div className="bg-gray-100 dark:bg-gray-700 rounded p-3 mb-3">
+                <code className="text-xs text-gray-700 dark:text-gray-300 break-all font-mono">
                   {campaign.admin_token}
                 </code>
               </div>
@@ -310,30 +310,30 @@ function CampaignDetailContent() {
                 onClick={handleCopyToken}
                 className={`w-full px-3 py-2 rounded text-sm font-medium transition-colors ${
                   copiedToken
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-blue-100 text-blue-600 hover:bg-blue-200 border border-blue-300'
+                    ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                    : 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800 border border-purple-300 dark:border-purple-700'
                 }`}
               >
                 {copiedToken ? 'Copied!' : 'Copy Token'}
               </button>
-              <p className="text-xs text-gray-500 mt-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
                 Use this token for any admin operations on this campaign
               </p>
             </div>
 
             {/* Campaign Info */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Info</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Info</h3>
               <dl className="space-y-3 text-sm">
                 <div>
-                  <dt className="text-gray-600">Created</dt>
-                  <dd className="text-gray-900">
+                  <dt className="text-gray-600 dark:text-gray-400">Created</dt>
+                  <dd className="text-gray-900 dark:text-gray-100">
                     {new Date(campaign.created_at).toLocaleDateString()}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-gray-600">Updated</dt>
-                  <dd className="text-gray-900">
+                  <dt className="text-gray-600 dark:text-gray-400">Updated</dt>
+                  <dd className="text-gray-900 dark:text-gray-100">
                     {new Date(campaign.updated_at).toLocaleDateString()}
                   </dd>
                 </div>
@@ -341,14 +341,14 @@ function CampaignDetailContent() {
             </div>
 
             {/* Danger Zone */}
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-              <h3 className="text-lg font-bold text-red-900 mb-2">Danger Zone</h3>
-              <p className="text-sm text-red-700 mb-4">
+            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-6">
+              <h3 className="text-lg font-bold text-red-900 dark:text-red-300 mb-2">Danger Zone</h3>
+              <p className="text-sm text-red-700 dark:text-red-400 mb-4">
                 Deleting a campaign cannot be undone. All associated data will be lost.
               </p>
               <button
                 onClick={() => setShowDeleteDialog(true)}
-                className="w-full px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-medium transition-colors"
+                className="w-full px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-semibold transition-colors"
               >
                 Delete Campaign
               </button>

@@ -1,6 +1,24 @@
-# Next Actions - Session 9 (Phase 3 Tier 3: Public Campaign Pages)
+# Next Actions - Session 10 (Phase 3 Tier 3: Public Campaign Pages - Continuation)
 
 **Phase 3 Tier 1 & 2 (Backend + Admin UI) are COMPLETE!**
+**Phase 3 Tier 3 STARTED - Session 9 Progress:**
+
+## Session 9 Summary (2025-11-23)
+
+✅ **COMPLETED:**
+- Started Phase 3 Tier 3: Public Campaign Pages
+- Debugged and fixed backend process issues (multiple old Python processes on port 8001)
+- Verified public campaign API endpoints are working correctly
+- Confirmed frontend pages are loading (`http://localhost:3000/campaigns/testing-campaign-unique`)
+- "View Characters" and "View Episodes" buttons are present in code and rendering
+
+⚠️ **IN PROGRESS / PENDING:**
+- Full visual testing of public campaign page layout
+- Test character roster page functionality
+- Test episode guide page functionality
+- **IMPORTANT:** Need to discuss adding unique identifier to URL to prevent slug collisions (e.g., `/campaigns/{owner-id}/{slug}` or `/campaigns/{campaign-id}`)
+
+---
 
 Phase 3 Tier 1 delivered:
 - ✅ Character Layout System with per-character color overrides
@@ -544,5 +562,41 @@ Everything you need is in:
 
 ---
 
-**Last updated:** 2025-11-22 (Session 8 Completion - Phase 3 Tier 2 Done)
-**Status:** Ready to Begin Phase 3 Tier 3
+---
+
+## ⚡ Session 10 Reminders (Next Session)
+
+**IMPORTANT TASKS FOR NEXT SESSION:**
+
+1. **Test Visual Rendering** (Priority 1)
+   - Visit `http://localhost:3000/campaigns/testing-campaign-unique`
+   - Verify the campaign hero section renders correctly with blue gradient
+   - Verify "View Characters" and "View Episodes" buttons are visible and styled properly
+   - Check that character count and episode count display correctly
+   - Test that clicking the buttons navigates to the correct pages
+
+2. **Test Character Roster Page** (Priority 2)
+   - Navigate to `/campaigns/testing-campaign-unique/characters`
+   - Verify character cards render with color overrides
+   - Test that character details work correctly
+   - Verify character search/filter functionality
+
+3. **Test Episode Guide Page** (Priority 3)
+   - Navigate to `/campaigns/testing-campaign-unique/episodes`
+   - Verify episode list renders correctly
+   - Test episode detail page
+   - Verify event timeline displays properly
+
+4. **CRITICAL DISCUSSION ITEM** (Priority 0 - Discuss First)
+   - **URL Slug Collision Problem:** Currently using `/campaigns/{slug}`
+   - Multiple campaigns can have the same slug, causing conflicts
+   - **Options to discuss:**
+     - A) Change to `/campaigns/{owner-id}/{slug}` (e.g., `/campaigns/user-123/testing-campaign`)
+     - B) Change to `/campaigns/{campaign-id}` (e.g., `/campaigns/b886fd7a-d81b-4f50-84b8-a8c7d6d0bf40`)
+     - C) Generate unique slugs with hash/random suffix (e.g., `testing-campaign-unique`)
+     - D) Use campaign name + ID combo
+   - **Decision impacts:** Frontend routes, SEO, API endpoints, database queries
+   - **Recommend:** Option A (owner-id + slug) - most user-friendly while preventing collisions
+
+**Last updated:** 2025-11-23 (Session 9 Started Phase 3 Tier 3)
+**Status:** Phase 3 Tier 3 In Progress - Awaiting Visual Testing & URL Design Discussion

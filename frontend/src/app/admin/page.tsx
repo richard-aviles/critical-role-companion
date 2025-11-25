@@ -19,34 +19,34 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <AdminHeader title="Dashboard" />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6 mb-8 border-l-4 border-purple-600">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Welcome back!
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             You're logged in and ready to manage your campaigns.
           </p>
         </div>
 
         {/* Campaigns Section */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Your Campaigns</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Your Campaigns</h2>
 
           <div className="flex justify-between items-center mb-4">
-            <p className="text-gray-700">
+            <p className="text-gray-700 dark:text-gray-300">
               {user.campaigns && user.campaigns.length > 0
                 ? `You have ${user.campaigns.length} campaign${user.campaigns.length > 1 ? 's' : ''}`
                 : 'No campaigns yet'}
             </p>
             <button
               onClick={() => router.push('/admin/campaigns')}
-              className="px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="px-4 py-2 text-sm font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
             >
               View All Campaigns →
             </button>

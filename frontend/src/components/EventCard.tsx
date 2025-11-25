@@ -55,12 +55,12 @@ export const EventCard: React.FC<EventCardProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-sm dark:hover:shadow-lg transition-shadow">
       {/* Header with Timestamp and Type */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Timestamp */}
-          <span className="text-sm font-mono font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
+          <span className="text-sm font-mono font-semibold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2.5 py-1 rounded">
             {formatTimestamp(event.timestamp_in_episode)}
           </span>
 
@@ -78,7 +78,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             {onEdit && (
               <button
                 onClick={onEdit}
-                className="p-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded transition-colors"
                 title="Edit event"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             {onDelete && (
               <button
                 onClick={onDelete}
-                className="p-1.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                className="p-1.5 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
                 title="Delete event"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,20 +102,20 @@ export const EventCard: React.FC<EventCardProps> = ({
       </div>
 
       {/* Event Name */}
-      <h4 className="text-base font-semibold text-gray-900 mb-1">
+      <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
         {event.name}
       </h4>
 
       {/* Description (truncated) */}
       {event.description && (
-        <p className="text-sm text-gray-600 line-clamp-2">
+        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
           {truncateDescription(event.description)}
         </p>
       )}
 
       {/* Characters Involved Count */}
       {event.characters_involved && event.characters_involved.length > 0 && (
-        <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>

@@ -74,35 +74,35 @@ function EpisodesPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading episodes...</p>
+          <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading episodes...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <AdminHeader title="Episodes" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with Add Button */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Episodes</h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Episodes</h1>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
               {episodes.length} episode{episodes.length !== 1 ? 's' : ''}
             </p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => router.push(`/admin/campaigns/${campaignId}`)}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-medium transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 font-medium transition-colors"
             >
               Back to Campaign
             </button>
             <Link href={`/admin/campaigns/${campaignId}/episodes/new`}>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
+              <button className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold transition-colors flex items-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -114,13 +114,13 @@ function EpisodesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 rounded-md border border-red-300 bg-red-50 p-4">
+          <div className="mb-6 rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950 p-4">
             <div className="flex">
               <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="ml-3">
-                <p className="text-sm text-red-800">{error}</p>
+                <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@ function EpisodesPageContent() {
 
         {/* Episodes Timeline */}
         {!error && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6">
             <EpisodeTimeline
               episodes={episodes}
               onSelectEpisode={handleSelectEpisode}
@@ -138,9 +138,9 @@ function EpisodesPageContent() {
 
         {/* Empty State */}
         {!error && episodes.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg shadow">
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -152,13 +152,13 @@ function EpisodesPageContent() {
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No episodes yet</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No episodes yet</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Get started by creating your first episode.
             </p>
             <div className="mt-6">
               <Link href={`/admin/campaigns/${campaignId}/episodes/new`}>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                <button className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold transition-colors">
                   Add Episode
                 </button>
               </Link>

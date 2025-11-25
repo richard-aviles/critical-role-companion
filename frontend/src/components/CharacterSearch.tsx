@@ -3,7 +3,7 @@
  * Provides search by name, filter by class/race, and sorting
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Character } from '@/lib/api';
 
 interface CharacterSearchProps {
@@ -73,7 +73,7 @@ export function CharacterSearch({ characters, onFilteredCharactersChange }: Char
   }, [characters, searchQuery, selectedClass, selectedRace, sortBy]);
 
   // Notify parent of filtered results
-  useMemo(() => {
+  useEffect(() => {
     onFilteredCharactersChange(filteredCharacters);
   }, [filteredCharacters, onFilteredCharactersChange]);
 
@@ -88,12 +88,12 @@ export function CharacterSearch({ characters, onFilteredCharactersChange }: Char
 
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Search & Filter</h2>
+      <h2 className="text-2xl font-bold mb-6" style={{ color: '#111827' }}>Search & Filter</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Search Input */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
             Search by Name
           </label>
           <input
@@ -101,19 +101,19 @@ export function CharacterSearch({ characters, onFilteredCharactersChange }: Char
             placeholder="Enter character name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder:text-gray-900 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           />
         </div>
 
         {/* Class Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
             Class
           </label>
           <select
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 dark:text-white dark:bg-gray-800 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           >
             <option value="">All Classes</option>
             {classes.map((cls) => (
@@ -126,13 +126,13 @@ export function CharacterSearch({ characters, onFilteredCharactersChange }: Char
 
         {/* Race Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
             Race
           </label>
           <select
             value={selectedRace}
             onChange={(e) => setSelectedRace(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 dark:text-white dark:bg-gray-800 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           >
             <option value="">All Races</option>
             {races.map((race) => (
@@ -145,13 +145,13 @@ export function CharacterSearch({ characters, onFilteredCharactersChange }: Char
 
         {/* Sort By */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: '#111827' }}>
             Sort By
           </label>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 dark:text-white dark:bg-gray-800 dark:border-gray-600 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           >
             <option value="name">Name</option>
             <option value="class">Class</option>
@@ -166,8 +166,8 @@ export function CharacterSearch({ characters, onFilteredCharactersChange }: Char
             disabled={!hasActiveFilters}
             className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
               hasActiveFilters
-                ? 'bg-gray-200 text-gray-900 hover:bg-gray-300'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                ? 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-500 cursor-not-allowed'
             }`}
           >
             Reset
@@ -176,7 +176,7 @@ export function CharacterSearch({ characters, onFilteredCharactersChange }: Char
       </div>
 
       {/* Results Count */}
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm text-gray-800 dark:text-gray-400">
         Showing <span className="font-semibold">{filteredCharacters.length}</span> of{' '}
         <span className="font-semibold">{characters.length}</span> characters
       </div>

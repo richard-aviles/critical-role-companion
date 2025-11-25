@@ -96,7 +96,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
         {label}
       </label>
 
@@ -116,28 +116,28 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           <img
             src={preview}
             alt="Preview"
-            className="w-full h-64 object-cover rounded-lg border-2 border-gray-300"
+            className="w-full h-64 object-cover rounded-lg border-2 border-gray-300 dark:border-gray-600"
           />
           {!disabled && (
             <div className="absolute top-2 right-2 flex gap-2">
               <button
                 type="button"
                 onClick={handleClick}
-                className="px-3 py-1 bg-white text-gray-700 rounded-md shadow-md hover:bg-gray-100 text-sm font-medium transition-colors"
+                className="px-3 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium transition-colors"
               >
                 Change
               </button>
               <button
                 type="button"
                 onClick={handleRemove}
-                className="px-3 py-1 bg-white text-red-600 rounded-md shadow-md hover:bg-red-50 text-sm font-medium transition-colors"
+                className="px-3 py-1 bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 rounded-md shadow-md hover:bg-red-50 dark:hover:bg-red-900/30 text-sm font-medium transition-colors"
               >
                 Remove
               </button>
             </div>
           )}
           {selectedFile && (
-            <p className="mt-2 text-xs text-gray-500">
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
               {selectedFile.name} ({formatFileSize(selectedFile.size)})
             </p>
           )}
@@ -150,12 +150,12 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           onDrop={handleDrop}
           className={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-            ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'}
-            ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 hover:bg-gray-100'}
+            ${isDragging ? 'border-purple-500 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800'}
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'}
           `}
         >
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
             stroke="currentColor"
             fill="none"
             viewBox="0 0 48 48"
@@ -168,10 +168,10 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
               strokeLinejoin="round"
             />
           </svg>
-          <p className="mt-2 text-sm text-gray-600">
-            <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <span className="font-medium text-purple-600 dark:text-purple-400">Click to upload</span> or drag and drop
           </p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             JPG, PNG, or WEBP up to 5MB
           </p>
         </div>
@@ -179,8 +179,8 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
 
       {/* Error message */}
       {error && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-3">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20 p-3">
+          <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
         </div>
       )}
     </div>

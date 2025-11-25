@@ -92,27 +92,27 @@ function NewCharacterContent() {
 
   if (isAuthLoading || !isReady) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <AdminHeader title="Create Character" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb navigation */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-gray-600">
+          <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
             <li>
               <button
                 onClick={() => router.push('/admin/campaigns')}
-                className="hover:text-blue-600 transition-colors"
+                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
               >
                 Campaigns
               </button>
@@ -121,7 +121,7 @@ function NewCharacterContent() {
             <li>
               <button
                 onClick={() => router.push(`/admin/campaigns/${campaignId}`)}
-                className="hover:text-blue-600 transition-colors"
+                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
               >
                 Campaign
               </button>
@@ -130,25 +130,25 @@ function NewCharacterContent() {
             <li>
               <button
                 onClick={() => router.push(`/admin/campaigns/${campaignId}/characters`)}
-                className="hover:text-blue-600 transition-colors"
+                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
               >
                 Characters
               </button>
             </li>
             <li>/</li>
-            <li className="text-gray-900 font-medium">New</li>
+            <li className="text-gray-900 dark:text-gray-100 font-medium">New</li>
           </ol>
         </nav>
 
         {/* Form Container */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
             Create New Character
           </h2>
 
           {error && (
-            <div className="mb-6 rounded-md border border-red-300 bg-red-50 p-4">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="mb-6 rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950 p-4">
+              <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
             </div>
           )}
 

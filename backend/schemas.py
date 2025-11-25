@@ -1,0 +1,386 @@
+"""
+Pydantic schemas for Critical Role Companion API
+Request/response validation and serialization
+"""
+
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+
+
+# ============================================================================
+# Character Schemas
+# ============================================================================
+
+class CharacterStatsInput(BaseModel):
+    """Character stats input (6 core stats + HP + AC)"""
+    str: Optional[int] = Field(None, description="Strength", alias="str")
+    dex: Optional[int] = Field(None, description="Dexterity")
+    con: Optional[int] = Field(None, description="Constitution")
+    int_stat: Optional[int] = Field(None, description="Intelligence", alias="int")
+    wis: Optional[int] = Field(None, description="Wisdom")
+    cha: Optional[int] = Field(None, description="Charisma")
+    hp: Optional[int] = Field(None, description="Hit Points")
+    ac: Optional[int] = Field(None, description="Armor Class")
+
+    class Config:
+        populate_by_name = True
+        schema_extra = {
+            "example": {
+                "str": 16,
+                "dex": 14,
+                "con": 15,
+                "int": 10,
+                "wis": 12,
+                "cha": 13,
+                "hp": 45,
+                "ac": 14
+            }
+        }
+
+
+class CharacterThemeOverrideInput(BaseModel):
+    """Character-specific color theme override"""
+    border_colors: List[str] = Field(..., description="Array of hex colors for border gradient")
+    text_color: str = Field(..., description="Hex color for stat text")
+    badge_interior_gradient: Dict[str, Any] = Field(..., description="Radial gradient for badge interiors")
+    hp_color: Dict[str, Any] = Field(..., description="HP badge colors")
+    ac_color: Dict[str, Any] = Field(..., description="AC badge colors")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "border_colors": ["#FFD700", "#FFA500", "#FF8C00", "#DC7F2E"],
+                "text_color": "#FFFFFF",
+                "badge_interior_gradient": {
+                    "type": "radial",
+                    "colors": ["#FFE4B5", "#DAA520"]
+                },
+                "hp_color": {
+                    "border": "#FF0000",
+                    "interior_gradient": {
+                        "type": "radial",
+                        "colors": ["#FF6B6B", "#CC0000"]
+                    }
+                },
+                "ac_color": {
+                    "border": "#808080",
+                    "interior_gradient": {
+                        "type": "radial",
+                        "colors": ["#A9A9A9", "#696969"]
+                    }
+                }
+            }
+        }
+
+
+class CharacterUpdateRequest(BaseModel):
+    """Update character info and stats"""
+    name: Optional[str] = None
+    class_name: Optional[str] = None
+    race: Optional[str] = None
+    player_name: Optional[str] = None
+    description: Optional[str] = None
+    backstory: Optional[str] = None
+    image_url: Optional[str] = None
+    background_image_url: Optional[str] = None
+    level: Optional[int] = None
+    is_active: Optional[bool] = None
+    stats: Optional[CharacterStatsInput] = None
+    color_theme_override: Optional[CharacterThemeOverrideInput] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "Vax'ildan",
+                "class_name": "Rogue",
+                "race": "Half-Elf",
+                "level": 16,
+                "stats": {
+                    "str": 16,
+                    "dex": 18,
+                    "con": 14,
+                    "int": 11,
+                    "wis": 12,
+                    "cha": 10,
+                    "hp": 95,
+                    "ac": 17
+                },
+                "color_theme_override": {
+                    "border_colors": ["#FFD700", "#FFA500", "#FF8C00", "#DC7F2E"],
+                    "text_color": "#FFFFFF",
+                    "badge_interior_gradient": {
+                        "type": "radial",
+                        "colors": ["#FFE4B5", "#DAA520"]
+                    },
+                    "hp_color": {
+                        "border": "#FF0000",
+                        "interior_gradient": {
+                            "type": "radial",
+                            "colors": ["#FF6B6B", "#CC0000"]
+                        }
+                    },
+                    "ac_color": {
+                        "border": "#808080",
+                        "interior_gradient": {
+                            "type": "radial",
+                            "colors": ["#A9A9A9", "#696969"]
+                        }
+                    }
+                }
+            }
+        }
+
+
+class CharacterResponse(BaseModel):
+    """Character response with all fields"""
+    id: str
+    campaign_id: str
+    name: str
+    slug: str
+    class_name: Optional[str]
+    race: Optional[str]
+    player_name: Optional[str]
+    description: Optional[str]
+    backstory: Optional[str]
+    image_url: Optional[str]
+    background_image_url: Optional[str]
+    level: int
+    is_active: bool
+    stats: Dict[str, Any]
+    color_theme_override: Optional[Dict[str, Any]]
+    created_at: Optional[str]
+    updated_at: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================================
+# Character Layout Schemas
+# ============================================================================
+
+class ColorGradientInput(BaseModel):
+    """Gradient definition for colors"""
+    type: str = Field(..., description="'linear' or 'radial'")
+    colors: List[str] = Field(..., description="Array of hex color codes")
+    direction: Optional[str] = None  # For linear: "top-to-bottom", "left-to-right", etc.
+    start_point: Optional[Dict[str, float]] = None  # For radial: {x, y}
+    radius: Optional[float] = None  # For radial gradients
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "type": "linear",
+                "colors": ["#FFD700", "#FFA500", "#FF8C00", "#DC7F2E"],
+                "direction": "135deg"
+            }
+        }
+
+
+class HPACColorInput(BaseModel):
+    """HP/AC specific color configuration"""
+    border: str = Field(..., description="Border hex color")
+    interior_gradient: Dict[str, Any] = Field(..., description="Radial gradient for interior")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "border": "#FF0000",
+                "interior_gradient": {
+                    "type": "radial",
+                    "colors": ["#FF6B6B", "#CC0000"]
+                }
+            }
+        }
+
+
+class BadgeLayoutInput(BaseModel):
+    """Badge configuration for a stat"""
+    stat: str = Field(..., description="Stat key: str, dex, con, int, wis, cha, hp, ac")
+    shape: str = Field(..., description="Shape: hexagon, heart, shield")
+    x: float = Field(..., description="X position (0-100%)")
+    y: float = Field(..., description="Y position (0-100%)")
+    size: Optional[float] = Field(None, description="Size multiplier (0.5-2.0)")
+    rotation: Optional[float] = Field(None, description="Rotation in degrees")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "stat": "str",
+                "shape": "hexagon",
+                "x": 10.0,
+                "y": 20.0,
+                "size": 1.0,
+                "rotation": 0.0
+            }
+        }
+
+
+class CharacterLayoutCreateRequest(BaseModel):
+    """Create character layout for a campaign"""
+    name: str = Field(default="Default", description="Layout name")
+    is_default: bool = Field(default=False, description="Is this the default layout?")
+    stats_to_display: List[str] = Field(
+        default=["str", "dex", "con", "int", "wis", "cha"],
+        description="Which stats to display"
+    )
+    border_color_count: int = Field(default=2, description="2 or 4 colors for gradient")
+    border_colors: List[str] = Field(..., description="Array of hex colors for border")
+    text_color: str = Field(default="#FFFFFF", description="Hex color for stat text")
+    badge_interior_gradient: Dict[str, Any] = Field(
+        ...,
+        description="Radial gradient for badge interiors"
+    )
+    hp_color: Dict[str, Any] = Field(..., description="HP badge colors")
+    ac_color: Dict[str, Any] = Field(..., description="AC badge colors")
+    badge_layout: List[BadgeLayoutInput] = Field(
+        default=[],
+        description="Badge positions and shapes"
+    )
+    color_preset: Optional[str] = Field(
+        None,
+        description="Preset: option_a, option_b, option_c, or null for custom"
+    )
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "name": "Gold Theme",
+                "is_default": True,
+                "stats_to_display": ["str", "dex", "con", "int", "wis", "cha"],
+                "border_color_count": 4,
+                "border_colors": ["#FFD700", "#FFA500", "#FF8C00", "#DC7F2E"],
+                "text_color": "#FFFFFF",
+                "badge_interior_gradient": {
+                    "type": "radial",
+                    "colors": ["#FFE4B5", "#DAA520"]
+                },
+                "hp_color": {
+                    "border": "#FF0000",
+                    "interior_gradient": {
+                        "type": "radial",
+                        "colors": ["#FF6B6B", "#CC0000"]
+                    }
+                },
+                "ac_color": {
+                    "border": "#808080",
+                    "interior_gradient": {
+                        "type": "radial",
+                        "colors": ["#A9A9A9", "#696969"]
+                    }
+                },
+                "badge_layout": [
+                    {
+                        "stat": "str",
+                        "shape": "hexagon",
+                        "x": 10.0,
+                        "y": 20.0,
+                        "size": 1.0
+                    }
+                ],
+                "color_preset": "option_a"
+            }
+        }
+
+
+class CharacterLayoutUpdateRequest(BaseModel):
+    """Update character layout"""
+    name: Optional[str] = None
+    is_default: Optional[bool] = None
+    stats_to_display: Optional[List[str]] = None
+    border_color_count: Optional[int] = None
+    border_colors: Optional[List[str]] = None
+    text_color: Optional[str] = None
+    badge_interior_gradient: Optional[Dict[str, Any]] = None
+    hp_color: Optional[Dict[str, Any]] = None
+    ac_color: Optional[Dict[str, Any]] = None
+    badge_layout: Optional[List[BadgeLayoutInput]] = None
+    color_preset: Optional[str] = None
+
+
+class CharacterLayoutResponse(BaseModel):
+    """Character layout response"""
+    id: str
+    campaign_id: str
+    name: str
+    is_default: bool
+    stats_to_display: List[str]
+    border_color_count: int
+    border_colors: List[str]
+    text_color: str
+    badge_interior_gradient: Dict[str, Any]
+    hp_color: Dict[str, Any]
+    ac_color: Dict[str, Any]
+    badge_layout: List[Dict[str, Any]]
+    color_preset: Optional[str]
+    created_at: Optional[str]
+    updated_at: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+# ============================================================================
+# Preset Color Schemes
+# ============================================================================
+
+class PresetColorScheme(BaseModel):
+    """Preset color scheme for quick setup"""
+    id: str
+    name: str
+    description: str
+    border_colors: List[str]
+    text_color: str
+    badge_interior_gradient: Dict[str, Any]
+    hp_color: Dict[str, Any]
+    ac_color: Dict[str, Any]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "id": "option_a",
+                "name": "Gold & Warmth",
+                "description": "Warm gold tones with rich accents",
+                "border_colors": ["#FFD700", "#FFA500", "#FF8C00", "#DC7F2E"],
+                "text_color": "#FFFFFF",
+                "badge_interior_gradient": {
+                    "type": "radial",
+                    "colors": ["#FFE4B5", "#DAA520"]
+                },
+                "hp_color": {
+                    "border": "#FF0000",
+                    "interior_gradient": {
+                        "type": "radial",
+                        "colors": ["#FF6B6B", "#CC0000"]
+                    }
+                },
+                "ac_color": {
+                    "border": "#808080",
+                    "interior_gradient": {
+                        "type": "radial",
+                        "colors": ["#A9A9A9", "#696969"]
+                    }
+                }
+            }
+        }
+
+
+# ============================================================================
+# Error Response
+# ============================================================================
+
+class ErrorResponse(BaseModel):
+    """Error response"""
+    status_code: int
+    message: str
+    detail: Optional[str] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "status_code": 404,
+                "message": "Layout not found",
+                "detail": "No character layout found for this campaign"
+            }
+        }

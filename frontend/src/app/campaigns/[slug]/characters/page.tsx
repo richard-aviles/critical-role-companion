@@ -54,10 +54,10 @@ function CharacterRosterPageContent() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading characters...</p>
+          <div className="animate-spin h-12 w-12 border-4 border-purple-600 dark:border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading characters...</p>
         </div>
       </div>
     );
@@ -66,15 +66,15 @@ function CharacterRosterPageContent() {
   // Error state
   if (error || !campaign) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="text-center max-w-md">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Campaign Not Found</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Campaign Not Found</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             {error || 'The campaign you are looking for does not exist.'}
           </p>
           <Link
             href="/"
-            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-block px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 transition-colors font-semibold"
           >
             Back to Home
           </Link>
@@ -84,22 +84,22 @@ function CharacterRosterPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-            <Link href={`/campaigns/${slug}`} className="hover:text-blue-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <Link href={`/campaigns/${slug}`} className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
               {campaign.name}
             </Link>
             <span>/</span>
-            <span className="text-gray-900 font-medium">Characters</span>
+            <span className="text-gray-900 dark:text-white font-medium">Characters</span>
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl font-bold text-gray-900">Character Roster</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Character Roster</h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
             Meet the heroes of {campaign.name}
           </p>
         </div>
@@ -108,13 +108,13 @@ function CharacterRosterPageContent() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {characters.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">
+          <div className="text-center py-20">
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-6">
               No characters found for this campaign yet.
             </p>
             <Link
               href={`/campaigns/${slug}`}
-              className="mt-4 inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 transition-colors font-semibold"
             >
               Back to Campaign
             </Link>
@@ -130,7 +130,7 @@ function CharacterRosterPageContent() {
             {/* Character Grid */}
             {filteredCharacters.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-600 text-lg">
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
                   No characters match your search criteria.
                 </p>
               </div>
@@ -150,7 +150,7 @@ function CharacterRosterPageContent() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 mt-12">
+      <footer className="bg-gray-900 dark:bg-gray-950 text-gray-300 dark:text-gray-400 py-12 mt-12 border-t border-gray-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
           <p>&copy; {new Date().getFullYear()} Critical Role Companion. All rights reserved.</p>
         </div>

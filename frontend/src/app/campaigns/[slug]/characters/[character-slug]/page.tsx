@@ -50,10 +50,10 @@ function CharacterDetailPageContent() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading character...</p>
+          <div className="animate-spin h-12 w-12 border-4 border-purple-600 dark:border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading character...</p>
         </div>
       </div>
     );
@@ -62,15 +62,15 @@ function CharacterDetailPageContent() {
   // Error state
   if (error || !character || !campaign) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center max-w-md">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Character Not Found</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Character Not Found</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             {error || 'The character you are looking for does not exist.'}
           </p>
           <Link
             href={`/campaigns/${campaignSlug}/characters`}
-            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-block px-6 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors"
           >
             Back to Roster
           </Link>
@@ -81,34 +81,35 @@ function CharacterDetailPageContent() {
 
   // Get styling from color override
   const textColor = character.color_theme_override?.text_color || '#1f2937';
+  const levelColor = character.color_theme_override?.text_color || '#FFFFFF';
   const borderColor = character.color_theme_override?.border_colors?.[0] || '#3b82f6';
   const accentBgColor = character.color_theme_override?.badge_interior_gradient?.colors?.[0] || '#dbeafe';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-            <Link href={`/campaigns/${campaignSlug}`} className="hover:text-blue-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <Link href={`/campaigns/${campaignSlug}`} className="hover:text-purple-600 dark:hover:text-purple-400">
               {campaign.name}
             </Link>
             <span>/</span>
             <Link
               href={`/campaigns/${campaignSlug}/characters`}
-              className="hover:text-blue-600"
+              className="hover:text-purple-600 dark:hover:text-purple-400"
             >
               Characters
             </Link>
             <span>/</span>
-            <span className="text-gray-900 font-medium">{character.name}</span>
+            <span className="text-gray-900 dark:text-white font-medium">{character.name}</span>
           </div>
 
           {/* Back button */}
           <Link
             href={`/campaigns/${campaignSlug}/characters`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+            className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-medium flex items-center gap-1"
           >
             ← Back to Roster
           </Link>
@@ -150,13 +151,13 @@ function CharacterDetailPageContent() {
             </div>
 
             {/* Quick Info Card */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               {character.level && (
-                <div className="mb-4 pb-4 border-b border-gray-200">
-                  <p className="text-sm text-gray-600 mb-1">Level</p>
+                <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                  <p className="text-sm mb-1 dark:text-gray-400" style={{ color: '#6b7280' }}>Level</p>
                   <p
                     className="text-3xl font-bold"
-                    style={{ color: textColor }}
+                    style={{ color: levelColor }}
                   >
                     {character.level}
                   </p>
@@ -165,8 +166,8 @@ function CharacterDetailPageContent() {
 
               {character.class_name && (
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-1">Class</p>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <p className="text-sm mb-1 dark:text-gray-400" style={{ color: '#6b7280' }}>Class</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     {character.class_name}
                   </p>
                 </div>
@@ -174,8 +175,8 @@ function CharacterDetailPageContent() {
 
               {character.race && (
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-1">Race</p>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <p className="text-sm mb-1 dark:text-gray-400" style={{ color: '#6b7280' }}>Race</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     {character.race}
                   </p>
                 </div>
@@ -183,8 +184,8 @@ function CharacterDetailPageContent() {
 
               {character.player_name && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Played By</p>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <p className="text-sm mb-1 dark:text-gray-400" style={{ color: '#6b7280' }}>Played By</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     {character.player_name}
                   </p>
                 </div>
@@ -203,7 +204,7 @@ function CharacterDetailPageContent() {
                 {character.name}
               </h1>
               {character.class_name && character.race && (
-                <p className="text-xl text-gray-600">
+                <p className="text-xl text-gray-600 dark:text-gray-400">
                   {character.race} {character.class_name}
                   {character.level && ` (Level ${character.level})`}
                 </p>
@@ -212,9 +213,9 @@ function CharacterDetailPageContent() {
 
             {/* Description */}
             {character.description && (
-              <div className="bg-white rounded-lg shadow p-6 mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Overview</h2>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
                   {character.description}
                 </p>
               </div>
@@ -222,9 +223,9 @@ function CharacterDetailPageContent() {
 
             {/* Backstory */}
             {character.backstory && (
-              <div className="bg-white rounded-lg shadow p-6 mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Backstory</h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Backstory</h2>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
                   {character.backstory}
                 </p>
               </div>
@@ -232,16 +233,16 @@ function CharacterDetailPageContent() {
 
             {/* Color Override Indicator */}
             {character.color_theme_override && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Character Theme</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Character Theme</h3>
                 <div className="flex items-center gap-4">
                   <div
                     className="w-12 h-12 rounded-lg shadow"
                     style={{ backgroundColor: textColor }}
                   />
                   <div>
-                    <p className="text-sm text-gray-600">Custom Color Override Applied</p>
-                    <p className="text-sm font-mono text-gray-500">{textColor}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Custom Color Override Applied</p>
+                    <p className="text-sm font-mono text-gray-500 dark:text-gray-600">{textColor}</p>
                   </div>
                 </div>
               </div>
@@ -251,7 +252,7 @@ function CharacterDetailPageContent() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 mt-12">
+      <footer className="bg-gray-900 dark:bg-gray-950 text-gray-300 dark:text-gray-400 py-12 mt-12 border-t border-gray-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
           <p>&copy; {new Date().getFullYear()} Critical Role Companion. All rights reserved.</p>
         </div>

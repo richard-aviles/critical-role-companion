@@ -203,14 +203,14 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-4">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20 p-4">
+          <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
         </div>
       )}
 
       {/* Character Name */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Character Name *
         </label>
         <input
@@ -221,7 +221,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., Jester Lavorre"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
           required
         />
       </div>
@@ -241,7 +241,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
             onChange={handleChange}
             disabled={isLoading}
             placeholder="e.g., Rogue, Cleric"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
           />
         </div>
 
@@ -258,7 +258,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
             onChange={handleChange}
             disabled={isLoading}
             placeholder="e.g., Tiefling, Half-Elf"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
           />
         </div>
       </div>
@@ -276,7 +276,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., Laura Bailey"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
         />
       </div>
 
@@ -293,7 +293,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
           disabled={isLoading}
           placeholder="Character description and physical appearance..."
           rows={3}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
         />
       </div>
 
@@ -310,7 +310,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
           disabled={isLoading}
           placeholder="Character backstory and background..."
           rows={3}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
         />
       </div>
 
@@ -328,16 +328,16 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
               }
             }}
             disabled={isLoading}
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:bg-gray-50"
+            className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-purple-600 dark:text-purple-500 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900"
           />
-          <label htmlFor="use_color_override" className="text-sm font-medium text-gray-700">
+          <label htmlFor="use_color_override" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Use custom color theme for this character
           </label>
         </div>
 
         {/* Color Override Form */}
         {useColorOverride && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
             <CharacterColorOverrideForm
               presets={COLOR_PRESETS}
               initialColors={colorOverride}
@@ -367,7 +367,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
         <button
           type="submit"
           disabled={!isFormValid || isLoading}
-          className="flex-1 rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 rounded-md bg-purple-600 dark:bg-purple-700 py-2 text-white font-medium hover:bg-purple-700 dark:hover:bg-purple-600 active:scale-95 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -385,7 +385,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="px-6 rounded-md border border-gray-300 py-2 text-gray-700 font-medium hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors"
+            className="px-6 rounded-md border border-gray-300 dark:border-gray-600 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-400 dark:disabled:text-gray-500 transition-all duration-200 focus:ring-4 focus:ring-gray-400 focus:ring-opacity-50"
           >
             Cancel
           </button>

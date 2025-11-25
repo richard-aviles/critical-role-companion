@@ -221,8 +221,8 @@ function EpisodeDetailPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading episode...</p>
+          <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading episode...</p>
         </div>
       </div>
     );
@@ -232,15 +232,15 @@ function EpisodeDetailPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             {error ? 'Error' : 'Episode Not Found'}
           </h1>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             {error || 'The episode you are looking for does not exist.'}
           </p>
           <Link
             href={`/admin/campaigns/${campaignId}/episodes`}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 inline-block"
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold inline-block"
           >
             Back to Episodes
           </Link>
@@ -250,43 +250,43 @@ function EpisodeDetailPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <AdminHeader title={episode.name} />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Error Message */}
         {error && (
-          <div className="mb-6 rounded-md border border-red-300 bg-red-50 p-4">
+          <div className="mb-6 rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950 p-4">
             <div className="flex">
               <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="ml-3">
-                <p className="text-sm text-red-800">{error}</p>
+                <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
               </div>
             </div>
           </div>
         )}
 
         {/* Episode Details Section */}
-        <div className="mb-8 bg-white rounded-lg shadow">
+        <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg">
           {/* Episode Info Header */}
           {!isEditing && (
-            <div className="p-6 border-b border-gray-200">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
-                    <h1 className="text-2xl font-bold text-gray-900">{episode.name}</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{episode.name}</h1>
                     {episode.season && episode.episode_number && (
-                      <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded">
+                      <span className="text-sm font-semibold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900 px-3 py-1 rounded">
                         S{episode.season}E{episode.episode_number}
                       </span>
                     )}
                     <span
                       className={`text-xs font-medium px-2.5 py-1 rounded ${
                         episode.is_published
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-600'
+                          ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       {episode.is_published ? 'Published' : 'Draft'}
@@ -294,27 +294,27 @@ function EpisodeDetailPageContent() {
                   </div>
 
                   {episode.description && (
-                    <p className="text-gray-700 mb-4">{episode.description}</p>
+                    <p className="text-gray-700 dark:text-gray-300 mb-4">{episode.description}</p>
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     {episode.air_date && (
                       <div>
-                        <span className="text-gray-600">Air Date:</span>{' '}
-                        <span className="text-gray-900 font-medium">
+                        <span className="text-gray-600 dark:text-gray-400">Air Date:</span>{' '}
+                        <span className="text-gray-900 dark:text-gray-100 font-medium">
                           {new Date(episode.air_date).toLocaleDateString()}
                         </span>
                       </div>
                     )}
                     {episode.runtime && (
                       <div>
-                        <span className="text-gray-600">Runtime:</span>{' '}
-                        <span className="text-gray-900 font-medium">{episode.runtime} minutes</span>
+                        <span className="text-gray-600 dark:text-gray-400">Runtime:</span>{' '}
+                        <span className="text-gray-900 dark:text-gray-100 font-medium">{episode.runtime} minutes</span>
                       </div>
                     )}
                     <div>
-                      <span className="text-gray-600">Slug:</span>{' '}
-                      <span className="text-gray-900 font-mono text-xs">{episode.slug}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Slug:</span>{' '}
+                      <span className="text-gray-900 dark:text-gray-100 font-mono text-xs">{episode.slug}</span>
                     </div>
                   </div>
                 </div>
@@ -322,13 +322,13 @@ function EpisodeDetailPageContent() {
                 <div className="flex gap-3 items-center">
                   <Link
                     href={`/admin/campaigns/${campaignId}/episodes`}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     Back to Episodes
                   </Link>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold transition-colors"
                   >
                     Edit
                   </button>
@@ -340,7 +340,7 @@ function EpisodeDetailPageContent() {
           {/* Edit Form */}
           {isEditing && (
             <div className="p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Edit Episode</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Edit Episode</h2>
               <EpisodeForm
                 mode="edit"
                 initialData={episode}
@@ -353,11 +353,11 @@ function EpisodeDetailPageContent() {
         </div>
 
         {/* Events Section */}
-        <div className="mb-8 bg-white rounded-lg shadow p-6">
+        <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6">
           {/* Show Event Form (Create or Edit) */}
           {(showEventForm || editingEvent) && (
-            <div className="mb-8 p-6 border border-gray-300 rounded-lg bg-gray-50">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
+            <div className="mb-8 p-6 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
                 {editingEvent ? 'Edit Event' : 'Create New Event'}
               </h3>
               <EventForm
@@ -388,15 +388,15 @@ function EpisodeDetailPageContent() {
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <h3 className="text-lg font-bold text-red-900 mb-2">Danger Zone</h3>
-          <p className="text-sm text-red-700 mb-4">
+        <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-6">
+          <h3 className="text-lg font-bold text-red-900 dark:text-red-300 mb-2">Danger Zone</h3>
+          <p className="text-sm text-red-700 dark:text-red-400 mb-4">
             Deleting an episode cannot be undone. All events associated with this episode will also be
             deleted.
           </p>
           <button
             onClick={() => setShowDeleteDialog(true)}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold transition-colors"
           >
             Delete Episode
           </button>

@@ -78,6 +78,21 @@ export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
 // CAMPAIGNS
 // ============================================================================
 
+export interface SlugCheckResponse {
+  slug: string;
+  available: boolean;
+  suggestions: string[];
+}
+
+export const checkSlugAvailability = async (slug: string): Promise<SlugCheckResponse> => {
+  try {
+    const response = await apiClient.get(`/campaigns/check-slug/${slug}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error('Failed to check slug availability');
+  }
+};
+
 export const getCampaigns = async () => {
   const response = await apiClient.get('/campaigns');
   return response.data;
@@ -563,6 +578,18 @@ export const deleteEvent = async (episodeId: string, eventId: string, adminToken
 // ============================================================================
 // PUBLIC ENDPOINTS (Phase 3 Tier 3 - Campaign Website Pages)
 // ============================================================================
+
+/**
+ * Get all public campaigns (no auth required)
+ */
+export const getPublicCampaigns = async (): Promise<Campaign[]> => {
+  try {
+    const response = await apiClient.get('/public/campaigns');
+    return response.data;
+  } catch (error: any) {
+    throw new Error('Failed to fetch campaigns');
+  }
+};
 
 /**
  * Get campaign by slug (public - no auth required)

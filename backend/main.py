@@ -312,6 +312,36 @@ def list_campaigns(
     return [CampaignResponse(**c.to_dict()) for c in campaigns]
 
 
+@app.get("/campaigns/check-slug/{slug}")
+def check_slug_availability(
+    slug: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Check if a campaign slug is available.
+    Also suggests alternatives if the slug is taken.
+    """
+    # Check if slug exists
+    existing = db.query(Campaign).filter(Campaign.slug == slug).first()
+    available = existing is None
+
+    suggestions = []
+    if not available:
+        # Generate suggestions: slug-2, slug-3, etc.
+        for i in range(2, 11):  # Try up to 10 suggestions
+            suggested_slug = f"{slug}-{i}"
+            if not db.query(Campaign).filter(Campaign.slug == suggested_slug).first():
+                suggestions.append(suggested_slug)
+                if len(suggestions) >= 5:  # Limit to 5 suggestions
+                    break
+
+    return {
+        "slug": slug,
+        "available": available,
+        "suggestions": suggestions
+    }
+
+
 @app.post("/campaigns", status_code=201)
 def create_campaign(
     payload: CampaignCreate,
@@ -1879,6 +1909,31 @@ async def update_layout(
 # ============================================================================
 # PUBLIC ENDPOINTS (Phase 3 Tier 3: Campaign Website Pages)
 # ============================================================================
+
+@app.get("/public/campaigns")
+def get_all_public_campaigns(db: Session = Depends(get_db)):
+    """
+    Get all public campaigns with character and episode counts (public - no auth required)
+    Returns: List of campaigns with character_count and episode_count
+    """
+    campaigns = db.query(Campaign).all()
+
+    result = []
+    for campaign in campaigns:
+        active_chars = db.query(Character).filter(
+            and_(Character.campaign_id == campaign.id, Character.is_active == True)
+        ).count()
+        published_eps = db.query(Episode).filter(
+            and_(Episode.campaign_id == campaign.id, Episode.is_published == True)
+        ).count()
+
+        campaign_dict = campaign.to_dict()
+        campaign_dict['character_count'] = active_chars
+        campaign_dict['episode_count'] = published_eps
+        result.append(campaign_dict)
+
+    return result
+
 
 @app.get("/public/campaigns/{slug}")
 def get_public_campaign(slug: str, db: Session = Depends(get_db)):

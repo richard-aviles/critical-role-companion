@@ -31,14 +31,14 @@ function CampaignListContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <AdminHeader title="Campaigns" />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <p className="text-gray-700">
+            <p className="text-gray-700 dark:text-gray-300">
               {hasCampaigns
                 ? `You own ${campaigns.length} campaign${campaigns.length > 1 ? 's' : ''}`
                 : 'No campaigns yet'}
@@ -46,7 +46,7 @@ function CampaignListContent() {
           </div>
           <button
             onClick={() => router.push('/admin/campaigns/new')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 font-semibold transition-colors"
           >
             + New Campaign
           </button>
@@ -57,7 +57,7 @@ function CampaignListContent() {
             {campaigns.map((campaign) => (
               <div
                 key={campaign.id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow"
               >
                 <div className="p-6">
                   {/* Campaign Name */}

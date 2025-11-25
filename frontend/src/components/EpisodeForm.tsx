@@ -156,14 +156,14 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-4">
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20 p-4">
+          <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
         </div>
       )}
 
       {/* Episode Name */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Episode Name *
         </label>
         <input
@@ -174,7 +174,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., Arrival at Kraghammer"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
           required
         />
       </div>
@@ -182,7 +182,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
       {/* Episode Slug (only for create or show in edit) */}
       {mode === 'create' && (
         <div>
-          <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Episode Slug *
           </label>
           <input
@@ -193,7 +193,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
             onChange={handleSlugChange}
             disabled={isLoading}
             placeholder="e.g., arrival-at-kraghammer"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
             required
           />
           <p className="mt-1 text-xs text-gray-500">
@@ -205,7 +205,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
       {/* Episode Number and Season */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="episode_number" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="episode_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Episode Number
           </label>
           <input
@@ -217,12 +217,12 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
             onChange={handleChange}
             disabled={isLoading}
             placeholder="e.g., 1"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
           />
         </div>
 
         <div>
-          <label htmlFor="season" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="season" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Season
           </label>
           <input
@@ -234,7 +234,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
             onChange={handleChange}
             disabled={isLoading}
             placeholder="e.g., 1"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
           />
         </div>
       </div>
@@ -242,7 +242,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
       {/* Air Date and Runtime */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="air_date" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="air_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Air Date
           </label>
           <input
@@ -252,12 +252,12 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
             value={formData.air_date}
             onChange={handleChange}
             disabled={isLoading}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
           />
         </div>
 
         <div>
-          <label htmlFor="runtime" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="runtime" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Runtime (minutes)
           </label>
           <input
@@ -269,14 +269,14 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
             onChange={handleChange}
             disabled={isLoading}
             placeholder="e.g., 180"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
           />
         </div>
       </div>
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Description
         </label>
         <textarea
@@ -287,7 +287,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
           disabled={isLoading}
           placeholder="Episode summary and key events..."
           rows={4}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-400"
         />
       </div>
 
@@ -300,9 +300,9 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
           checked={formData.is_published}
           onChange={handleChange}
           disabled={isLoading}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:bg-gray-50"
+          className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-purple-600 dark:text-purple-500 focus:ring-purple-500 dark:focus:ring-purple-400 disabled:bg-gray-50 dark:disabled:bg-gray-900"
         />
-        <label htmlFor="is_published" className="ml-2 block text-sm font-medium text-gray-700">
+        <label htmlFor="is_published" className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           Published
         </label>
       </div>
@@ -312,7 +312,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
         <button
           type="submit"
           disabled={isLoading}
-          className="flex-1 rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 rounded-md bg-purple-600 dark:bg-purple-700 py-2 text-white font-medium hover:bg-purple-700 dark:hover:bg-purple-600 active:scale-95 disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -330,7 +330,7 @@ export const EpisodeForm: React.FC<EpisodeFormProps> = ({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="px-6 rounded-md border border-gray-300 py-2 text-gray-700 font-medium hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors"
+            className="px-6 rounded-md border border-gray-300 dark:border-gray-600 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-400 dark:disabled:text-gray-500 transition-all duration-200 focus:ring-4 focus:ring-gray-400 focus:ring-opacity-50"
           >
             Cancel
           </button>

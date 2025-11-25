@@ -3,12 +3,27 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Phase 2: Epic Fantasy Palette */
+  --color-primary: #6B46C1;
+  --color-gold: #D4AF37;
+  --color-emerald: #047857;
+  --color-crimson: #DC2626;
+  --color-amethyst: #A855F7;
+  --color-bronze: #B45309;
+  --color-sapphire: #0369A1;
+
+  /* Phase 2: Shadow Colors for depth */
+  --shadow-primary: rgba(107, 70, 193, 0.15);
+  --shadow-gold: rgba(212, 175, 55, 0.15);
+  --shadow-emerald: rgba(4, 120, 87, 0.15);
+  --shadow-accent: rgba(168, 85, 247, 0.12);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -23,4 +38,282 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* CRITICAL FIX: Ensure light mode has proper contrast */
+@media (prefers-color-scheme: light) {
+  body {
+    color: #171717;
+    background-color: #ffffff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: inherit;
+  }
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #ededed;
+    background-color: #0a0a0a;
+  }
+}
+
+/* Phase 1: Animation Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInStagger {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Phase 1 & 2: Typography Improvements */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  font-family: var(--font-cinzel);
+  font-weight: 700;
+}
+
+p, body, input, textarea, button {
+  font-family: var(--font-inter);
+  font-weight: 400;
+}
+
+/* Phase 2: Enhanced Typography with Custom Fonts */
+h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  /* Don't force color - let components control it */
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+h4, h5, h6 {
+  font-weight: 600;
+}
+
+body {
+  line-height: 1.6;
+  letter-spacing: 0.3px;
+}
+
+/* Phase 1: Global Button Styles */
+button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Phase 1: Utility Classes */
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-fade-in-stagger {
+  animation: fadeInStagger 0.5s ease-out forwards;
+}
+
+/* Stagger delays for multiple elements */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Phase 2: Enhanced Shadow System */
+.shadow-primary {
+  box-shadow: 0 10px 25px -5px var(--shadow-primary),
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-gold {
+  box-shadow: 0 10px 25px -5px var(--shadow-gold),
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-emerald {
+  box-shadow: 0 10px 25px -5px var(--shadow-emerald),
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-accent {
+  box-shadow: 0 10px 25px -5px var(--shadow-accent),
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-elevated {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1),
+              0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+/* Phase 2: Micro-interactions - Hover states */
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px var(--shadow-primary);
+}
+
+.hover-pulse:hover {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Phase 2: Loading animations */
+@keyframes shimmer {
+  -100% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Phase 3: Error state animations */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+.error-message {
+  animation: slideInDown 0.3s ease-out forwards;
+  background-color: #FEE2E2;
+  border-color: #FCA5A5;
+  color: #991B1B;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Phase 3: Success state animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-message {
+  animation: slideInUp 0.3s ease-out forwards;
+  background-color: #ECFDF5;
+  border-color: #86EFAC;
+  color: #166534;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-checkmark {
+  animation: checkmark 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Phase 3: Warning state animations */
+.warning-message {
+  animation: slideInUp 0.3s ease-out forwards;
+  background-color: #FFFBEB;
+  border-color: #FCD34D;
+  color: #92400E;
+}
+
+/* Phase 2: Focus visible states for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Phase 3: Dark mode support */
+@media (prefers-color-scheme: dark) {
+  h1, h2, h3, h4, h5, h6 {
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  .shadow-primary,
+  .shadow-gold,
+  .shadow-emerald,
+  .shadow-accent {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  }
 }
