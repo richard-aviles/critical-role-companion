@@ -202,6 +202,7 @@ export interface CreateCharacterData {
   player_name?: string;
   description?: string;
   backstory?: string;
+  color_theme_override?: ColorThemeOverride | null;
 }
 
 export interface UpdateCharacterData {
