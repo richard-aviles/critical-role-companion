@@ -490,6 +490,7 @@ class CharacterCreate(BaseModel):
     race: Optional[str] = None
     description: Optional[str] = None
     backstory: Optional[str] = None
+    color_theme_override: Optional[Dict[str, Any]] = None
 
 
 class CharacterUpdate(BaseModel):
@@ -499,6 +500,7 @@ class CharacterUpdate(BaseModel):
     race: Optional[str] = None
     description: Optional[str] = None
     backstory: Optional[str] = None
+    color_theme_override: Optional[Dict[str, Any]] = None
 
 
 class EpisodeCreate(BaseModel):
@@ -574,6 +576,7 @@ def create_character(
         race=payload.race,
         description=payload.description,
         backstory=payload.backstory,
+        color_theme_override=payload.color_theme_override,
     )
     db.add(character)
     db.commit()
@@ -1205,9 +1208,9 @@ async def create_episode_event(
     if campaign.admin_token != token:
         raise HTTPException(status_code=403, detail="Invalid admin token")
 
-    # Convert characters_involved array to JSON string if provided
+    # Convert characters_involved array to JSON string if provided (always JSON, even if empty)
     characters_involved_str = None
-    if payload.characters_involved:
+    if payload.characters_involved is not None:
         characters_involved_str = json.dumps(payload.characters_involved)
 
     # Create the event
@@ -1282,7 +1285,8 @@ async def update_episode_event(
     if payload.event_type is not None:
         event.event_type = payload.event_type
     if payload.characters_involved is not None:
-        event.characters_involved = json.dumps(payload.characters_involved) if payload.characters_involved else None
+        # Handle empty arrays - always serialize to JSON, even if empty list
+        event.characters_involved = json.dumps(payload.characters_involved)
 
     db.commit()
     db.refresh(event)
