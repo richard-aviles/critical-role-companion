@@ -29,6 +29,21 @@ const EVENT_TYPES = [
   { value: 'other', label: 'Other' },
 ];
 
+// Helper to safely parse characters_involved - handle both string and array
+const parseCharactersInvolved = (data: any): string[] => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (typeof data === 'string') {
+    try {
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 export const EventForm: React.FC<EventFormProps> = ({
   mode,
   episodeId,
@@ -43,7 +58,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     description: initialData?.description || '',
     timestamp_in_episode: initialData?.timestamp_in_episode?.toString() || '',
     event_type: initialData?.event_type || '',
-    characters_involved: initialData?.characters_involved || [],
+    characters_involved: parseCharactersInvolved(initialData?.characters_involved),
   });
 
   const [error, setError] = useState<string | null>(null);
