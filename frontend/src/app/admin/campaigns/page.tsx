@@ -57,25 +57,25 @@ function CampaignListContent() {
             {campaigns.map((campaign) => (
               <div
                 key={campaign.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-all duration-200 hover:-translate-y-1"
               >
                 <div className="p-6">
                   {/* Campaign Name */}
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                     {campaign.name}
                   </h3>
 
                   {/* Campaign Slug */}
-                  <p className="text-sm text-gray-500 mb-4">
-                    <code className="bg-gray-100 px-2 py-1 rounded">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <code className="bg-gray-100 dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded">
                       {campaign.slug}
                     </code>
                   </p>
 
                   {/* Campaign Token (truncated) */}
-                  <div className="bg-gray-50 rounded p-2 mb-4">
-                    <p className="text-xs text-gray-600 mb-1">Admin Token</p>
-                    <code className="text-xs text-gray-700 break-all">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded p-2 mb-4">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Admin Token</p>
+                    <code className="text-xs text-gray-700 dark:text-gray-300 break-all">
                       {campaign.admin_token?.substring(0, 20)}...
                     </code>
                   </div>

@@ -219,8 +219,9 @@ class Event(Base):
 
     def to_dict(self):
         # Parse characters_involved JSON string back to array
-        characters_array = None
-        if self.characters_involved:
+        # Handle None, empty string, and JSON string (including "[]")
+        characters_array = []
+        if self.characters_involved is not None:
             try:
                 characters_array = json.loads(self.characters_involved)
             except (json.JSONDecodeError, TypeError):

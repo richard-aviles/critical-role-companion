@@ -325,6 +325,23 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
               setUseColorOverride(e.target.checked);
               if (!e.target.checked) {
                 setColorOverride(undefined);
+              } else if (mode === 'create' && !colorOverride) {
+                // In create mode, initialize with default preset colors when checkbox is checked
+                const defaultPreset = COLOR_PRESETS[0];
+                const defaultColors = {
+                  border_colors: defaultPreset.borderColors,
+                  text_color: defaultPreset.textColor,
+                  badge_interior_gradient: defaultPreset.badgeInteriorGradient,
+                  hp_color: {
+                    border: defaultPreset.hpColor.border,
+                    interior_gradient: defaultPreset.hpColor.interiorGradient,
+                  },
+                  ac_color: {
+                    border: defaultPreset.acColor.border,
+                    interior_gradient: defaultPreset.acColor.interiorGradient,
+                  },
+                };
+                setColorOverride(defaultColors);
               }
             }}
             disabled={isLoading}
@@ -342,12 +359,19 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
               presets={COLOR_PRESETS}
               initialColors={colorOverride}
               isLoading={isLoading}
+              mode={mode}
               onSubmit={async (colors) => {
                 setColorOverride(colors);
               }}
               onCancel={() => {
                 setUseColorOverride(false);
                 setColorOverride(undefined);
+              }}
+              onChange={(colors) => {
+                // In create mode, auto-update colors as user makes changes
+                if (mode === 'create') {
+                  setColorOverride(colors);
+                }
               }}
             />
           </div>

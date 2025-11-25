@@ -31,8 +31,10 @@ interface CharacterColorOverrideFormProps {
   initialColors?: ColorThemeOverride;
   presets: ColorPreset[];
   isLoading?: boolean;
+  mode?: 'create' | 'edit';
   onSubmit: (colors: ColorThemeOverride) => Promise<void>;
   onCancel?: () => void;
+  onChange?: (colors: ColorThemeOverride) => void;
 }
 
 const DEFAULT_PRESET: ColorPreset = {
@@ -88,8 +90,10 @@ export const CharacterColorOverrideForm: React.FC<
   initialColors,
   presets,
   isLoading = false,
+  mode = 'edit',
   onSubmit,
   onCancel,
+  onChange,
 }) => {
   const [selectedPreset, setSelectedPreset] = useState<ColorPreset | null>(
     initialColors ? null : presets[0] || DEFAULT_PRESET
@@ -109,7 +113,12 @@ export const CharacterColorOverrideForm: React.FC<
 
   const handlePresetSelect = (preset: ColorPreset) => {
     setSelectedPreset(preset);
-    setCustomColors(presetToColorThemeOverride(preset));
+    const newColors = presetToColorThemeOverride(preset);
+    setCustomColors(newColors);
+    // Auto-update parent in create mode
+    if (mode === 'create' && onChange) {
+      onChange(newColors);
+    }
   };
 
   const handleCustomSelect = () => {
@@ -157,6 +166,11 @@ export const CharacterColorOverrideForm: React.FC<
     setCustomColors(updatedColors);
     setSelectedPreset(null);
     setEditingColorField(null);
+
+    // Auto-update parent in create mode
+    if (mode === 'create' && onChange) {
+      onChange(updatedColors);
+    }
   };
 
   return (
@@ -385,58 +399,69 @@ export const CharacterColorOverrideForm: React.FC<
         </div>
       </div>
 
-      {/* Form Actions */}
-      <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <button
-          type="button"
-          onClick={async () => {
-            setIsSaving(true);
-            setSaveSuccess(false);
-            try {
-              console.log('[ColorOverride] Saving colors:', customColors);
-              await onSubmit(customColors);
-              console.log('[ColorOverride] Colors saved successfully');
-              setSaveSuccess(true);
-              // Reset success state after 2 seconds
-              setTimeout(() => setSaveSuccess(false), 2000);
-            } catch (error) {
-              console.error('[ColorOverride] Error saving colors:', error);
-            } finally {
-              setIsSaving(false);
-            }
-          }}
-          disabled={isLoading || isSaving}
-          className={`flex-1 rounded-md py-2 px-4 text-white font-semibold transition-all ${
-            saveSuccess
-              ? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
-              : 'bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 disabled:bg-gray-400 disabled:cursor-not-allowed'
-          }`}
-        >
-          {isSaving ? (
-            <span className="flex items-center justify-center">
-              <span className="animate-spin mr-2 border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block"></span>
-              Saving...
-            </span>
-          ) : saveSuccess ? (
-            <span className="flex items-center justify-center">
-              <span className="mr-2">✓</span>
-              Saved!
-            </span>
-          ) : (
-            'Save Color Override'
-          )}
-        </button>
-        {onCancel && (
+      {/* Form Actions - Only shown in edit mode */}
+      {mode === 'edit' && (
+        <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
-            onClick={onCancel}
-            disabled={isLoading}
-            className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-4 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
+            onClick={async () => {
+              setIsSaving(true);
+              setSaveSuccess(false);
+              try {
+                console.log('[ColorOverride] Saving colors:', customColors);
+                await onSubmit(customColors);
+                console.log('[ColorOverride] Colors saved successfully');
+                setSaveSuccess(true);
+                // Reset success state after 2 seconds
+                setTimeout(() => setSaveSuccess(false), 2000);
+              } catch (error) {
+                console.error('[ColorOverride] Error saving colors:', error);
+              } finally {
+                setIsSaving(false);
+              }
+            }}
+            disabled={isLoading || isSaving}
+            className={`flex-1 rounded-md py-2 px-4 text-white font-semibold transition-all ${
+              saveSuccess
+                ? 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
+                : 'bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 disabled:bg-gray-400 disabled:cursor-not-allowed'
+            }`}
           >
-            Cancel
+            {isSaving ? (
+              <span className="flex items-center justify-center">
+                <span className="animate-spin mr-2 border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block"></span>
+                Saving...
+              </span>
+            ) : saveSuccess ? (
+              <span className="flex items-center justify-center">
+                <span className="mr-2">✓</span>
+                Saved!
+              </span>
+            ) : (
+              'Save Color Override'
+            )}
           </button>
-        )}
-      </div>
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={isLoading}
+              className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-4 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Info message in create mode */}
+      {mode === 'create' && (
+        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+            Color changes will be saved when you create the character.
+          </p>
+        </div>
+      )}
 
       {/* Color Picker Modal */}
       <ColorPickerModal

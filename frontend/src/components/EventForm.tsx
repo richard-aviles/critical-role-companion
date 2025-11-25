@@ -112,7 +112,8 @@ export const EventForm: React.FC<EventFormProps> = ({
         name: formData.name,
         description: formData.description || undefined,
         event_type: formData.event_type || undefined,
-        characters_involved: formData.characters_involved.length > 0 ? formData.characters_involved : undefined,
+        // Always send characters_involved array, even if empty (to allow clearing all characters)
+        characters_involved: formData.characters_involved,
       };
 
       if (formData.timestamp_in_episode) {

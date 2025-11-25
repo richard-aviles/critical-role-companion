@@ -57,18 +57,18 @@ function DashboardContent() {
               {user.campaigns.slice(0, 3).map((campaign) => (
                 <div
                   key={campaign.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm dark:shadow-md hover:shadow-md dark:hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         {campaign.name}
                       </h3>
-                      <p className="text-sm text-gray-500">{campaign.slug}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{campaign.slug}</p>
                     </div>
                     <button
                       onClick={() => router.push(`/admin/campaigns/${campaign.id}`)}
-                      className="px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+                      className="px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                     >
                       Manage →
                     </button>
