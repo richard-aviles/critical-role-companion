@@ -84,7 +84,7 @@ function CampaignListContent() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => router.push(`/admin/campaigns/${campaign.id}`)}
-                      className="flex-1 px-3 py-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-sm font-medium transition-colors"
+                      className="flex-1 px-3 py-2 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded hover:bg-purple-200 dark:hover:bg-purple-800 text-sm font-medium transition-colors"
                     >
                       Manage
                     </button>
@@ -92,8 +92,8 @@ function CampaignListContent() {
                       onClick={() => handleCopyToken(campaign.admin_token, campaign.id)}
                       className={`flex-1 px-3 py-2 rounded text-sm font-medium transition-colors ${
                         copiedTokenId === campaign.id
-                          ? 'bg-green-100 text-green-600'
-                          : 'bg-blue-100 text-blue-600 hover:bg-blue-200 border border-blue-300'
+                          ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300'
+                          : 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800 border border-purple-300 dark:border-purple-700'
                       }`}
                       title="Copy admin token"
                     >
@@ -105,17 +105,17 @@ function CampaignListContent() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="bg-gray-800 dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-12 text-center border border-gray-700 dark:border-gray-700">
+            <h3 className="text-xl font-semibold text-white dark:text-white mb-2">
               No campaigns yet
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-400 dark:text-gray-400 mb-6">
               Create your first campaign to get started managing characters,
               episodes, and events.
             </p>
             <button
               onClick={() => router.push('/admin/campaigns/new')}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 font-medium transition-colors"
             >
               Create Campaign
             </button>
