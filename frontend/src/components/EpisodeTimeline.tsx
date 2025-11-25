@@ -54,7 +54,7 @@ export const EpisodeTimeline: React.FC<EpisodeTimelineProps> = ({
     return (
       <div className="text-center py-12">
         <svg
-          className="mx-auto h-12 w-12 text-gray-400"
+          className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -66,8 +66,8 @@ export const EpisodeTimeline: React.FC<EpisodeTimelineProps> = ({
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
           />
         </svg>
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No episodes</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No episodes</h3>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Get started by creating your first episode.
         </p>
       </div>
@@ -77,7 +77,7 @@ export const EpisodeTimeline: React.FC<EpisodeTimelineProps> = ({
   return (
     <div className="relative">
       {/* Timeline Line */}
-      <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200" />
+      <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-600" />
 
       {/* Episodes */}
       <div className="space-y-6">
@@ -107,10 +107,10 @@ export const EpisodeTimeline: React.FC<EpisodeTimelineProps> = ({
               <div className="ml-16 flex-1">
                 <div
                   onClick={() => onSelectEpisode?.(episode.id)}
-                  className={`bg-white border rounded-lg p-4 transition-all cursor-pointer ${
+                  className={`bg-white dark:bg-gray-700 border rounded-lg p-4 transition-all cursor-pointer ${
                     isSelected
-                      ? 'border-blue-500 shadow-md'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                      ? 'border-blue-500 dark:border-blue-400 shadow-md dark:shadow-lg'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-sm'
                   }`}
                 >
                   {/* Header with Episode Number and Status */}
@@ -132,13 +132,13 @@ export const EpisodeTimeline: React.FC<EpisodeTimelineProps> = ({
                   </div>
 
                   {/* Episode Name */}
-                  <h3 className="text-base font-semibold text-gray-900 mb-1">
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
                     {episode.name}
                   </h3>
 
                   {/* Air Date */}
                   {episode.air_date && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       {formatDate(episode.air_date)}
                     </p>
                   )}

@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
+import json
 
 Base = declarative_base()
 
@@ -217,6 +218,14 @@ class Event(Base):
     episode = relationship("Episode", back_populates="events")
 
     def to_dict(self):
+        # Parse characters_involved JSON string back to array
+        characters_array = None
+        if self.characters_involved:
+            try:
+                characters_array = json.loads(self.characters_involved)
+            except (json.JSONDecodeError, TypeError):
+                characters_array = []
+
         return {
             "id": str(self.id),
             "episode_id": str(self.episode_id),
@@ -224,7 +233,7 @@ class Event(Base):
             "description": self.description,
             "timestamp_in_episode": self.timestamp_in_episode,
             "event_type": self.event_type,
-            "characters_involved": self.characters_involved,
+            "characters_involved": characters_array,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
