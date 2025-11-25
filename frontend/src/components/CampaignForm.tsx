@@ -44,7 +44,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
     description: initialData?.description || '',
   });
   const [localError, setLocalError] = useState<string | null>(null);
-  const [slugTouched, setSlugTouched] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(mode === 'edit');
   const [slugCheck, setSlugCheck] = useState<SlugCheckState>({
     checking: false,
     available: null,
@@ -52,16 +52,16 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
   });
   const slugCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-generate slug from name
+  // Auto-generate slug from name (create mode only)
   useEffect(() => {
-    if (!slugTouched && formData.name) {
+    if (mode === 'create' && !slugTouched && formData.name) {
       const generatedSlug = formData.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
       setFormData((prev) => ({ ...prev, slug: generatedSlug }));
     }
-  }, [formData.name, slugTouched]);
+  }, [formData.name, slugTouched, mode]);
 
   // Check slug availability (debounced) - only in create mode
   useEffect(() => {
