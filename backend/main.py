@@ -490,7 +490,7 @@ class CharacterCreate(BaseModel):
     race: Optional[str] = None
     description: Optional[str] = None
     backstory: Optional[str] = None
-    color_theme_override: Optional[Dict[str, Any]] = None
+    color_theme_override: Optional[CharacterThemeOverrideInput] = None
 
 
 class CharacterUpdate(BaseModel):
@@ -576,7 +576,7 @@ def create_character(
         race=payload.race,
         description=payload.description,
         backstory=payload.backstory,
-        color_theme_override=payload.color_theme_override,
+        color_theme_override=payload.color_theme_override.dict() if payload.color_theme_override else None,
     )
     db.add(character)
     db.commit()
