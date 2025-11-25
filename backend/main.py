@@ -4,6 +4,7 @@ Multi-tenant D&D campaign companion with real-time WebSocket updates
 """
 
 import os
+import json
 import asyncio
 import uuid
 from datetime import datetime
@@ -1093,10 +1094,10 @@ async def create_event(
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid campaign ID")
 
-    # Convert characters_involved array to comma-separated string if provided
+    # Convert characters_involved array to JSON string if provided
     characters_involved_str = None
     if payload.characters_involved:
-        characters_involved_str = ",".join(payload.characters_involved)
+        characters_involved_str = json.dumps(payload.characters_involved)
 
     # Note: This endpoint creates events without an episode context
     # For episode-specific events, use POST /episodes/{episode_id}/events instead
@@ -1204,10 +1205,10 @@ async def create_episode_event(
     if campaign.admin_token != token:
         raise HTTPException(status_code=403, detail="Invalid admin token")
 
-    # Convert characters_involved array to comma-separated string if provided
+    # Convert characters_involved array to JSON string if provided
     characters_involved_str = None
     if payload.characters_involved:
-        characters_involved_str = ",".join(payload.characters_involved)
+        characters_involved_str = json.dumps(payload.characters_involved)
 
     # Create the event
     event = Event(
@@ -1281,7 +1282,7 @@ async def update_episode_event(
     if payload.event_type is not None:
         event.event_type = payload.event_type
     if payload.characters_involved is not None:
-        event.characters_involved = ",".join(payload.characters_involved) if payload.characters_involved else None
+        event.characters_involved = json.dumps(payload.characters_involved) if payload.characters_involved else None
 
     db.commit()
     db.refresh(event)
