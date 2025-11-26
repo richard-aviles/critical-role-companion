@@ -1466,19 +1466,25 @@ async def create_character_layout(
         print(f"Other defaults unset")
 
     print(f"Creating layout object...")
+    # Convert Pydantic models to dicts for JSON serialization
+    stats_config_list = payload.stats_config or [
+        {"key": "str", "label": "STR", "visible": True, "order": 0},
+        {"key": "dex", "label": "DEX", "visible": True, "order": 1},
+        {"key": "con", "label": "CON", "visible": True, "order": 2},
+        {"key": "int", "label": "INT", "visible": True, "order": 3},
+        {"key": "wis", "label": "WIS", "visible": True, "order": 4},
+        {"key": "cha", "label": "CHA", "visible": True, "order": 5},
+    ]
+    stats_config_dicts = [s.dict() if hasattr(s, 'dict') else s for s in stats_config_list]
+
+    badge_layout_dicts = [b.dict() if hasattr(b, 'dict') else b for b in (payload.badge_layout or [])]
+
     layout = CharacterLayout(
         campaign_id=campaign_uuid,
         name=payload.name or "Default",
         is_default=payload.is_default,
         card_type=payload.card_type or "simple",
-        stats_config=payload.stats_config or [
-            {"key": "str", "label": "STR", "visible": True, "order": 0},
-            {"key": "dex", "label": "DEX", "visible": True, "order": 1},
-            {"key": "con", "label": "CON", "visible": True, "order": 2},
-            {"key": "int", "label": "INT", "visible": True, "order": 3},
-            {"key": "wis", "label": "WIS", "visible": True, "order": 4},
-            {"key": "cha", "label": "CHA", "visible": True, "order": 5},
-        ],
+        stats_config=stats_config_dicts,
         stats_to_display=payload.stats_to_display or ["str", "dex", "con", "int", "wis", "cha"],
         image_width_percent=payload.image_width_percent or 30,
         image_aspect_ratio=payload.image_aspect_ratio or "square",
@@ -1489,7 +1495,7 @@ async def create_character_layout(
         badge_interior_gradient=payload.badge_interior_gradient or {},
         hp_color=payload.hp_color or {},
         ac_color=payload.ac_color or {},
-        badge_layout=[b.dict() if hasattr(b, 'dict') else b for b in (payload.badge_layout or [])],
+        badge_layout=badge_layout_dicts,
         color_preset=payload.color_preset,
     )
 
