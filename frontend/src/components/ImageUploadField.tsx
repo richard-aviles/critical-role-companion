@@ -96,7 +96,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         {label}
       </label>
 
@@ -116,21 +116,21 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           <img
             src={preview}
             alt="Preview"
-            className="w-full h-64 object-cover rounded-lg border-2 border-gray-300 dark:border-gray-600"
+            className="w-full h-64 object-cover rounded-lg border-2 border-sky-300 dark:border-sky-700 shadow-lg transition-all duration-200"
           />
           {!disabled && (
             <div className="absolute top-2 right-2 flex gap-2">
               <button
                 type="button"
                 onClick={handleClick}
-                className="px-3 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 text-sm font-medium transition-colors"
+                className="px-3 py-1.5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm text-gray-700 dark:text-gray-300 rounded-lg shadow-lg hover:bg-white dark:hover:bg-gray-700 hover:-translate-y-0.5 text-sm font-medium transition-all duration-200 border border-gray-300 dark:border-gray-600"
               >
                 Change
               </button>
               <button
                 type="button"
                 onClick={handleRemove}
-                className="px-3 py-1 bg-white dark:bg-gray-800 text-red-600 dark:text-red-400 rounded-md shadow-md hover:bg-red-50 dark:hover:bg-red-900/30 text-sm font-medium transition-colors"
+                className="px-3 py-1.5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm text-red-600 dark:text-red-400 rounded-lg shadow-lg hover:bg-red-50 dark:hover:bg-red-900/30 hover:-translate-y-0.5 text-sm font-medium transition-all duration-200 border border-red-300 dark:border-red-700"
               >
                 Remove
               </button>
@@ -149,9 +149,9 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={`
-            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-            ${isDragging ? 'border-purple-500 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800'}
-            ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'}
+            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200
+            ${isDragging ? 'border-sky-500 dark:border-sky-600 bg-gradient-to-br from-sky-50 to-purple-50 dark:from-sky-900/20 dark:to-purple-900/20 backdrop-blur-sm shadow-lg' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800'}
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-sky-400 dark:hover:border-sky-500 hover:bg-gradient-to-br hover:from-gray-100 hover:to-sky-50 dark:hover:from-gray-700 dark:hover:to-sky-900/20'}
           `}
         >
           <svg
@@ -169,7 +169,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
             />
           </svg>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-            <span className="font-medium text-purple-600 dark:text-purple-400">Click to upload</span> or drag and drop
+            <span className="font-medium text-sky-600 dark:text-sky-400">Click to upload</span> or drag and drop
           </p>
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             JPG, PNG, or WEBP up to 5MB
@@ -179,8 +179,8 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
 
       {/* Error message */}
       {error && (
-        <div className="rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20 p-3">
-          <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
+        <div className="rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/50 backdrop-blur-sm p-3 shadow-lg transition-all duration-200">
+          <p className="text-sm font-medium text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
     </div>

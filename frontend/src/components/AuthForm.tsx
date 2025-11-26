@@ -68,14 +68,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Error Message */}
       {(error || localError) && (
-        <div className="rounded-md border border-red-300 bg-red-50 p-3">
-          <p className="text-sm text-red-800">{error || localError}</p>
+        <div className="rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/50 backdrop-blur-sm p-3 shadow-sm">
+          <p className="text-sm text-red-800 dark:text-red-300">{error || localError}</p>
         </div>
       )}
 
       {/* Email Input */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Email
         </label>
         <input
@@ -84,7 +84,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={isLoading}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600 transition-all duration-200"
           placeholder="your@email.com"
           required
         />
@@ -92,7 +92,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
       {/* Password Input */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Password
         </label>
         <input
@@ -101,20 +101,20 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isLoading}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1 block w-full rounded-md border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600 transition-all duration-200"
           placeholder="••••••••"
           required
           minLength={8}
         />
         {isSignup && (
-          <p className="mt-1 text-xs text-gray-500">Minimum 8 characters</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Minimum 8 characters</p>
         )}
       </div>
 
       {/* Confirm Password Input (Signup Only) */}
       {isSignup && (
         <div>
-          <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Confirm Password
           </label>
           <input
@@ -123,7 +123,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             disabled={isLoading}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+            className="mt-1 block w-full rounded-md border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600 transition-all duration-200"
             placeholder="••••••••"
             required
           />
@@ -134,11 +134,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       <button
         type="submit"
         disabled={!isFormValid || isLoading}
-        className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        className="w-full rounded-md bg-purple-600 py-2 text-white font-medium hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 disabled:bg-gray-400 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all duration-200 shadow-lg"
       >
         {isLoading ? (
           <span className="flex items-center justify-center">
-            <span className="animate-spin mr-2">◌</span>
+            <span className="animate-spin mr-2 border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block"></span>
             {isSignup ? 'Creating account...' : 'Logging in...'}
           </span>
         ) : isSignup ? (
@@ -150,14 +150,14 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 
       {/* Toggle Mode Link */}
       <div className="text-center">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 dark:text-gray-300">
           {isSignup ? 'Already have an account?' : "Don't have an account?"}
           {' '}
           <button
             type="button"
             onClick={onToggleMode}
             disabled={isLoading}
-            className="text-blue-600 hover:text-blue-700 font-medium disabled:text-gray-400"
+            className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
           >
             {isSignup ? 'Log in' : 'Sign up'}
           </button>

@@ -239,10 +239,24 @@ export const createCharacter = async (data: CreateCharacterData, adminToken?: st
     // Use campaign admin token for this request if provided
     const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
 
-    const response = await apiClient.post(`/campaigns/${campaign_id}/characters`, {
+    const requestPayload = {
       ...characterData,
       slug,
-    }, config);
+    };
+
+    // DEBUG LOGGING
+    console.log('[API] createCharacter - Request payload:', {
+      color_theme_override: requestPayload.color_theme_override,
+      character_name: requestPayload.name,
+      campaign_id: campaign_id,
+      full_payload: requestPayload,
+    });
+
+    const response = await apiClient.post(`/campaigns/${campaign_id}/characters`, requestPayload, config);
+
+    // DEBUG LOGGING
+    console.log('[API] createCharacter - Response:', response.data);
+
     return response.data;
   } catch (error: any) {
     if (error.response?.data?.detail) {
@@ -683,6 +697,131 @@ export const getPublicEvents = async (episodeId: string): Promise<Event[]> => {
     }
     throw new Error('Failed to fetch events');
   }
+};
+
+// ============================================================================
+// OVERLAY ENDPOINTS (Phase 4 - Live Stream Overlay)
+// ============================================================================
+
+/**
+ * Get active episode for campaign (for overlay)
+ */
+export interface OverlayActiveEpisode {
+  id: string;
+  name: string;
+  episode_number?: number;
+  season?: number;
+}
+
+export const getOverlayActiveEpisode = async (campaignSlug: string): Promise<OverlayActiveEpisode | null> => {
+  try {
+    // Since backend doesn't have this endpoint yet, we'll get the latest published episode
+    const episodes = await getPublicEpisodes(campaignSlug);
+    if (episodes.length === 0) return null;
+
+    // Return the most recent published episode
+    const latest = episodes[0];
+    return {
+      id: latest.id,
+      name: latest.name,
+      episode_number: latest.episode_number,
+      season: latest.season,
+    };
+  } catch (error: any) {
+    console.error('Failed to fetch active episode:', error);
+    return null;
+  }
+};
+
+/**
+ * Get character data for overlay (with resolved colors)
+ */
+export interface OverlayCharacter extends Character {
+  resolved_colors?: ResolvedColorsResponse;
+  stats?: {
+    hp?: number;
+    ac?: number;
+    [key: string]: any;
+  };
+}
+
+export const getOverlayCharacter = async (
+  campaignSlug: string,
+  characterSlug: string
+): Promise<OverlayCharacter> => {
+  try {
+    // Get campaign to find ID
+    const campaign = await getPublicCampaign(campaignSlug);
+
+    // Get character
+    const character = await getPublicCharacter(campaignSlug, characterSlug);
+
+    // Get resolved colors
+    try {
+      const resolvedColors = await getResolvedCharacterColors(campaign.id, character.id);
+      return {
+        ...character,
+        resolved_colors: resolvedColors,
+      };
+    } catch (error) {
+      // If resolved colors fail, return character without them
+      return character;
+    }
+  } catch (error: any) {
+    throw new Error('Failed to fetch overlay character');
+  }
+};
+
+/**
+ * Get roster for overlay (all active characters with resolved colors)
+ */
+export const getOverlayRoster = async (campaignSlug: string): Promise<OverlayCharacter[]> => {
+  try {
+    const campaign = await getPublicCampaign(campaignSlug);
+    const characters = await getPublicCharacters(campaignSlug);
+
+    // Fetch resolved colors for all characters in parallel
+    const charactersWithColors = await Promise.all(
+      characters.map(async (character) => {
+        try {
+          const resolvedColors = await getResolvedCharacterColors(campaign.id, character.id);
+          return {
+            ...character,
+            resolved_colors: resolvedColors,
+          };
+        } catch (error) {
+          // If resolved colors fail, return character without them
+          return character;
+        }
+      })
+    );
+
+    return charactersWithColors;
+  } catch (error: any) {
+    throw new Error('Failed to fetch overlay roster');
+  }
+};
+
+/**
+ * Get events for episode (for overlay timeline)
+ */
+export const getOverlayEvents = async (episodeId: string): Promise<Event[]> => {
+  try {
+    return await getPublicEvents(episodeId);
+  } catch (error: any) {
+    throw new Error('Failed to fetch overlay events');
+  }
+};
+
+// Additional overlay endpoint functions for backend API calls (when backend implements them)
+export const getOverlayConfig = async (campaignId: string) => {
+  const response = await apiClient.get(`/campaigns/${campaignId}/overlay/config`);
+  return response.data;
+};
+
+export const getOverlayEpisodeEvents = async (campaignId: string, episodeId: string) => {
+  const response = await apiClient.get(`/campaigns/${campaignId}/episodes/${episodeId}/overlay/events`);
+  return response.data;
 };
 
 // ============================================================================

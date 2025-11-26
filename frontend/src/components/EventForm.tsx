@@ -141,16 +141,16 @@ export const EventForm: React.FC<EventFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Error Message */}
+      {/* Error Message - Epic Fantasy Style */}
       {error && (
-        <div className="rounded-md border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700 p-4">
-          <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
+        <div className="rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/50 backdrop-blur-sm p-4 shadow-lg transition-all duration-200">
+          <p className="text-sm font-medium text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
       {/* Event Name */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Event Name *
         </label>
         <input
@@ -161,14 +161,14 @@ export const EventForm: React.FC<EventFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., Battle with the Glabrezu"
-          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
+          className="block w-full rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-600"
           required
         />
       </div>
 
       {/* Event Type */}
       <div>
-        <label htmlFor="event_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="event_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Event Type
         </label>
         <select
@@ -177,7 +177,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           value={formData.event_type}
           onChange={handleChange}
           disabled={isLoading}
-          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
+          className="block w-full rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-600"
         >
           <option value="">Select event type...</option>
           {EVENT_TYPES.map((type) => (
@@ -190,7 +190,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
       {/* Timestamp */}
       <div>
-        <label htmlFor="timestamp_in_episode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="timestamp_in_episode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Timestamp (seconds)
         </label>
         <input
@@ -202,7 +202,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., 3600 (1 hour)"
-          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
+          className="block w-full rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-600"
         />
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
           Time in seconds from the start of the episode (e.g., 3600 = 1 hour)
@@ -211,7 +211,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
       {/* Description */}
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Description
         </label>
         <textarea
@@ -222,7 +222,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           disabled={isLoading}
           placeholder="What happened during this event..."
           rows={4}
-          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
+          className="block w-full rounded-lg border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-600 resize-none"
         />
       </div>
 
@@ -232,18 +232,18 @@ export const EventForm: React.FC<EventFormProps> = ({
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Characters Involved
           </label>
-          <div className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md p-3 max-h-48 overflow-y-auto space-y-2">
+          <div className="border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2 backdrop-blur-sm">
             {availableCharacters.map((character) => (
               <label
                 key={character.id}
-                className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-600 rounded cursor-pointer"
+                className="flex items-center gap-2 p-2 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-md cursor-pointer transition-all duration-200"
               >
                 <input
                   type="checkbox"
                   checked={formData.characters_involved.includes(character.id)}
                   onChange={() => handleCharacterToggle(character.id)}
                   disabled={isLoading}
-                  className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800"
+                  className="h-4 w-4 rounded border-purple-300 dark:border-purple-700 text-purple-600 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 disabled:bg-gray-50 dark:disabled:bg-gray-900 transition-all duration-200"
                 />
                 <div className="flex-1">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -264,12 +264,12 @@ export const EventForm: React.FC<EventFormProps> = ({
         </div>
       )}
 
-      {/* Form Actions */}
-      <div className="flex gap-3">
+      {/* Form Actions - Epic Fantasy Style */}
+      <div className="flex gap-3 pt-2">
         <button
           type="submit"
           disabled={isLoading}
-          className="flex-1 rounded-md bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 py-2 text-white font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 rounded-lg bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 hover:-translate-y-0.5 py-2.5 text-white font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-purple-500/20"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -287,7 +287,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="px-6 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
+            className="px-6 rounded-lg border-2 border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 py-2.5 text-gray-700 dark:text-gray-300 font-medium hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-400 dark:hover:border-purple-600 hover:-translate-y-0.5 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-400 dark:disabled:text-gray-600 transition-all duration-200"
           >
             Cancel
           </button>

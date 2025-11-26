@@ -44,10 +44,10 @@ function CampaignDetailPageContent() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-950 dark:to-purple-950/20">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-4 border-purple-600 dark:border-purple-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading campaign...</p>
+          <div className="animate-spin h-12 w-12 border-4 border-purple-600 dark:border-purple-500 border-t-transparent rounded-full mx-auto shadow-primary"></div>
+          <p className="mt-4 text-gray-700 dark:text-gray-300 font-medium">Loading campaign...</p>
         </div>
       </div>
     );
@@ -56,15 +56,15 @@ function CampaignDetailPageContent() {
   // Error state
   if (error || !campaign) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <div className="text-center max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-950 dark:to-purple-950/20">
+        <div className="text-center max-w-md bg-white dark:bg-gray-900 rounded-xl shadow-elevated p-8 border border-gray-200 dark:border-gray-800">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Campaign Not Found</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             {error || 'The campaign you are looking for does not exist.'}
           </p>
           <Link
             href="/"
-            className="inline-block px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 transition-colors font-semibold"
+            className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 transition-all duration-200 font-semibold shadow-primary hover:shadow-lg hover:-translate-y-0.5"
           >
             Back to Home
           </Link>
@@ -77,7 +77,7 @@ function CampaignDetailPageContent() {
   const episodeCount = campaign.episode_count || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-950 dark:to-purple-950/20">
       {/* Hero Section */}
       <CampaignHeroSection
         campaignName={campaign.name}
@@ -88,7 +88,7 @@ function CampaignDetailPageContent() {
       />
 
       {/* Stats Section */}
-      <div className="py-12 bg-gray-50 dark:bg-gray-900">
+      <div className="py-12 bg-gradient-to-b from-gray-50/50 to-gray-100/50 dark:from-gray-900/50 dark:to-gray-950/50">
         <CampaignStats
           campaignSlug={slug}
           characterCount={characterCount}
@@ -98,7 +98,7 @@ function CampaignDetailPageContent() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-gray-950 text-gray-300 dark:text-gray-400 py-12 border-t border-gray-800">
+      <footer className="bg-gradient-to-br from-gray-900 to-gray-950 dark:from-gray-950 dark:to-black text-gray-300 dark:text-gray-400 py-12 border-t border-gray-800 dark:border-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
           <p>&copy; {new Date().getFullYear()} Critical Role Companion. All rights reserved.</p>
         </div>

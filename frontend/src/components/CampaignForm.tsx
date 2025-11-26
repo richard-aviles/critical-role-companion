@@ -158,14 +158,14 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Error Message - Phase 3: Error animations */}
+      {/* Error Message - Epic Fantasy Style */}
       {(error || localError) && (
-        <div className="error-message rounded-lg border p-5">
-          <p className="text-base font-medium">{error || localError}</p>
+        <div className="rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/50 backdrop-blur-sm p-5 shadow-lg transition-all duration-200">
+          <p className="text-base font-medium text-red-800 dark:text-red-300">{error || localError}</p>
         </div>
       )}
 
-      {/* Campaign Name - Phase 3: Dark Mode */}
+      {/* Campaign Name - Epic Fantasy Style */}
       <div className="animate-fade-in">
         <label htmlFor="name" className="block text-base font-semibold text-gray-900 dark:text-white mb-2">
           Campaign Name *
@@ -178,7 +178,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
           onChange={handleChange}
           disabled={isLoading}
           placeholder="e.g., Exandria Campaign"
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 focus:border-transparent transition-all disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base"
+          className="w-full rounded-lg border border-purple-300 dark:border-purple-700 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base"
           required
         />
       </div>
@@ -197,7 +197,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
             onChange={handleSlugChange}
             disabled={isLoading}
             placeholder="e.g., exandria-campaign"
-            className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 focus:border-transparent transition-all disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base"
+            className="flex-1 rounded-lg border border-purple-300 dark:border-purple-700 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base"
             pattern="^[a-z0-9-]+$"
             required
           />
@@ -267,7 +267,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
         )}
       </div>
 
-      {/* Campaign Description - Phase 3: Dark Mode */}
+      {/* Campaign Description - Epic Fantasy Style */}
       <div className="animate-fade-in delay-200">
         <label htmlFor="description" className="block text-base font-semibold text-gray-900 dark:text-white mb-2">
           Description
@@ -280,7 +280,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
           disabled={isLoading}
           placeholder="e.g., A campaign set in the world of Exandria..."
           rows={5}
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 focus:border-transparent transition-all disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base resize-none"
+          className="w-full rounded-lg border border-purple-300 dark:border-purple-700 px-4 py-3 text-gray-900 dark:text-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 dark:disabled:bg-gray-900 disabled:text-gray-500 text-base resize-none"
         />
       </div>
 
@@ -289,7 +289,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
         <button
           type="submit"
           disabled={!isFormValid || isLoading}
-          className="flex-1 rounded-lg bg-blue-600 py-3 text-white font-semibold hover:bg-blue-700 active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 min-h-[44px] focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-base"
+          className="flex-1 rounded-lg bg-purple-600 py-3 text-white font-semibold hover:bg-purple-700 hover:-translate-y-0.5 active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 min-h-[44px] shadow-lg shadow-purple-500/20 focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 text-base"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -306,7 +306,7 @@ export const CampaignForm: React.FC<CampaignFormProps> = ({
           type="button"
           onClick={onCancel}
           disabled={isLoading}
-          className="px-8 rounded-lg border-2 border-gray-300 py-3 text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 active:scale-95 disabled:bg-gray-50 disabled:text-gray-400 disabled:border-gray-200 transition-all duration-200 min-h-[44px] focus:ring-4 focus:ring-gray-300 focus:ring-opacity-50 text-base"
+          className="px-8 rounded-lg border-2 border-purple-300 dark:border-purple-700 py-3 text-gray-700 dark:text-gray-300 font-semibold hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-400 dark:hover:border-purple-600 hover:-translate-y-0.5 active:scale-95 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 disabled:border-gray-200 dark:disabled:border-gray-700 transition-all duration-200 min-h-[44px] text-base"
         >
           Cancel
         </button>

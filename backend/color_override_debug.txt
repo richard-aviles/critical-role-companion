@@ -1,0 +1,44 @@
+Working directory: C:\Development\Twitch_CriticalRole_Project\CR_Companion_PreReq_Layout\critical-role-companion\backend
+Character name: this guy lol
+payload.color_theme_override is None: False
+payload.color_theme_override type: <class 'dict'>
+payload.color_theme_override value:
+{
+  "border_colors": [
+    "#00FF00",
+    "#6A5ACD",
+    "#483D8B",
+    "#36213E"
+  ],
+  "text_color": "#E6E6FA",
+  "badge_interior_gradient": {
+    "type": "radial",
+    "colors": [
+      "#B19CD9",
+      "#6A5ACD"
+    ]
+  },
+  "hp_color": {
+    "border": "#DC143C",
+    "interior_gradient": {
+      "type": "radial",
+      "colors": [
+        "#FF69B4",
+        "#C71585"
+      ]
+    }
+  },
+  "ac_color": {
+    "border": "#4B0082",
+    "interior_gradient": {
+      "type": "radial",
+      "colors": [
+        "#9370DB",
+        "#6A5ACD"
+      ]
+    }
+  }
+}
+
+color_override_data is None: False
+color_override_data type: <class 'dict'>

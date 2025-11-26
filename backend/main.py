@@ -7,6 +7,8 @@ import os
 import json
 import asyncio
 import uuid
+import sys
+import logging
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Set
 from io import BytesIO
@@ -37,6 +39,10 @@ app = FastAPI(
     version=os.getenv("COMMIT_SHA", "dev"),
     description="Multi-tenant D&D campaign companion API"
 )
+
+# Configure logging
+logger = logging.getLogger("app")
+logger.setLevel(logging.DEBUG)
 
 # CORS configuration
 origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
@@ -490,7 +496,7 @@ class CharacterCreate(BaseModel):
     race: Optional[str] = None
     description: Optional[str] = None
     backstory: Optional[str] = None
-    color_theme_override: Optional[CharacterThemeOverrideInput] = None
+    color_theme_override: Optional[Dict[str, Any]] = None
 
 
 class CharacterUpdate(BaseModel):
@@ -564,8 +570,38 @@ def create_character(
     db: Session = Depends(get_db)
 ):
     """Create character in campaign (admin only)"""
+    import json
+    import os
+
+    # FIRST THING: Write immediate log to confirm endpoint was called
+    import tempfile
+    try:
+        test_file = os.path.join(tempfile.gettempdir(), "CREATE_CHAR_CALLED.txt")
+        with open(test_file, "w") as f:
+            f.write(f"CREATE_CHARACTER ENDPOINT CALLED at {str(__import__('datetime').datetime.now())}\n")
+            f.write(f"Campaign ID: {campaign_id}\n")
+            f.write(f"Payload name: {payload.name}\n")
+    except:
+        pass  # Ignore write errors
+
     # Generate slug if not provided
     slug = payload.slug or payload.name.lower().replace(" ", "-")
+
+    # THIS IS THE KEY ISSUE: Check what we're getting from payload
+    color_override_data = payload.color_theme_override
+
+    # Write to file in the current working directory
+    cwd = os.getcwd()
+    log_file = os.path.join(cwd, "color_override_debug.txt")
+
+    with open(log_file, "w") as f:
+        f.write(f"Working directory: {cwd}\n")
+        f.write(f"Character name: {payload.name}\n")
+        f.write(f"payload.color_theme_override is None: {payload.color_theme_override is None}\n")
+        f.write(f"payload.color_theme_override type: {type(payload.color_theme_override)}\n")
+        f.write(f"payload.color_theme_override value:\n{json.dumps(payload.color_theme_override, indent=2) if payload.color_theme_override else 'NONE'}\n")
+        f.write(f"\ncolor_override_data is None: {color_override_data is None}\n")
+        f.write(f"color_override_data type: {type(color_override_data)}\n")
 
     character = Character(
         campaign_id=campaign.id,
@@ -576,8 +612,9 @@ def create_character(
         race=payload.race,
         description=payload.description,
         backstory=payload.backstory,
-        color_theme_override=payload.color_theme_override.dict() if payload.color_theme_override else None,
+        color_theme_override=color_override_data,
     )
+
     db.add(character)
     db.commit()
     db.refresh(character)
@@ -1651,12 +1688,6 @@ async def update_character(
 ):
     """Update character info and stats (admin only)"""
 
-    # DEBUG: Log incoming color override data
-    print(f"\n[UPDATE_CHAR] Received payload")
-    print(f"  Fields set: {payload.__fields_set__}")
-    print(f"  color_theme_override in fields_set: {'color_theme_override' in payload.__fields_set__}")
-    print(f"  color_theme_override value: {payload.color_theme_override}")
-    print(f"  color_theme_override type: {type(payload.color_theme_override)}")
 
     try:
         campaign_uuid = uuid.UUID(campaign_id)
@@ -1703,12 +1734,7 @@ async def update_character(
     # Update color theme override if provided in the request
     # Check if the field was explicitly set (either to a value or to null)
     if 'color_theme_override' in payload.__fields_set__:
-        if payload.color_theme_override is not None:
-            character.color_theme_override = payload.color_theme_override.dict()
-        else:
-            # Explicitly null means clear the override
-            character.color_theme_override = None
-            print(f"[DEBUG] Clearing color_theme_override for character {character.id}")
+        character.color_theme_override = payload.color_theme_override
 
     character.updated_at = datetime.utcnow()
     db.commit()
@@ -2068,6 +2094,277 @@ def get_public_episode_events(episode_id: str, db: Session = Depends(get_db)):
 
     events = db.query(Event).filter(Event.episode_id == episode_uuid).all()
     return [e.to_dict() for e in events]
+
+
+# ============================================================================
+# PHASE 4: HELPER FUNCTIONS FOR OVERLAY ENDPOINTS
+# ============================================================================
+
+def resolve_character_colors(character: Character, campaign: Campaign, db: Session) -> tuple[Dict[str, Any], str]:
+    """
+    Resolve character colors using three-tier fallback logic:
+    1. Character's color_theme_override (if set)
+    2. Campaign's default color theme from CharacterLayout (if exists)
+    3. System default (Option A - Gold & Warmth preset)
+
+    Returns: (resolved_colors_dict, source_string)
+    """
+    # Tier 1: Character override
+    if character.color_theme_override:
+        return (character.color_theme_override, "character_override")
+
+    # Tier 2: Campaign default layout
+    layout = db.query(CharacterLayout).filter(
+        and_(CharacterLayout.campaign_id == campaign.id, CharacterLayout.is_default == True)
+    ).first()
+
+    if layout:
+        campaign_colors = {
+            "border_colors": layout.border_colors,
+            "text_color": layout.text_color,
+            "badge_interior_gradient": layout.badge_interior_gradient,
+            "hp_color": layout.hp_color,
+            "ac_color": layout.ac_color
+        }
+        return (campaign_colors, "campaign_default")
+
+    # Tier 3: System default (Option A preset)
+    from presets import DEFAULT_PRESET
+    system_default = {
+        "border_colors": DEFAULT_PRESET.border_colors,
+        "text_color": DEFAULT_PRESET.text_color,
+        "badge_interior_gradient": DEFAULT_PRESET.badge_interior_gradient,
+        "hp_color": DEFAULT_PRESET.hp_color,
+        "ac_color": DEFAULT_PRESET.ac_color
+    }
+    return (system_default, "system_default")
+
+
+# ============================================================================
+# PHASE 4: LIVE STREAM OVERLAY ENDPOINTS (PUBLIC - NO AUTH REQUIRED)
+# ============================================================================
+
+@app.get("/campaigns/{campaign_id}/overlay/config")
+def get_overlay_config(campaign_id: str, db: Session = Depends(get_db)):
+    """Get overlay configuration for campaign (PUBLIC - no auth required)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign ID format")
+
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    # Get default color theme from campaign layout
+    default_layout = db.query(CharacterLayout).filter(
+        and_(CharacterLayout.campaign_id == campaign_uuid, CharacterLayout.is_default == True)
+    ).first()
+
+    default_color_theme = None
+    if default_layout:
+        default_color_theme = {
+            "border_colors": default_layout.border_colors,
+            "text_color": default_layout.text_color,
+            "badge_interior_gradient": default_layout.badge_interior_gradient,
+            "hp_color": default_layout.hp_color,
+            "ac_color": default_layout.ac_color
+        }
+
+    return {
+        "campaign_id": str(campaign.id),
+        "campaign_name": campaign.name,
+        "campaign_slug": campaign.slug,
+        "default_color_theme": default_color_theme,
+        "settings": campaign.settings or {}
+    }
+
+
+@app.get("/campaigns/{campaign_id}/overlay/character/{character_id}")
+def get_overlay_character(campaign_id: str, character_id: str, db: Session = Depends(get_db)):
+    """Get character with resolved colors for overlay (PUBLIC - no auth required)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        char_uuid = uuid.UUID(character_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or character ID format")
+
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    character = db.query(Character).filter(
+        and_(Character.id == char_uuid, Character.campaign_id == campaign_uuid)
+    ).first()
+
+    if not character:
+        raise HTTPException(status_code=404, detail="Character not found")
+
+    # Resolve colors with three-tier fallback
+    resolved_colors, color_source = resolve_character_colors(character, campaign, db)
+
+    return {
+        "id": str(character.id),
+        "campaign_id": str(character.campaign_id),
+        "name": character.name,
+        "slug": character.slug,
+        "class_name": character.class_name,
+        "race": character.race,
+        "player_name": character.player_name,
+        "image_url": character.image_url,
+        "level": character.level,
+        "is_active": character.is_active,
+        "stats": character.stats or {},
+        "resolved_colors": resolved_colors,
+        "color_source": color_source
+    }
+
+
+@app.get("/campaigns/{campaign_id}/overlay/roster")
+def get_overlay_roster(campaign_id: str, db: Session = Depends(get_db)):
+    """Get character roster for overlay (PUBLIC - no auth required)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign ID format")
+
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    # Get all characters
+    characters = db.query(Character).filter(Character.campaign_id == campaign_uuid).all()
+
+    # Get active roster
+    roster = db.query(Roster).filter(Roster.campaign_id == campaign_uuid).first()
+    active_roster_ids = [str(cid) for cid in roster.character_ids] if roster and roster.character_ids else []
+
+    # Build character list with resolved colors
+    character_list = []
+    for char in characters:
+        resolved_colors, color_source = resolve_character_colors(char, campaign, db)
+        character_list.append({
+            "id": str(char.id),
+            "name": char.name,
+            "slug": char.slug,
+            "class_name": char.class_name,
+            "image_url": char.image_url,
+            "level": char.level,
+            "is_active": char.is_active,
+            "resolved_colors": resolved_colors,
+            "color_source": color_source
+        })
+
+    return {
+        "campaign_id": str(campaign.id),
+        "characters": character_list,
+        "active_roster_ids": active_roster_ids
+    }
+
+
+@app.get("/campaigns/{campaign_id}/episodes/{episode_id}/overlay/events")
+def get_overlay_episode_events(campaign_id: str, episode_id: str, db: Session = Depends(get_db)):
+    """Get episode events timeline for overlay (PUBLIC - no auth required)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+        episode_uuid = uuid.UUID(episode_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign or episode ID format")
+
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    episode = db.query(Episode).filter(
+        and_(Episode.id == episode_uuid, Episode.campaign_id == campaign_uuid)
+    ).first()
+
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+
+    # Get all events for episode
+    events = db.query(Event).filter(Event.episode_id == episode_uuid).order_by(Event.timestamp_in_episode.asc()).all()
+
+    # Build event list with character names
+    event_list = []
+    for event in events:
+        character_ids = []
+        character_names = []
+
+        if event.characters_involved:
+            try:
+                character_ids = json.loads(event.characters_involved) if isinstance(event.characters_involved, str) else event.characters_involved
+
+                # Resolve character names
+                if character_ids:
+                    for char_id_str in character_ids:
+                        try:
+                            char_uuid = uuid.UUID(char_id_str)
+                            char = db.query(Character).filter(Character.id == char_uuid).first()
+                            if char:
+                                character_names.append(char.name)
+                        except (ValueError, AttributeError):
+                            continue
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        event_list.append({
+            "id": str(event.id),
+            "episode_id": str(event.episode_id),
+            "name": event.name,
+            "description": event.description,
+            "timestamp_in_episode": event.timestamp_in_episode,
+            "event_type": event.event_type,
+            "characters_involved": character_ids,
+            "character_names": character_names,
+            "created_at": event.created_at.isoformat() if event.created_at else None
+        })
+
+    return {
+        "episode_id": str(episode.id),
+        "episode_name": episode.name,
+        "episode_number": episode.episode_number,
+        "season": episode.season,
+        "events": event_list
+    }
+
+
+@app.get("/campaigns/{campaign_id}/overlay/active-episode")
+def get_overlay_active_episode(campaign_id: str, db: Session = Depends(get_db)):
+    """Get active/featured episode for overlay (PUBLIC - no auth required)"""
+    try:
+        campaign_uuid = uuid.UUID(campaign_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid campaign ID format")
+
+    campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    # Get most recent published episode
+    episode = db.query(Episode).filter(
+        and_(Episode.campaign_id == campaign_uuid, Episode.is_published == True)
+    ).order_by(Episode.created_at.desc()).first()
+
+    if not episode:
+        raise HTTPException(status_code=404, detail="No published episodes found")
+
+    # Count events in episode
+    event_count = db.query(Event).filter(Event.episode_id == episode.id).count()
+
+    return {
+        "id": str(episode.id),
+        "campaign_id": str(episode.campaign_id),
+        "name": episode.name,
+        "slug": episode.slug,
+        "episode_number": episode.episode_number,
+        "season": episode.season,
+        "description": episode.description,
+        "air_date": episode.air_date,
+        "runtime": episode.runtime,
+        "is_published": episode.is_published,
+        "event_count": event_count
+    }
 
 
 # ============================================================================

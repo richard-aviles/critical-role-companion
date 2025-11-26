@@ -37,8 +37,8 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-xl p-6 max-w-md mx-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 transition-all duration-200">
+      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-lg shadow-elevated dark:shadow-elevated border border-purple-200 dark:border-purple-800/40 p-6 max-w-md mx-4 transition-all duration-200">
         {/* Header */}
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{title}</h2>
 
@@ -61,7 +61,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
               value={selectedColor}
               onChange={(e) => setSelectedColor(e.target.value)}
               disabled={isLoading}
-              className="h-20 w-20 rounded-md border-2 border-gray-300 dark:border-gray-600 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500 disabled:cursor-not-allowed"
+              className="h-20 w-20 rounded-md border-2 border-purple-300 dark:border-purple-700 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500 hover:shadow-lg disabled:cursor-not-allowed transition-all duration-200"
             />
 
             {/* Hex Value Input */}
@@ -78,7 +78,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
                 disabled={isLoading}
                 placeholder="#000000"
                 maxLength={7}
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600"
+                className="w-full rounded-md border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white font-mono text-sm placeholder-gray-400 dark:placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-600 transition-all duration-200"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Hex format: #RRGGBB</p>
             </div>
@@ -110,7 +110,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
                 type="button"
                 onClick={() => !isLoading && setSelectedColor(color)}
                 disabled={isLoading}
-                className="h-8 w-8 rounded-md border-2 border-gray-300 dark:border-gray-600 hover:border-purple-500 dark:hover:border-purple-500 disabled:cursor-not-allowed transition-all"
+                className="h-8 w-8 rounded-md border-2 border-gray-300 dark:border-gray-600 hover:border-purple-500 dark:hover:border-purple-500 hover:scale-110 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-lg"
                 style={{
                   backgroundColor: color,
                   borderColor: selectedColor === color ? '#9333EA' : undefined,
@@ -128,7 +128,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
             type="button"
             onClick={handleConfirm}
             disabled={isLoading}
-            className="flex-1 rounded-md bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 py-2 text-white font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 rounded-md bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 py-2 text-white font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all duration-200 shadow-lg"
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -143,7 +143,7 @@ export const ColorPickerModal: React.FC<ColorPickerModalProps> = ({
             type="button"
             onClick={handleCancel}
             disabled={isLoading}
-            className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-600 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors"
+            className="flex-1 rounded-md border border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-700 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-purple-50 dark:hover:bg-purple-900/20 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-600 hover:-translate-y-0.5 transition-all duration-200 shadow-sm"
           >
             Cancel
           </button>

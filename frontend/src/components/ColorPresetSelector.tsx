@@ -55,10 +55,10 @@ export const ColorPresetSelector: React.FC<ColorPresetSelectorProps> = ({
             key={preset.id}
             type="button"
             onClick={() => onPresetSelect(preset)}
-            className={`relative rounded-lg border-2 p-4 transition-all text-left ${
+            className={`relative rounded-lg border-2 p-4 transition-all duration-200 text-left shadow-sm hover:shadow-lg ${
               selectedPresetId === preset.id
-                ? 'border-purple-500 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+                ? 'border-purple-500 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20 scale-105'
+                : 'border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:border-purple-300 dark:hover:border-purple-700 hover:-translate-y-1'
             }`}
           >
             {/* Selection Indicator */}
@@ -124,10 +124,10 @@ export const ColorPresetSelector: React.FC<ColorPresetSelectorProps> = ({
           <button
             type="button"
             onClick={() => onCustomSelect?.()}
-            className={`rounded-lg border-2 p-4 transition-all text-left ${
+            className={`rounded-lg border-2 p-4 transition-all duration-200 text-left shadow-sm hover:shadow-lg ${
               selectedPresetId === 'custom'
-                ? 'border-purple-500 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20'
-                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+                ? 'border-purple-500 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/20 scale-105'
+                : 'border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:border-purple-300 dark:hover:border-purple-700 hover:-translate-y-1'
             }`}
           >
             {selectedPresetId === 'custom' && (

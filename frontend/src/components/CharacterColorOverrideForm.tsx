@@ -67,19 +67,29 @@ const DEFAULT_PRESET: ColorPreset = {
  * Convert ColorPreset (camelCase) to ColorThemeOverride (snake_case)
  * This is needed because the frontend uses camelCase for presets,
  * but the backend expects snake_case for the API.
+ * IMPORTANT: Deep copy all arrays and objects to prevent mutations of the original preset
  */
 function presetToColorThemeOverride(preset: ColorPreset): ColorThemeOverride {
   return {
-    border_colors: preset.borderColors,
+    border_colors: [...preset.borderColors], // Deep copy array
     text_color: preset.textColor,
-    badge_interior_gradient: preset.badgeInteriorGradient,
+    badge_interior_gradient: {
+      type: preset.badgeInteriorGradient.type,
+      colors: [...preset.badgeInteriorGradient.colors], // Deep copy array
+    },
     hp_color: {
       border: preset.hpColor.border,
-      interior_gradient: preset.hpColor.interiorGradient,
+      interior_gradient: {
+        type: preset.hpColor.interiorGradient.type,
+        colors: [...preset.hpColor.interiorGradient.colors], // Deep copy array
+      },
     },
     ac_color: {
       border: preset.acColor.border,
-      interior_gradient: preset.acColor.interiorGradient,
+      interior_gradient: {
+        type: preset.acColor.interiorGradient.type,
+        colors: [...preset.acColor.interiorGradient.colors], // Deep copy array
+      },
     },
   };
 }

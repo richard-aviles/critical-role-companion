@@ -41,11 +41,11 @@ class CharacterStatsInput(BaseModel):
 
 class CharacterThemeOverrideInput(BaseModel):
     """Character-specific color theme override"""
-    border_colors: List[str] = Field(..., description="Array of hex colors for border gradient")
-    text_color: str = Field(..., description="Hex color for stat text")
-    badge_interior_gradient: Dict[str, Any] = Field(..., description="Radial gradient for badge interiors")
-    hp_color: Dict[str, Any] = Field(..., description="HP badge colors")
-    ac_color: Dict[str, Any] = Field(..., description="AC badge colors")
+    border_colors: Optional[List[str]] = Field(None, description="Array of hex colors for border gradient")
+    text_color: Optional[str] = Field(None, description="Hex color for stat text")
+    badge_interior_gradient: Optional[Dict[str, Any]] = Field(None, description="Radial gradient for badge interiors")
+    hp_color: Optional[Dict[str, Any]] = Field(None, description="HP badge colors")
+    ac_color: Optional[Dict[str, Any]] = Field(None, description="AC badge colors")
 
     class Config:
         schema_extra = {
@@ -87,7 +87,7 @@ class CharacterUpdateRequest(BaseModel):
     level: Optional[int] = None
     is_active: Optional[bool] = None
     stats: Optional[CharacterStatsInput] = None
-    color_theme_override: Optional[CharacterThemeOverrideInput] = None
+    color_theme_override: Optional[Dict[str, Any]] = None
 
     class Config:
         schema_extra = {
@@ -384,3 +384,111 @@ class ErrorResponse(BaseModel):
                 "detail": "No character layout found for this campaign"
             }
         }
+
+
+# ============================================================================
+# Phase 4: Live Stream Overlay Schemas
+# ============================================================================
+
+class OverlayConfigResponse(BaseModel):
+    """Overlay configuration response"""
+    campaign_id: str
+    campaign_name: str
+    campaign_slug: str
+    default_color_theme: Optional[Dict[str, Any]] = None
+    settings: Dict[str, Any]
+
+    class Config:
+        from_attributes = True
+
+
+class OverlayCharacterResponse(BaseModel):
+    """Character data for overlay with resolved colors"""
+    id: str
+    campaign_id: str
+    name: str
+    slug: str
+    class_name: Optional[str]
+    race: Optional[str]
+    player_name: Optional[str]
+    image_url: Optional[str]
+    level: int
+    is_active: bool
+    stats: Dict[str, Any]
+    resolved_colors: Dict[str, Any]
+    color_source: str
+
+    class Config:
+        from_attributes = True
+
+
+class OverlayRosterCharacter(BaseModel):
+    """Lightweight character for roster display"""
+    id: str
+    name: str
+    slug: str
+    class_name: Optional[str]
+    image_url: Optional[str]
+    level: int
+    is_active: bool
+    resolved_colors: Dict[str, Any]
+    color_source: str
+
+    class Config:
+        from_attributes = True
+
+
+class OverlayRosterResponse(BaseModel):
+    """Character roster for overlay"""
+    campaign_id: str
+    characters: List[OverlayRosterCharacter]
+    active_roster_ids: List[str]
+
+    class Config:
+        from_attributes = True
+
+
+class OverlayEventResponse(BaseModel):
+    """Event data for overlay timeline"""
+    id: str
+    episode_id: str
+    name: str
+    description: Optional[str]
+    timestamp_in_episode: Optional[int]
+    event_type: Optional[str]
+    characters_involved: List[str]
+    character_names: List[str]
+    created_at: str
+
+    class Config:
+        from_attributes = True
+
+
+class OverlayEpisodeEventsResponse(BaseModel):
+    """Episode events timeline for overlay"""
+    episode_id: str
+    episode_name: str
+    episode_number: Optional[int]
+    season: Optional[int]
+    events: List[OverlayEventResponse]
+
+    class Config:
+        from_attributes = True
+
+
+class OverlayActiveEpisodeResponse(BaseModel):
+    """Active/featured episode for overlay"""
+    id: str
+    campaign_id: str
+    name: str
+    slug: str
+    episode_number: Optional[int]
+    season: Optional[int]
+    description: Optional[str]
+    air_date: Optional[str]
+    runtime: Optional[int]
+    is_published: bool
+    event_count: int
+
+    class Config:
+        from_attributes = True
