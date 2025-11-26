@@ -289,6 +289,7 @@ class CharacterLayoutCreateRequest(BaseModel):
     )
 
     class Config:
+        extra = "ignore"  # Ignore extra fields like campaign_id
         schema_extra = {
             "example": {
                 "name": "Gold Theme",

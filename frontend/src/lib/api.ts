@@ -873,9 +873,11 @@ export const getCharacterLayout = async (campaignId: string, layoutId: string) =
  */
 export const createCharacterLayout = async (campaignId: string, layout: any) => {
   try {
+    // Remove campaign_id from the layout object as it comes from the URL
+    const { campaign_id, ...layoutData } = layout;
     const response = await apiClient.post(
       `/campaigns/${campaignId}/character-layouts`,
-      layout,
+      layoutData,
       {
         headers: {
           'X-Token': localStorage.getItem(`campaign_${campaignId}_token`) || '',
@@ -895,9 +897,11 @@ export const createCharacterLayout = async (campaignId: string, layout: any) => 
  */
 export const updateCharacterLayout = async (campaignId: string, layoutId: string, layout: any) => {
   try {
+    // Remove campaign_id and id from the layout object as they come from the URL
+    const { campaign_id, id, ...layoutData } = layout;
     const response = await apiClient.patch(
       `/campaigns/${campaignId}/character-layouts/${layoutId}`,
-      layout,
+      layoutData,
       {
         headers: {
           'X-Token': localStorage.getItem(`campaign_${campaignId}_token`) || '',

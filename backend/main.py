@@ -1438,21 +1438,34 @@ async def create_character_layout(
     db: Session = Depends(get_db)
 ):
     """Create a new character layout for a campaign (admin only)"""
+    print(f"\n=== CREATE CHARACTER LAYOUT ===")
+    print(f"Campaign ID: {campaign_id}")
+    print(f"Payload: name={payload.name}, is_default={payload.is_default}, card_type={payload.card_type}")
+
     try:
         campaign_uuid = uuid.UUID(campaign_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid campaign ID")
 
+    print(f"Campaign UUID validated: {campaign_uuid}")
+    print(f"Verified campaign ID: {campaign.id}")
+
     # Verify campaign ownership
     if campaign.id != campaign_uuid:
         raise HTTPException(status_code=403, detail="Not authorized to modify this campaign")
 
+    print(f"Campaign ownership verified")
+
     # If this layout is set as default, unset other defaults
     if payload.is_default:
+        print(f"Setting as default, unsetting other defaults...")
         db.query(CharacterLayout).filter(
             and_(CharacterLayout.campaign_id == campaign_uuid, CharacterLayout.is_default == True)
         ).update({"is_default": False})
+        db.commit()
+        print(f"Other defaults unset")
 
+    print(f"Creating layout object...")
     layout = CharacterLayout(
         campaign_id=campaign_uuid,
         name=payload.name or "Default",
@@ -1480,11 +1493,19 @@ async def create_character_layout(
         color_preset=payload.color_preset,
     )
 
+    print(f"Layout object created: {layout.id if hasattr(layout, 'id') else 'no ID yet'}")
+    print(f"Adding to session...")
     db.add(layout)
+    print(f"Committing transaction...")
     db.commit()
+    print(f"Transaction committed. Layout ID: {layout.id}")
+    print(f"Refreshing layout...")
     db.refresh(layout)
+    print(f"Layout refreshed")
 
-    return layout.to_dict()
+    result = layout.to_dict()
+    print(f"Returning layout dict: {result}")
+    return result
 
 
 @app.get("/campaigns/{campaign_id}/character-layouts")
