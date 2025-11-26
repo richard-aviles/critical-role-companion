@@ -106,11 +106,24 @@ export default function CardPreview({ layout }: { layout: Layout }) {
   }
 
   // Enhanced Card
+  const getBackgroundHeight = () => {
+    // Ensure background is tall enough for the image
+    switch (layout.image_aspect_ratio) {
+      case 'portrait':
+        return 'h-96'; // Taller for portrait images
+      case 'landscape':
+        return 'h-48';
+      case 'square':
+      default:
+        return 'h-64';
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow" style={borderStyle}>
       {/* Background + Image Layout */}
       <div
-        className="relative w-full h-64"
+        className={`relative w-full ${getBackgroundHeight()}`}
         style={{
           backgroundImage: layout.background_image_url
             ? `url(${layout.background_image_url})`

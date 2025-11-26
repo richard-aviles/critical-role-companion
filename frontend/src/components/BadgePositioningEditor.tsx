@@ -140,7 +140,7 @@ export default function BadgePositioningEditor({
         <div
           ref={canvasRef}
           className="relative w-full bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300 rounded-lg overflow-hidden"
-          style={{ paddingBottom: '75%' }}
+          style={{ paddingBottom: '50%' }}
         >
           {/* Grid Background */}
           <div
