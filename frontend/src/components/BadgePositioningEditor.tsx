@@ -24,8 +24,8 @@ interface BadgePositioningEditorProps {
   onChange: (badges: Badge[]) => void;
 }
 
-const GRID_SIZE = 8; // 8px grid
-const SNAP_DISTANCE = 8; // Snap within 8px
+const GRID_SIZE = 2; // 2px grid for smooth, precise movement
+const SNAP_DISTANCE = 4; // Snap within 4px
 
 export default function BadgePositioningEditor({
   stats,
@@ -198,13 +198,31 @@ export default function BadgePositioningEditor({
         </div>
 
         <div className="text-xs text-gray-500 mt-2">
-          Uses 8px snap-to-grid. Badges automatically align with others within 8px.
+          2px grid precision. Badges automatically align with others within 4px.
+        </div>
+      </div>
+
+      {/* Add Badges */}
+      <div>
+        <h3 className="text-sm font-medium text-gray-900 mb-3">Add Badges</h3>
+
+        <div className="grid grid-cols-3 gap-2">
+          {stats.map((stat) => (
+            <button
+              key={stat.key}
+              onClick={() => handleAddBadge(stat)}
+              disabled={badges.some((b) => b.stat === stat.key)}
+              className="px-3 py-2 text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-200"
+            >
+              {stat.label}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Badge List */}
       <div>
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Badges</h3>
+        <h3 className="text-sm font-medium text-gray-900 mb-3">Active Badges</h3>
 
         <div className="space-y-2">
           {badges.map((badge) => (
@@ -231,24 +249,6 @@ export default function BadgePositioningEditor({
         {badges.length === 0 && (
           <p className="text-sm text-gray-600">No badges added yet</p>
         )}
-      </div>
-
-      {/* Add Badges */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Add Badges</h3>
-
-        <div className="grid grid-cols-3 gap-2">
-          {stats.map((stat) => (
-            <button
-              key={stat.key}
-              onClick={() => handleAddBadge(stat)}
-              disabled={badges.some((b) => b.stat === stat.key)}
-              className="px-3 py-2 text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-200"
-            >
-              {stat.label}
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );
