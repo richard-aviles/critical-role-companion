@@ -61,6 +61,10 @@ function CampaignDetailContent() {
             updated_at: localCampaign.updated_at || new Date().toISOString(),
           };
           setCampaign(campaignData);
+          // Save token to localStorage for admin operations (card layout, etc)
+          if (localCampaign.admin_token) {
+            localStorage.setItem(`campaign_${localCampaign.id}_token`, localCampaign.admin_token);
+          }
           setError(null);
           setIsLoading(false);
 
@@ -68,6 +72,10 @@ function CampaignDetailContent() {
           try {
             const data = await getCampaignDetail(campaignId);
             setCampaign(data);
+            // Update token in localStorage from server data
+            if (data.admin_token) {
+              localStorage.setItem(`campaign_${campaignId}_token`, data.admin_token);
+            }
           } catch (err) {
             // If fetch fails, we already have the local data, so continue silently
             console.log('Background fetch failed, using local data');
@@ -78,6 +86,10 @@ function CampaignDetailContent() {
         // If not in localStorage, fetch from server
         const data = await getCampaignDetail(campaignId);
         setCampaign(data);
+        // Save token to localStorage for admin operations (card layout, etc)
+        if (data.admin_token) {
+          localStorage.setItem(`campaign_${campaignId}_token`, data.admin_token);
+        }
         setError(null);
       } catch (err: any) {
         const status = err.response?.status;
@@ -111,6 +123,11 @@ function CampaignDetailContent() {
 
       // Update local state with fresh campaign data
       setCampaign(result);
+
+      // Save token to localStorage for admin operations
+      if (result.admin_token) {
+        localStorage.setItem(`campaign_${campaignId}_token`, result.admin_token);
+      }
 
       // Update localStorage with updated campaign
       if (user && user.campaigns) {
