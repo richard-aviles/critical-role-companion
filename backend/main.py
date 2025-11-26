@@ -44,21 +44,11 @@ app = FastAPI(
 logger = logging.getLogger("app")
 logger.setLevel(logging.DEBUG)
 
-# CORS configuration
-origins_str = settings.CORS_ORIGINS.strip()
-if origins_str == "*":
-    # Wildcard mode - allow all origins without credentials
-    cors_origins = ["*"]
-    allow_credentials = False
-else:
-    # Specific origins mode
-    cors_origins = [o.strip() for o in origins_str.split(",") if o.strip()]
-    allow_credentials = True
-
+# CORS configuration - Allow all origins for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
-    allow_credentials=allow_credentials,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
