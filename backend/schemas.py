@@ -271,14 +271,14 @@ class CharacterLayoutCreateRequest(BaseModel):
 
     # Color scheme
     border_color_count: int = Field(default=2, description="2 or 4 colors for gradient")
-    border_colors: List[str] = Field(..., description="Array of hex colors for border")
+    border_colors: Optional[List[str]] = Field(default=None, description="Array of hex colors for border")
     text_color: str = Field(default="#FFFFFF", description="Hex color for stat text")
-    badge_interior_gradient: Dict[str, Any] = Field(
-        ...,
+    badge_interior_gradient: Optional[Dict[str, Any]] = Field(
+        default=None,
         description="Radial gradient for badge interiors"
     )
-    hp_color: Dict[str, Any] = Field(..., description="HP badge colors")
-    ac_color: Dict[str, Any] = Field(..., description="AC badge colors")
+    hp_color: Optional[Dict[str, Any]] = Field(default=None, description="HP badge colors")
+    ac_color: Optional[Dict[str, Any]] = Field(default=None, description="AC badge colors")
     badge_layout: List[BadgeLayoutInput] = Field(
         default=[],
         description="Badge positions and shapes"
