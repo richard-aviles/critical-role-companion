@@ -1458,14 +1458,19 @@ async def create_character_layout(
         campaign_id=campaign_uuid,
         name=payload.name,
         is_default=payload.is_default,
+        card_type=payload.card_type,
+        stats_config=payload.stats_config,
         stats_to_display=payload.stats_to_display,
+        image_width_percent=payload.image_width_percent,
+        image_aspect_ratio=payload.image_aspect_ratio,
+        background_image_url=payload.background_image_url,
         border_color_count=payload.border_color_count,
         border_colors=payload.border_colors,
         text_color=payload.text_color,
         badge_interior_gradient=payload.badge_interior_gradient,
         hp_color=payload.hp_color,
         ac_color=payload.ac_color,
-        badge_layout=[b.dict() for b in payload.badge_layout],
+        badge_layout=[b.dict() if hasattr(b, 'dict') else b for b in payload.badge_layout],
         color_preset=payload.color_preset,
     )
 
@@ -1559,8 +1564,18 @@ async def update_character_layout(
                 and_(CharacterLayout.campaign_id == campaign_uuid, CharacterLayout.is_default == True, CharacterLayout.id != layout_uuid)
             ).update({"is_default": False})
         layout.is_default = payload.is_default
+    if payload.card_type is not None:
+        layout.card_type = payload.card_type
+    if payload.stats_config is not None:
+        layout.stats_config = payload.stats_config
     if payload.stats_to_display is not None:
         layout.stats_to_display = payload.stats_to_display
+    if payload.image_width_percent is not None:
+        layout.image_width_percent = payload.image_width_percent
+    if payload.image_aspect_ratio is not None:
+        layout.image_aspect_ratio = payload.image_aspect_ratio
+    if payload.background_image_url is not None:
+        layout.background_image_url = payload.background_image_url
     if payload.border_color_count is not None:
         layout.border_color_count = payload.border_color_count
     if payload.border_colors is not None:
@@ -1574,7 +1589,7 @@ async def update_character_layout(
     if payload.ac_color is not None:
         layout.ac_color = payload.ac_color
     if payload.badge_layout is not None:
-        layout.badge_layout = [b.dict() for b in payload.badge_layout]
+        layout.badge_layout = [b.dict() if hasattr(b, 'dict') else b for b in payload.badge_layout]
     if payload.color_preset is not None:
         layout.color_preset = payload.color_preset
 

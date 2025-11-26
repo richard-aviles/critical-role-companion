@@ -884,8 +884,9 @@ export const createCharacterLayout = async (campaignId: string, layout: any) => 
     );
     return response.data;
   } catch (error: any) {
-    console.error('Failed to create character layout:', error);
-    throw new Error(error.response?.data?.detail || 'Failed to create character layout');
+    const errorDetail = error.response?.data?.detail || error.response?.data?.message || JSON.stringify(error.response?.data) || error.message;
+    console.error('Failed to create character layout:', { error, detail: errorDetail, response: error.response?.data });
+    throw new Error(errorDetail);
   }
 };
 
@@ -905,8 +906,9 @@ export const updateCharacterLayout = async (campaignId: string, layoutId: string
     );
     return response.data;
   } catch (error: any) {
-    console.error('Failed to update character layout:', error);
-    throw new Error(error.response?.data?.detail || 'Failed to update character layout');
+    const errorDetail = error.response?.data?.detail || error.response?.data?.message || JSON.stringify(error.response?.data) || error.message;
+    console.error('Failed to update character layout:', { error, detail: errorDetail, response: error.response?.data });
+    throw new Error(errorDetail);
   }
 };
 
