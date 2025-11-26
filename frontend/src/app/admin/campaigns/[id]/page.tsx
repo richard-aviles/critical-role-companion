@@ -270,6 +270,9 @@ function CampaignDetailContent() {
             <a href={`/admin/campaigns/${campaign.id}/episodes`} className="px-4 py-3 border-b-2 border-transparent text-gray-600 dark:text-gray-300 font-medium hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-200">
               Episodes
             </a>
+            <a href={`/admin/campaigns/${campaign.id}/card-layout`} className="px-4 py-3 border-b-2 border-transparent text-gray-600 dark:text-gray-300 font-medium hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-200">
+              Card Layout
+            </a>
           </div>
         </div>
 
