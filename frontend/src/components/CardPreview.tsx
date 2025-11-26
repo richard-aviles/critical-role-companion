@@ -147,12 +147,12 @@ export default function CardPreview({ layout }: { layout: Layout }) {
           </div>
         </div>
 
-        {/* Badge Preview Area */}
+        {/* Badge Preview Area - Show All Badges */}
         {layout.badge_layout.length > 0 && (
           <div className="absolute inset-0 pointer-events-none">
-            {layout.badge_layout.slice(0, 3).map((badge, idx) => (
+            {layout.badge_layout.map((badge, idx) => (
               <div
-                key={idx}
+                key={badge.stat}
                 className="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg"
                 style={{
                   left: `${badge.x}%`,
@@ -164,11 +164,6 @@ export default function CardPreview({ layout }: { layout: Layout }) {
                 {badge.stat[0].toUpperCase()}
               </div>
             ))}
-            {layout.badge_layout.length > 3 && (
-              <div className="absolute bottom-4 right-4 text-white text-xs bg-black bg-opacity-50 px-2 py-1 rounded">
-                +{layout.badge_layout.length - 3} more
-              </div>
-            )}
           </div>
         )}
       </div>
