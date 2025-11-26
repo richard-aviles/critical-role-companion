@@ -115,6 +115,15 @@ export default function CardLayoutPage() {
   useEffect(() => {
     async function loadLayout() {
       try {
+        const token = localStorage.getItem(`campaign_${campaignId}_token`);
+        if (!token) {
+          // No token found - this is expected on first visit
+          // User can still create a new layout, just won't be able to save
+          setError('Please go to the campaign admin page first to enable saving.');
+          setLoading(false);
+          return;
+        }
+
         const layouts = await getCampaignLayouts(campaignId);
         if (layouts && layouts.length > 0) {
           // Load the default layout or the first one
@@ -122,9 +131,10 @@ export default function CardLayoutPage() {
           setLayout(defaultLayout);
           setExistingLayout(defaultLayout);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error loading layout:', err);
-        setError('Failed to load layout');
+        const errorMsg = err.message || 'Failed to load layout';
+        setError(errorMsg);
       } finally {
         setLoading(false);
       }

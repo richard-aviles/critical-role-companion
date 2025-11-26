@@ -833,10 +833,18 @@ export const getOverlayEpisodeEvents = async (campaignId: string, episodeId: str
  */
 export const getCampaignLayouts = async (campaignId: string) => {
   try {
-    const response = await apiClient.get(`/campaigns/${campaignId}/character-layouts`);
-    return response.data;
+    const response = await apiClient.get(
+      `/campaigns/${campaignId}/character-layouts`,
+      {
+        headers: {
+          'X-Token': localStorage.getItem(`campaign_${campaignId}_token`) || '',
+        },
+      }
+    );
+    return response.data.layouts || response.data;
   } catch (error: any) {
-    throw new Error('Failed to fetch character layouts');
+    console.error('Failed to fetch character layouts:', error);
+    throw new Error(error.response?.data?.detail || 'Failed to fetch character layouts');
   }
 };
 
@@ -846,11 +854,17 @@ export const getCampaignLayouts = async (campaignId: string) => {
 export const getCharacterLayout = async (campaignId: string, layoutId: string) => {
   try {
     const response = await apiClient.get(
-      `/campaigns/${campaignId}/character-layouts/${layoutId}`
+      `/campaigns/${campaignId}/character-layouts/${layoutId}`,
+      {
+        headers: {
+          'X-Token': localStorage.getItem(`campaign_${campaignId}_token`) || '',
+        },
+      }
     );
     return response.data;
   } catch (error: any) {
-    throw new Error('Failed to fetch character layout');
+    console.error('Failed to fetch character layout:', error);
+    throw new Error(error.response?.data?.detail || 'Failed to fetch character layout');
   }
 };
 
@@ -870,7 +884,8 @@ export const createCharacterLayout = async (campaignId: string, layout: any) => 
     );
     return response.data;
   } catch (error: any) {
-    throw new Error('Failed to create character layout');
+    console.error('Failed to create character layout:', error);
+    throw new Error(error.response?.data?.detail || 'Failed to create character layout');
   }
 };
 
@@ -890,7 +905,8 @@ export const updateCharacterLayout = async (campaignId: string, layoutId: string
     );
     return response.data;
   } catch (error: any) {
-    throw new Error('Failed to update character layout');
+    console.error('Failed to update character layout:', error);
+    throw new Error(error.response?.data?.detail || 'Failed to update character layout');
   }
 };
 
