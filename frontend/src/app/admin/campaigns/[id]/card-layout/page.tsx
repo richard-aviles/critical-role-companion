@@ -227,8 +227,8 @@ export default function CardLayoutPage() {
         </div>
       )}
 
-      {/* Preview Section - Sticky */}
-      <div className="bg-white shadow sticky top-16 z-30 border-b border-gray-200">
+      {/* Preview Section */}
+      <div className="bg-white shadow border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Card Preview</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
