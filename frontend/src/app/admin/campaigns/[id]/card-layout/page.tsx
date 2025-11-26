@@ -333,11 +333,23 @@ export default function CardLayoutPage() {
           {layout.card_type === 'enhanced' && (
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Badge Positioning</h2>
-              <BadgePositioningEditor
-                stats={layout.stats_config.filter(s => s.visible)}
-                badges={layout.badge_layout}
-                onChange={(badges) => setLayout({ ...layout, badge_layout: badges })}
-              />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Badge Editor Canvas */}
+                <div>
+                  <div className="text-sm font-medium text-gray-700 mb-3">Positioning Canvas</div>
+                  <BadgePositioningEditor
+                    stats={layout.stats_config.filter(s => s.visible)}
+                    badges={layout.badge_layout}
+                    onChange={(badges) => setLayout({ ...layout, badge_layout: badges })}
+                  />
+                </div>
+
+                {/* Live Card Preview */}
+                <div>
+                  <div className="text-sm font-medium text-gray-700 mb-3">Live Card Preview</div>
+                  <CardPreview layout={layout} />
+                </div>
+              </div>
             </div>
           )}
         </div>
