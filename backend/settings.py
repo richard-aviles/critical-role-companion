@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     BACKEND_BASE_URL: str = "http://localhost:8000"
 
     # CORS
-    CORS_ORIGINS: str = "*"
+    CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001"
 
     # WebSocket
     WS_PING_INTERVAL: int = 25
