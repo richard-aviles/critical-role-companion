@@ -293,9 +293,10 @@ class LayoutOverrides(Base):
 
 class CharacterLayout(Base):
     """
-    Character card layout and styling configuration for a campaign (Phase 3)
+    Character card layout and styling configuration for a campaign (Phase 3+)
     Defines which stats display, their positions, shapes, and color scheme
     Applied campaign-wide: all characters in campaign use the same layout
+    Supports both simple (text-based) and enhanced (visual badges) card types
     """
     __tablename__ = "character_layouts"
 
@@ -306,8 +307,29 @@ class CharacterLayout(Base):
     name = Column(String(100), nullable=False, default="Default")  # User-friendly name
     is_default = Column(Boolean, default=False)  # Whether this is the default layout
 
-    # Stat configuration
+    # NEW: Card type (simple = text-based, enhanced = visual badges)
+    card_type = Column(String(20), nullable=False, default="simple")  # "simple" or "enhanced"
+
+    # NEW: Enhanced stat configuration (allows 1-8 stats with custom labels and ordering)
+    # Format: [{"key": "str", "label": "STR", "visible": true, "order": 0}, ...]
+    stats_config = Column(JSONB, nullable=False, default=[
+        {"key": "str", "label": "STR", "visible": True, "order": 0},
+        {"key": "dex", "label": "DEX", "visible": True, "order": 1},
+        {"key": "con", "label": "CON", "visible": True, "order": 2},
+        {"key": "int", "label": "INT", "visible": True, "order": 3},
+        {"key": "wis", "label": "WIS", "visible": True, "order": 4},
+        {"key": "cha", "label": "CHA", "visible": True, "order": 5},
+    ])
+
+    # Stat configuration (LEGACY - keeping for backward compatibility)
     stats_to_display = Column(JSONB, nullable=False, default=["str", "dex", "con", "int", "wis", "cha"])  # Array of stat keys
+
+    # NEW: Image configuration for enhanced cards
+    image_width_percent = Column(Integer, nullable=False, default=30)  # 25-40 range
+    image_aspect_ratio = Column(String(20), nullable=False, default="square")  # "square", "portrait", "landscape"
+
+    # NEW: Optional background image for enhanced cards
+    background_image_url = Column(String(500), nullable=True)
 
     # Color scheme
     border_color_count = Column(Integer, default=2, nullable=False)  # 2 or 4 colors for gradient
@@ -338,7 +360,12 @@ class CharacterLayout(Base):
             "campaign_id": str(self.campaign_id),
             "name": self.name,
             "is_default": self.is_default,
+            "card_type": self.card_type,
+            "stats_config": self.stats_config or [],
             "stats_to_display": self.stats_to_display or [],
+            "image_width_percent": self.image_width_percent,
+            "image_aspect_ratio": self.image_aspect_ratio,
+            "background_image_url": self.background_image_url,
             "border_color_count": self.border_color_count,
             "border_colors": self.border_colors or {},
             "text_color": self.text_color,

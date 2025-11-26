@@ -217,14 +217,59 @@ class BadgeLayoutInput(BaseModel):
         }
 
 
+class StatConfig(BaseModel):
+    """Stat configuration for character card layout"""
+    key: str = Field(..., description="Stat key (str, dex, con, int, wis, cha, or custom)")
+    label: str = Field(..., description="Display label for stat")
+    visible: bool = Field(default=True, description="Whether this stat is visible")
+    order: int = Field(..., description="Display order (0-7)")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "key": "str",
+                "label": "STR",
+                "visible": True,
+                "order": 0
+            }
+        }
+
+
 class CharacterLayoutCreateRequest(BaseModel):
     """Create character layout for a campaign"""
     name: str = Field(default="Default", description="Layout name")
     is_default: bool = Field(default=False, description="Is this the default layout?")
+
+    # NEW: Card type (simple or enhanced)
+    card_type: str = Field(default="simple", description="Card style: 'simple' (text) or 'enhanced' (badges)")
+
+    # NEW: Stat configuration (1-8 stats with custom labels)
+    stats_config: List[StatConfig] = Field(
+        default=[
+            {"key": "str", "label": "STR", "visible": True, "order": 0},
+            {"key": "dex", "label": "DEX", "visible": True, "order": 1},
+            {"key": "con", "label": "CON", "visible": True, "order": 2},
+            {"key": "int", "label": "INT", "visible": True, "order": 3},
+            {"key": "wis", "label": "WIS", "visible": True, "order": 4},
+            {"key": "cha", "label": "CHA", "visible": True, "order": 5},
+        ],
+        description="Stat configuration (key, label, visibility, order)"
+    )
+
+    # LEGACY: Keeping for backward compatibility
     stats_to_display: List[str] = Field(
         default=["str", "dex", "con", "int", "wis", "cha"],
-        description="Which stats to display"
+        description="Which stats to display (legacy field)"
     )
+
+    # NEW: Image configuration for enhanced cards
+    image_width_percent: int = Field(default=30, description="Character image width (25-40 range)")
+    image_aspect_ratio: str = Field(default="square", description="Image aspect ratio: square, portrait, landscape")
+
+    # NEW: Optional background image
+    background_image_url: Optional[str] = Field(None, description="Background image URL for enhanced cards")
+
+    # Color scheme
     border_color_count: int = Field(default=2, description="2 or 4 colors for gradient")
     border_colors: List[str] = Field(..., description="Array of hex colors for border")
     text_color: str = Field(default="#FFFFFF", description="Hex color for stat text")
@@ -288,7 +333,12 @@ class CharacterLayoutUpdateRequest(BaseModel):
     """Update character layout"""
     name: Optional[str] = None
     is_default: Optional[bool] = None
+    card_type: Optional[str] = None
+    stats_config: Optional[List[StatConfig]] = None
     stats_to_display: Optional[List[str]] = None
+    image_width_percent: Optional[int] = None
+    image_aspect_ratio: Optional[str] = None
+    background_image_url: Optional[str] = None
     border_color_count: Optional[int] = None
     border_colors: Optional[List[str]] = None
     text_color: Optional[str] = None
@@ -305,7 +355,12 @@ class CharacterLayoutResponse(BaseModel):
     campaign_id: str
     name: str
     is_default: bool
+    card_type: str
+    stats_config: List[Dict[str, Any]]
     stats_to_display: List[str]
+    image_width_percent: int
+    image_aspect_ratio: str
+    background_image_url: Optional[str]
     border_color_count: int
     border_colors: List[str]
     text_color: str

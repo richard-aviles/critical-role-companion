@@ -496,6 +496,7 @@ class CharacterCreate(BaseModel):
     race: Optional[str] = None
     description: Optional[str] = None
     backstory: Optional[str] = None
+    stats: Optional[Dict[str, Any]] = None  # NEW: Character stats (str, dex, con, int, wis, cha, hp, ac)
     color_theme_override: Optional[Dict[str, Any]] = None
 
 
@@ -506,6 +507,7 @@ class CharacterUpdate(BaseModel):
     race: Optional[str] = None
     description: Optional[str] = None
     backstory: Optional[str] = None
+    stats: Optional[Dict[str, Any]] = None  # NEW: Character stats (str, dex, con, int, wis, cha, hp, ac)
     color_theme_override: Optional[Dict[str, Any]] = None
 
 
@@ -570,38 +572,8 @@ def create_character(
     db: Session = Depends(get_db)
 ):
     """Create character in campaign (admin only)"""
-    import json
-    import os
-
-    # FIRST THING: Write immediate log to confirm endpoint was called
-    import tempfile
-    try:
-        test_file = os.path.join(tempfile.gettempdir(), "CREATE_CHAR_CALLED.txt")
-        with open(test_file, "w") as f:
-            f.write(f"CREATE_CHARACTER ENDPOINT CALLED at {str(__import__('datetime').datetime.now())}\n")
-            f.write(f"Campaign ID: {campaign_id}\n")
-            f.write(f"Payload name: {payload.name}\n")
-    except:
-        pass  # Ignore write errors
-
     # Generate slug if not provided
     slug = payload.slug or payload.name.lower().replace(" ", "-")
-
-    # THIS IS THE KEY ISSUE: Check what we're getting from payload
-    color_override_data = payload.color_theme_override
-
-    # Write to file in the current working directory
-    cwd = os.getcwd()
-    log_file = os.path.join(cwd, "color_override_debug.txt")
-
-    with open(log_file, "w") as f:
-        f.write(f"Working directory: {cwd}\n")
-        f.write(f"Character name: {payload.name}\n")
-        f.write(f"payload.color_theme_override is None: {payload.color_theme_override is None}\n")
-        f.write(f"payload.color_theme_override type: {type(payload.color_theme_override)}\n")
-        f.write(f"payload.color_theme_override value:\n{json.dumps(payload.color_theme_override, indent=2) if payload.color_theme_override else 'NONE'}\n")
-        f.write(f"\ncolor_override_data is None: {color_override_data is None}\n")
-        f.write(f"color_override_data type: {type(color_override_data)}\n")
 
     character = Character(
         campaign_id=campaign.id,
@@ -612,7 +584,8 @@ def create_character(
         race=payload.race,
         description=payload.description,
         backstory=payload.backstory,
-        color_theme_override=color_override_data,
+        stats=payload.stats or {},  # NEW: Save stats from payload
+        color_theme_override=payload.color_theme_override,
     )
 
     db.add(character)
@@ -1727,9 +1700,9 @@ async def update_character(
     if payload.is_active is not None:
         character.is_active = payload.is_active
     if payload.stats is not None:
-        allowed_stats = {"str", "dex", "con", "int", "wis", "cha", "hp", "ac"}
-        stats_dict = payload.stats.dict(exclude_none=True)
-        character.stats = {k: v for k, v in stats_dict.items() if k in allowed_stats}
+        # Stats can be any dict with stat keys (str, dex, con, int, wis, cha, hp, ac, or custom)
+        # We don't validate keys here - let DM set whatever they want
+        character.stats = payload.stats
 
     # Update color theme override if provided in the request
     # Check if the field was explicitly set (either to a value or to null)
