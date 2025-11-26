@@ -825,6 +825,76 @@ export const getOverlayEpisodeEvents = async (campaignId: string, episodeId: str
 };
 
 // ============================================================================
+// CHARACTER LAYOUTS
+// ============================================================================
+
+/**
+ * Get all character layouts for a campaign
+ */
+export const getCampaignLayouts = async (campaignId: string) => {
+  try {
+    const response = await apiClient.get(`/campaigns/${campaignId}/character-layouts`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error('Failed to fetch character layouts');
+  }
+};
+
+/**
+ * Get a specific character layout
+ */
+export const getCharacterLayout = async (campaignId: string, layoutId: string) => {
+  try {
+    const response = await apiClient.get(
+      `/campaigns/${campaignId}/character-layouts/${layoutId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error('Failed to fetch character layout');
+  }
+};
+
+/**
+ * Create a new character layout
+ */
+export const createCharacterLayout = async (campaignId: string, layout: any) => {
+  try {
+    const response = await apiClient.post(
+      `/campaigns/${campaignId}/character-layouts`,
+      layout,
+      {
+        headers: {
+          'X-Token': localStorage.getItem(`campaign_${campaignId}_token`) || '',
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error('Failed to create character layout');
+  }
+};
+
+/**
+ * Update a character layout
+ */
+export const updateCharacterLayout = async (campaignId: string, layoutId: string, layout: any) => {
+  try {
+    const response = await apiClient.patch(
+      `/campaigns/${campaignId}/character-layouts/${layoutId}`,
+      layout,
+      {
+        headers: {
+          'X-Token': localStorage.getItem(`campaign_${campaignId}_token`) || '',
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error('Failed to update character layout');
+  }
+};
+
+// ============================================================================
 // HEALTH & VERSION
 // ============================================================================
 
