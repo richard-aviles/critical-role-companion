@@ -1,198 +1,155 @@
-# Tomorrow's Startup - Issue #1 Investigation
+# Tomorrow's Startup - Session 2 (November 27, 2025)
 
-**Last Updated:** November 25, 2025, 8:17 PM
-**Session Goal:** Diagnose why create_character endpoint isn't executing
-
----
-
-## Current Status
-- All backend processes killed (Python and Node)
-- System left idle overnight for full reset
-- Diagnostic files created with findings
+**Last Updated:** November 26, 2025, Evening
+**Session Goal:** Fix persistent 500 error on character layout save/load
 
 ---
 
-## Step 1: Verify Clean System (5 min)
+## Problem: Character Layout Save Returns 500 Error
 
+### Error Details
+- **Endpoint:** POST `/campaigns/{campaignId}/character-layouts`
+- **Error Message:** "No data found for resource with given identifier"
+- **Status Code:** 500
+- **When It Happens:** Clicking "Save Layout" on card layout editor
+- **Still Occurring:** Even after schema fix and backend restart
+
+### Root Cause: Unknown
+The error persists even after fixing Pydantic schema validation errors. The issue is likely deeper in the database layer or data flow, not just validation.
+
+---
+
+## What Was Done Yesterday
+
+### 1. Identified and Fixed Schema Issue
+**File:** `backend/schemas.py` (lines 274-281)
+- Changed 4 fields from required to optional in `CharacterLayoutCreateRequest`:
+  - `border_colors: Optional[List[str]] = None`
+  - `badge_interior_gradient: Optional[Dict[str, Any]] = None`
+  - `hp_color: Optional[Dict[str, Any]] = None`
+  - `ac_color: Optional[Dict[str, Any]] = None`
+- **Fix committed to git** ✓
+
+### 2. Backend Restart Performed
+- Killed old processes on port 8001 (PIDs 37988, 90668)
+- Started fresh backend on port 8002 with clean Python environment
+- Backend confirmed working on port 8002
+- **Result:** Error still persists - fix was not the root cause
+
+### 3. Changes Made
+- `backend/schemas.py`: Optional color fields
+- `frontend/src/lib/api.ts`: Temporarily used port 8002 for testing, reverted to 8001
+
+---
+
+## Tomorrow: Fresh Start Checklist
+
+### Step 1: Clean System (5 min)
 ```bash
-# Check no Python processes running
+# Kill all processes
+taskkill /F /IM python.exe
+taskkill /F /IM node.exe
+
+# Verify ports are free
 netstat -ano | findstr :8001
 netstat -ano | findstr :3000
-
-# Should return nothing - if ports still in use, kill the PIDs
 ```
 
----
-
-## Step 2: Start Backend WITH DIAGNOSTICS (10 min)
-
-**DO NOT use auto-reload** - It's causing issues with the diagnostics
-
+### Step 2: Start Backend (10 min)
 ```bash
 cd "C:\Development\Twitch_CriticalRole_Project\CR_Companion_PreReq_Layout\critical-role-companion\backend"
-python -m uvicorn main:app --host 127.0.0.1 --port 8001 --no-reload
+python -m uvicorn main:app --reload --port 8001 --timeout-keep-alive 600
 ```
 
 **Watch for:**
 - "Application startup complete" message
 - No errors during startup
 
----
-
-## Step 3: Start Frontend in NEW terminal
-
+### Step 3: Start Frontend (5 min)
 ```bash
 cd "C:\Development\Twitch_CriticalRole_Project\CR_Companion_PreReq_Layout\critical-role-companion\frontend"
-npm run dev -- -p 3000
+npm run dev
 ```
 
-**Watch for:**
-- "ready - started server on" message
+---
+
+## Investigation Strategy
+
+### Priority 1: Check Database
+1. Is the campaign in the database?
+2. Are the character layout tables created?
+3. Can you manually INSERT a layout via SQL?
+
+### Priority 2: Check Backend Logs
+1. Add `print()` statements to `create_character_layout` endpoint
+2. Log the request payload
+3. Log the database operation
+4. Watch terminal output when saving a layout
+
+### Priority 3: Test Endpoints
+1. **Test GET** `/campaigns/{id}/character-layouts` - Do saved layouts load?
+2. **Test POST** with minimal data (just name, is_default, card_type)
+3. **Test UPDATE** to see if that endpoint works better
+4. Check if similar endpoints work (episodes, characters)
+
+### Priority 4: Check Token/Authorization
+1. Verify X-Token header is being sent correctly
+2. Check if campaign token validation is causing the issue
+3. Test with different campaign/character combinations
 
 ---
 
-## Step 4: CRITICAL TEST - Create Debug Character
+## Key Files to Investigate
 
-1. Go to http://localhost:3000
-2. Create new character with:
-   - Name: "DEBUG_ENDPOINT_TEST"
-   - **IMPORTANT: Check "Use custom color theme" checkbox**
-   - **Select some colors**
-3. Click Create
-
----
-
-## Step 5: Check Evidence
-
-### Check 1: Debug Files
-```bash
-# Check if the endpoint was even called
-ls C:\Users\richa\AppData\Local\Temp\CREATE_CHAR_CALLED.txt
-ls C:\Development\Twitch_CriticalRole_Project\CR_Companion_PreReq_Layout\critical-role-companion\backend\color_override_debug.txt
-```
-
-**Expected:**
-- IF endpoint was called: Both files should exist with debug output
-- IF endpoint NOT called: Files won't exist
-
-### Check 2: Database
-```bash
-python backend/check_character_colors.py | grep -A5 "DEBUG_ENDPOINT_TEST"
-```
-
-**Expected:** color_theme_override should be NULL (confirming the endpoint doesn't save it)
-
-### Check 3: Backend Console
-**Look at the terminal where backend is running:**
-- Search for any error messages
-- Search for the character name in output
-- Look for exception tracebacks
+| File | Why | Lines |
+|------|-----|-------|
+| `backend/main.py` | Create layout endpoint | 1433-1487 |
+| `backend/schemas.py` | Request/response schemas | 274-281 (already fixed) |
+| `frontend/src/lib/api.ts` | API client & error handling | All |
+| `backend/database.py` | Database queries | TBD |
+| Database logs | Transaction errors | TBD |
 
 ---
 
-## Step 6: Hypothesis Testing
-
-### IF debug files DO exist (endpoint IS being called):
-- Then the issue is Pydantic validation or data transformation
-- Next: Add logging INSIDE endpoint to see what payload.color_theme_override contains
-- Check if it's None or if it's the actual data
-
-### IF debug files DON'T exist (endpoint NOT being called):
-- Then something else is handling character creation
-- Next: Search codebase for OTHER endpoints that might create characters:
-  ```bash
-  grep -n "POST.*character\|def.*create.*character" backend/main.py
-  ```
-- Next: Add startup logging to print all registered routes:
-  ```python
-  # Add this at app startup
-  from fastapi.openapi.utils import get_openapi
-  for route in app.routes:
-      if "character" in route.path:
-          print(f"REGISTERED: {route.methods} {route.path}")
-  ```
+## What We Know Works
+✅ Backend starts and responds to requests
+✅ Frontend can communicate with backend
+✅ Other endpoints work (campaigns, characters)
+✅ Schema validation fix was applied and committed
 
 ---
 
-## Step 7: If Still Stuck - Try Nuclear Option
-
-If the endpoint isn't being called, try this:
-
-1. **Add a print() statement at the very first line of create_character:**
-   ```python
-   @app.post("/campaigns/{campaign_id}/characters", status_code=201)
-   def create_character(...):
-       print("=== CREATE_CHARACTER CALLED ===")  # THIS LINE
-       """Create character in campaign (admin only)"""
-   ```
-
-2. **Restart backend and watch terminal for the print statement**
-
-3. **If you don't see "=== CREATE_CHARACTER CALLED ===" when creating a character, then FastAPI isn't routing to this endpoint at all**
+## What's NOT Working
+❌ Character layout save returns 500 error
+❌ Error message doesn't indicate validation issue
+❌ Fresh backend restart didn't fix it
+❌ Error is persistent across multiple attempts
 
 ---
 
-## Important Notes
+## Success Criteria for Tomorrow
 
-1. **Leave processes running once they're working** - Don't restart during debugging
-2. **Check backend terminal first** - Errors often appear there before network
-3. **Compare with working update endpoint** - The update_character endpoint DOES work, so use it as reference
-4. **Network tab is your friend** - But trust the file existence check more
-
----
-
-## Key Files to Have Open
-
-1. `ISSUE_1_DIAGNOSIS.md` - Reference what we learned
-2. `backend/main.py` - Lines 565 (create), 1682 (update for comparison), 1746 (set colors)
-3. `backend/schemas.py` - Lines 42-90 (schemas)
-4. Browser DevTools Network tab - Watch requests/responses
+**Session succeeds if we:**
+1. Identify the actual root cause (not just schema)
+2. Either fix it or create an isolated test case
+3. Document findings in TROUBLESHOOTING.md
 
 ---
 
-## What We Know
+## Testing Order
 
-✅ **Frontend sends correct data** - Network shows full color_theme_override
-✅ **Character gets created** - It appears in database
-✅ **Response is 201 Created** - Server responds successfully
-✅ **UPDATE endpoint works** - Manual edits save colors fine
-❌ **create_character endpoint doesn't execute** - Debug files never created
-❌ **Color data never saves** - Always NULL in database
-
-The mystery: **How is the character being created if the endpoint isn't running?**
+1. **First:** Check if database/campaign exists
+2. **Second:** Add logging to endpoint and watch output
+3. **Third:** Test with curl/Postman before browser
+4. **Fourth:** Check token authorization
+5. **Fifth:** Compare with working endpoints (episodes, characters)
 
 ---
 
-## Success Criteria
+## Notes
 
-**Session is successful if we definitively answer:**
-1. What code path IS handling the POST /campaigns/{id}/characters request?
-2. Where and why is color_theme_override being set to NULL?
-3. Why doesn't the endpoint execution leave any trace in debug files?
-
-Once we answer these, the fix will be obvious.
-
----
-
-## DO NOT DO THESE THINGS
-
-❌ Don't use `--reload` - It's causing stale process issues
-❌ Don't restart backend every 5 seconds - Give it time to fully start
-❌ Don't skip checking the debug files - They're our proof the endpoint runs
-❌ Don't make more code changes until we understand what's happening
-❌ Don't assume the frontend is wrong - We verified it sends correct data
-
----
-
-## Checklist for Tomorrow
-
-- [ ] Kill all Python/Node processes
-- [ ] Start backend without reload
-- [ ] Start frontend
-- [ ] Create DEBUG_ENDPOINT_TEST character WITH colors
-- [ ] Check if debug files were created
-- [ ] Check database for character
-- [ ] Check backend console for errors
-- [ ] Make decision: Is endpoint being called or not?
-- [ ] Update ISSUE_1_DIAGNOSIS.md with findings
-- [ ] Plan next steps based on findings
+- The schema fix was correct but isn't the root cause
+- The error may be in database connectivity or constraints
+- A fresh overnight restart may have helped clear corrupted state
+- Log output will be more helpful than browser DevTools
+- Consider checking database transactions and deadlocks
