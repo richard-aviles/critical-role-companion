@@ -227,101 +227,119 @@ export default function CardLayoutPage() {
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Panel: Configuration */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Card Type */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Card Style</h2>
-              <CardTypeToggle
-                cardType={layout.card_type}
-                onChange={(type) => setLayout({ ...layout, card_type: type })}
-              />
-            </div>
-
-            {/* Stats Configuration */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Character Stats</h2>
-              <StatConfigPanel
-                stats={layout.stats_config}
-                onChange={(stats) =>
-                  setLayout({
+      {/* Preview Section - Sticky */}
+      <div className="bg-white shadow sticky top-16 z-30 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Card Preview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Show cards for each card type to compare */}
+            <div>
+              <div className="text-sm font-medium text-gray-700 mb-2">Simple Card Style</div>
+              <div className="max-w-sm">
+                <CardPreview
+                  layout={{
                     ...layout,
-                    stats_config: stats,
-                    stats_to_display: stats.filter(s => s.visible).map(s => s.key),
-                  })
-                }
-              />
-            </div>
-
-            {/* Image Settings */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Image Settings</h2>
-              <ImageSettingsPanel
-                widthPercent={layout.image_width_percent}
-                aspectRatio={layout.image_aspect_ratio}
-                backgroundImageUrl={layout.background_image_url}
-                onWidthChange={(width) => setLayout({ ...layout, image_width_percent: width })}
-                onAspectRatioChange={(ratio) =>
-                  setLayout({ ...layout, image_aspect_ratio: ratio })
-                }
-                onBackgroundImageChange={(url) =>
-                  setLayout({ ...layout, background_image_url: url })
-                }
-              />
-            </div>
-
-            {/* Color Theme */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Color Theme</h2>
-              <ColorThemeSelector
-                borderColors={layout.border_colors}
-                textColor={layout.text_color}
-                badgeInteriorGradient={layout.badge_interior_gradient}
-                hpColor={layout.hp_color}
-                acColor={layout.ac_color}
-                colorPreset={layout.color_preset}
-                onColorPresetChange={(preset, colors) => {
-                  setLayout({
-                    ...layout,
-                    ...colors,
-                    color_preset: preset,
-                  });
-                }}
-                onBorderColorsChange={(colors) =>
-                  setLayout({ ...layout, border_colors: colors })
-                }
-                onTextColorChange={(color) => setLayout({ ...layout, text_color: color })}
-                onBadgeGradientChange={(gradient) =>
-                  setLayout({ ...layout, badge_interior_gradient: gradient })
-                }
-                onHpColorChange={(color) => setLayout({ ...layout, hp_color: color })}
-                onAcColorChange={(color) => setLayout({ ...layout, ac_color: color })}
-              />
-            </div>
-
-            {/* Badge Positioning */}
-            {layout.card_type === 'enhanced' && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Badge Positioning</h2>
-                <BadgePositioningEditor
-                  stats={layout.stats_config.filter(s => s.visible)}
-                  badges={layout.badge_layout}
-                  onChange={(badges) => setLayout({ ...layout, badge_layout: badges })}
+                    card_type: 'simple',
+                  }}
                 />
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Right Panel: Preview */}
-          <div>
-            <div className="bg-white rounded-lg shadow p-6 sticky top-24">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Preview</h2>
-              <CardPreview layout={layout} />
+            {/* Enhanced Card Preview */}
+            <div className="md:col-span-1 lg:col-span-2">
+              <div className="text-sm font-medium text-gray-700 mb-2">Enhanced Card Style (Current Selection)</div>
+              <div className="max-w-2xl">
+                <CardPreview layout={layout} />
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
+          {/* Card Type */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Card Style</h2>
+            <CardTypeToggle
+              cardType={layout.card_type}
+              onChange={(type) => setLayout({ ...layout, card_type: type })}
+            />
+          </div>
+
+          {/* Stats Configuration */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Character Stats</h2>
+            <StatConfigPanel
+              stats={layout.stats_config}
+              onChange={(stats) =>
+                setLayout({
+                  ...layout,
+                  stats_config: stats,
+                  stats_to_display: stats.filter(s => s.visible).map(s => s.key),
+                })
+              }
+            />
+          </div>
+
+          {/* Image Settings */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Image Settings</h2>
+            <ImageSettingsPanel
+              widthPercent={layout.image_width_percent}
+              aspectRatio={layout.image_aspect_ratio}
+              backgroundImageUrl={layout.background_image_url}
+              onWidthChange={(width) => setLayout({ ...layout, image_width_percent: width })}
+              onAspectRatioChange={(ratio) =>
+                setLayout({ ...layout, image_aspect_ratio: ratio })
+              }
+              onBackgroundImageChange={(url) =>
+                setLayout({ ...layout, background_image_url: url })
+              }
+            />
+          </div>
+
+          {/* Color Theme */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Color Theme</h2>
+            <ColorThemeSelector
+              borderColors={layout.border_colors}
+              textColor={layout.text_color}
+              badgeInteriorGradient={layout.badge_interior_gradient}
+              hpColor={layout.hp_color}
+              acColor={layout.ac_color}
+              colorPreset={layout.color_preset}
+              onColorPresetChange={(preset, colors) => {
+                setLayout({
+                  ...layout,
+                  ...colors,
+                  color_preset: preset,
+                });
+              }}
+              onBorderColorsChange={(colors) =>
+                setLayout({ ...layout, border_colors: colors })
+              }
+              onTextColorChange={(color) => setLayout({ ...layout, text_color: color })}
+              onBadgeGradientChange={(gradient) =>
+                setLayout({ ...layout, badge_interior_gradient: gradient })
+              }
+              onHpColorChange={(color) => setLayout({ ...layout, hp_color: color })}
+              onAcColorChange={(color) => setLayout({ ...layout, ac_color: color })}
+            />
+          </div>
+
+          {/* Badge Positioning */}
+          {layout.card_type === 'enhanced' && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Badge Positioning</h2>
+              <BadgePositioningEditor
+                stats={layout.stats_config.filter(s => s.visible)}
+                badges={layout.badge_layout}
+                onChange={(badges) => setLayout({ ...layout, badge_layout: badges })}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
