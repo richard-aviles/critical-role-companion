@@ -1,7 +1,7 @@
 /**
  * Public Character Card Component
  * Displays character with color override styling and card layout support
- * Supports both "simple" (text-based) and "enhanced" (visual badges) layouts
+ * Supports both "simple" (text-based) and "enhanced" (background + badges) layouts
  */
 
 import Link from 'next/link';
@@ -30,6 +30,128 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
   // Determine which layout to use: layout?.card_type or default to "simple"
   const cardType = layout?.card_type || 'simple';
 
+  // ============================================
+  // ENHANCED LAYOUT RENDERING
+  // ============================================
+  if (cardType === 'enhanced') {
+    return (
+      <Link href={`/campaigns/${campaignSlug}/characters/${character.slug}`}>
+        <div
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow overflow-hidden cursor-pointer group border border-gray-200 dark:border-gray-700"
+          style={{
+            borderLeft: `4px solid ${borderColor}`,
+          }}
+        >
+          {/* Background Image Container with Badge Overlay */}
+          <div
+            className="relative w-full overflow-hidden"
+            style={{
+              height: '300px',
+              backgroundImage: layout?.background_image_url
+                ? `url(${layout.background_image_url})`
+                : 'linear-gradient(135deg, rgb(229, 231, 235), rgb(209, 213, 219))',
+              backgroundSize: 'cover',
+              backgroundPosition: `calc(50% + ${layout?.background_image_offset_x || 0}%) calc(50% + ${layout?.background_image_offset_y || 0}%)`,
+            }}
+          >
+            {/* Dark overlay for readability */}
+            <div className="absolute inset-0 bg-black bg-opacity-20" />
+
+            {/* Character Image - positioned at top-left with configurable width */}
+            {character.image_url && (
+              <div
+                className="absolute left-4 top-4 rounded-lg overflow-hidden shadow-lg border-2 group-hover:scale-105 transition-transform"
+                style={{
+                  width: `${layout?.image_width_percent || 30}%`,
+                  height: `${layout?.image_width_percent || 30}%`,
+                  borderColor: borderColor,
+                }}
+              >
+                <Image
+                  src={character.image_url}
+                  alt={character.name}
+                  fill
+                  className="object-cover"
+                  style={{
+                    objectPosition: `calc(50% + ${layout?.background_image_offset_x || 0}%) calc(50% + ${layout?.background_image_offset_y || 0}%)`,
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Badge Overlay - positioned badges from layout configuration */}
+            {layout?.badge_layout && layout.badge_layout.length > 0 && (
+              <div className="absolute inset-0 pointer-events-none">
+                {layout.badge_layout.map((badge: any, idx: number) => (
+                  <div
+                    key={badge.stat}
+                    className="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg border-2 border-white"
+                    style={{
+                      left: `${badge.x}%`,
+                      top: `${badge.y}%`,
+                      backgroundColor: layout.badge_colors[idx % layout.badge_colors.length],
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                  >
+                    {badge.stat[0].toUpperCase()}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Content Section */}
+          <div className="p-4">
+            {/* Name */}
+            <h3
+              className="text-lg font-bold mb-2 line-clamp-2"
+              style={{ color: textColor }}
+            >
+              {character.name}
+            </h3>
+
+            {/* Class and Race */}
+            <div className="space-y-1 mb-3">
+              {character.class_name && (
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-semibold">Class:</span> {character.class_name}
+                </p>
+              )}
+              {character.race && (
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-semibold">Race:</span> {character.race}
+                </p>
+              )}
+            </div>
+
+            {/* Level Badge */}
+            {character.level && (
+              <div className="flex items-center gap-2">
+                <span
+                  className="px-3 py-1 rounded-full text-white text-sm font-semibold"
+                  style={{ backgroundColor: badgeColor }}
+                >
+                  Level {character.level}
+                </span>
+              </div>
+            )}
+
+            {/* Player Name */}
+            {character.player_name && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                Player: {character.player_name}
+              </p>
+            )}
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  // ============================================
+  // SIMPLE LAYOUT RENDERING (Default)
+  // ============================================
+
   return (
     <Link href={`/campaigns/${campaignSlug}/characters/${character.slug}`}>
       <div
@@ -42,7 +164,7 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
         <div
           className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-700"
           style={{
-            height: cardType === 'enhanced' ? '280px' : '200px'
+            height: '200px'
           }}
         >
           {character.image_url ? (

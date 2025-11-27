@@ -279,10 +279,11 @@ export default function CardLayoutPage() {
       <div className="bg-white dark:bg-gray-900 shadow dark:shadow-lg border-b border-gray-200 dark:border-gray-800 border-t-2 border-t-purple-500/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Card Preview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Show cards for each card type to compare */}
+
+          {/* Show only the selected card type preview */}
+          {layout.card_type === 'simple' ? (
             <div>
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Simple Card Style</div>
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Simple Card Style - Compact display with just character info</div>
               <div className="max-w-sm">
                 <CardPreview
                   layout={{
@@ -292,15 +293,14 @@ export default function CardLayoutPage() {
                 />
               </div>
             </div>
-
-            {/* Enhanced Card Preview */}
+          ) : (
             <div>
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enhanced Card Style (Current Selection)</div>
-              <div className="max-w-md">
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Enhanced Card Style - Rich visual design with background image and positioned badges</div>
+              <div className="max-w-2xl">
                 <CardPreview layout={layout} />
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

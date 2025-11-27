@@ -22,6 +22,8 @@ interface Layout {
   image_width_percent: number;
   image_aspect_ratio: 'square' | 'portrait' | 'landscape';
   background_image_url?: string;
+  background_image_offset_x?: number;
+  background_image_offset_y?: number;
   border_colors: string[];
   badge_colors: string[];
   text_color: string;
@@ -29,22 +31,6 @@ interface Layout {
 }
 
 export default function CardPreview({ layout }: { layout: Layout }) {
-  const getImageHeight = () => {
-    switch (layout.image_aspect_ratio) {
-      case 'portrait':
-        return 'h-96';
-      case 'landscape':
-        return 'h-48';
-      case 'square':
-      default:
-        return 'h-64';
-    }
-  };
-
-  const visibleStats = layout.stats_config
-    .filter((s) => s.visible)
-    .sort((a, b) => a.order - b.order);
-
   const borderStyle = {
     borderLeft: `4px solid ${layout.border_colors[0]}`,
   };
@@ -103,29 +89,33 @@ export default function CardPreview({ layout }: { layout: Layout }) {
     );
   }
 
-  // Enhanced Card - shows background image with badge positioning overlay
+  // Enhanced Card - shows background image with character image and badges positioned on it
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow" style={borderStyle}>
-      {/* Background + Badge Positioning Canvas */}
+    <div
+      className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700"
+      style={borderStyle}
+    >
+      {/* Background Image Container with Badge Overlay */}
       <div
-        className="relative w-full"
+        className="relative w-full overflow-hidden"
         style={{
           height: '300px',
           backgroundImage: layout.background_image_url
             ? `url(${layout.background_image_url})`
             : 'linear-gradient(135deg, rgb(229, 231, 235), rgb(209, 213, 219))',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: `calc(50% + ${layout?.background_image_offset_x || 0}%) calc(50% + ${layout?.background_image_offset_y || 0}%)`,
         }}
       >
+        {/* Dark overlay for readability */}
         <div className="absolute inset-0 bg-black bg-opacity-20" />
 
-        {/* Character Image Container - positioned at top-left */}
+        {/* Character Image - positioned at top-left with configurable width */}
         <div
-          className="absolute left-4 top-4 rounded-lg overflow-hidden shadow-lg border-2"
+          className="absolute left-4 top-4 rounded-lg overflow-hidden shadow-lg border-2 group-hover:scale-105 transition-transform"
           style={{
-            width: `${layout.image_width_percent}%`,
-            height: '120px',
+            width: `${layout.image_width_percent || 30}%`,
+            height: `${layout.image_width_percent || 30}%`,
             borderColor: layout.border_colors[0],
           }}
         >
@@ -134,13 +124,13 @@ export default function CardPreview({ layout }: { layout: Layout }) {
           </div>
         </div>
 
-        {/* Badge Preview Area - Show All Badges */}
-        {layout.badge_layout.length > 0 && (
+        {/* Badge Overlay - positioned badges from layout configuration */}
+        {layout.badge_layout && layout.badge_layout.length > 0 && (
           <div className="absolute inset-0 pointer-events-none">
-            {layout.badge_layout.map((badge, idx) => (
+            {layout.badge_layout.map((badge: any, idx: number) => (
               <div
                 key={badge.stat}
-                className="absolute w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg border-2 border-white"
+                className="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg border-2 border-white"
                 style={{
                   left: `${badge.x}%`,
                   top: `${badge.y}%`,
@@ -153,42 +143,42 @@ export default function CardPreview({ layout }: { layout: Layout }) {
             ))}
           </div>
         )}
-
-        {/* Help Text if no badges */}
-        {layout.badge_layout.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center text-white text-sm font-medium drop-shadow-lg">
-              <p>No badges configured</p>
-              <p className="text-xs opacity-80">Configure badges below</p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Content Section */}
-      <div className="p-4 bg-white dark:bg-gray-800">
-        <h3 className="text-lg font-bold mb-2 line-clamp-2" style={textStyle}>
+      <div className="p-4">
+        {/* Name */}
+        <h3
+          className="text-lg font-bold mb-2 line-clamp-2"
+          style={textStyle}
+        >
           Character Name
         </h3>
 
-        <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-          <div>
-            <span className="font-medium">Class:</span> Wizard
-          </div>
-          <div>
-            <span className="font-medium">Race:</span> Elf
-          </div>
-          <div>
-            <span className="font-medium">Level:</span> 5
-          </div>
+        {/* Class and Race */}
+        <div className="space-y-1 mb-3">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold">Class:</span> Wizard
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="font-semibold">Race:</span> Elf
+          </p>
         </div>
-      </div>
 
-      {/* Info Message */}
-      <div className="px-4 pb-4 text-xs text-gray-500 dark:text-gray-400">
-        {layout.badge_layout.length === 0 && (
-          <div className="text-purple-600 dark:text-purple-400">Configure badge positions to see preview</div>
-        )}
+        {/* Level Badge */}
+        <div className="flex items-center gap-2">
+          <span
+            className="px-3 py-1 rounded-full text-white text-sm font-semibold"
+            style={{ backgroundColor: layout.badge_colors[0] }}
+          >
+            Level 5
+          </span>
+        </div>
+
+        {/* Player Name */}
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+          Player: John
+        </p>
       </div>
     </div>
   );
