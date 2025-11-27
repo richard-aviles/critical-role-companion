@@ -364,6 +364,8 @@ class CharacterLayoutResponse(BaseModel):
     image_width_percent: int
     image_aspect_ratio: str
     background_image_url: Optional[str]
+    background_image_offset_x: int = 0
+    background_image_offset_y: int = 0
     border_color_count: int
     border_colors: List[str]
     badge_colors: List[str]

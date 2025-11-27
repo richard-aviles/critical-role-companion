@@ -1,8 +1,8 @@
 # Critical Role Companion - Project Status
 
-**Last Updated:** 2025-11-24 (Session 10 - Phase 2 & 3 Styling In Progress)
-**Current Phase:** Phase 2 & 3 (Design System & Styling) - IN PROGRESS 🎨
-**Status:** Epic Fantasy color palette applied to 9 major components. Dark mode fully supported. TypeScript: 0 errors. 24% complete. Remaining: 28+ components and 8+ pages for tomorrow.
+**Last Updated:** 2025-11-27 (Session 11 - Production Deployment & Feature Planning)
+**Current Phase:** Phase 3 Tier 4 (Production Deployment & New Features) - IN PROGRESS 🚀
+**Status:** Application deployed to production (Vercel + Fly.io). Domain registration in progress. Two new features planned and documented.
 
 ---
 
@@ -33,11 +33,12 @@
 
 ## 🏗️ Architecture
 
-- **Frontend:** Next.js 14 (TypeScript, TailwindCSS, shadcn/ui) - NOT YET BUILT
-- **Backend:** FastAPI (Python) - BEING REFACTORED
-- **Database:** PostgreSQL via Neon - ✅ CONNECTED
-- **Image Storage:** Cloudflare R2 - NOT YET SET UP
-- **Deployment:** Fly.io (both frontend + backend)
+- **Frontend:** Next.js 14 (TypeScript, TailwindCSS, shadcn/ui) - ✅ DEPLOYED TO VERCEL
+- **Backend:** FastAPI (Python) - ✅ DEPLOYED TO FLY.IO
+- **Database:** PostgreSQL via Neon - ✅ CONNECTED & IN PRODUCTION
+- **Image Storage:** Cloudflare R2 - ✅ CONFIGURED & WORKING
+- **Deployment:** Vercel (frontend) + Fly.io (backend)
+- **Domain:** mythweavercompanion.com (registration in progress)
 - **DNS/CDN:** Cloudflare
 
 ---
@@ -280,13 +281,59 @@
 - **Dark Mode Support:** 100% of updated components
 - **Accessibility:** WCAG AA compliant
 
-#### ⏳ Tier 3 Continued: Public Campaign Pages (Next Priority - Session 11)
-- [ ] Update all 5 public campaign pages with Epic Fantasy colors
-- [ ] Add dark mode to all public pages
-- [ ] Update all 8 admin pages with consistent styling
-- [ ] Polish utility components
-- [ ] Comprehensive testing in light and dark modes
-- [ ] Accessibility validation
+#### ⏳ Tier 4: Production Deployment & New Features (Current - Session 11)
+**Status:** Deployment complete, two new features identified and documented
+
+##### ✅ Deployment Completed
+- ✅ Backend deployed to Fly.io at `https://cr-overlay-staging-bold-feather-4496.fly.dev`
+- ✅ Frontend deployed to Vercel with automatic GitHub integration
+- ✅ Environment variables configured (DATABASE_URL, R2 credentials, API endpoints)
+- ✅ Production database (Neon PostgreSQL) connected and verified
+- ✅ Production image storage (Cloudflare R2) configured and working
+- ✅ CORS middleware configured for production
+- ✅ Docker containerization working for backend
+
+##### 🎯 New Features Identified (To Be Implemented)
+###### Feature 1: Sync Card Layout to Public Pages
+**Problem:** The public character display pages do not currently show the card layout type (simple vs enhanced) that was selected in the admin card layout editor.
+
+**Requirements:**
+- Fetch card_type from CharacterLayout when displaying public character cards
+- Apply the correct card layout (Simple vs Enhanced) to PublicCharacterCard component
+- Ensure all layout styling (colors, badges, positioning) is applied to public pages
+- Maintain responsive design on mobile/tablet/desktop
+
+**Affected Files:**
+- `frontend/src/components/PublicCharacterCard.tsx` - Add card_type support
+- `frontend/src/app/campaigns/[slug]/characters/page.tsx` - Fetch and apply layouts
+- `frontend/src/app/campaigns/[slug]/characters/[character-slug]/page.tsx` - Fetch and apply layouts
+- `backend/main.py` - Ensure character endpoints include card_type data
+
+###### Feature 2: Image Position Control
+**Problem:** Character background images default to center position, which often cuts off the character's head/face. Users need the ability to manually adjust image position (move up/down and left/right).
+
+**Requirements:**
+- Add background_image_offset_x and background_image_offset_y fields to CharacterLayout model
+- Create UI controls (sliders) in ImageSettingsPanel for position adjustment
+- Display live preview of positioned image
+- Apply positioning when rendering cards
+- Support both simple and enhanced card layouts
+
+**Affected Files:**
+- `backend/models.py` - Add offset fields to CharacterLayout
+- `backend/alembic/versions/` - New migration for image positioning
+- `backend/main.py` - Update endpoints to handle offsets
+- `backend/schemas.py` - Add offset fields to Pydantic schemas
+- `frontend/src/components/ImageSettingsPanel.tsx` - Add position sliders
+- `frontend/src/components/PublicCharacterCard.tsx` - Apply positioning
+- `frontend/src/components/CardPreview.tsx` - Update preview
+
+##### 📋 Next Steps for Tier 4 (Session 12+)
+- [ ] Implement Feature 1: Sync Card Layout to Public Pages
+- [ ] Implement Feature 2: Image Position Control
+- [ ] Comprehensive testing on production URLs
+- [ ] Update public pages with Epic Fantasy colors
+- [ ] Accessibility validation for new features
 
 ---
 

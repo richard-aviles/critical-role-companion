@@ -51,6 +51,9 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
               alt={character.name}
               fill
               className="object-cover group-hover:scale-105 transition-transform"
+              style={{
+                objectPosition: `calc(50% + ${layout?.background_image_offset_x || 0}%) calc(50% + ${layout?.background_image_offset_y || 0}%)`
+              }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-700">

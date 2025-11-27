@@ -332,6 +332,10 @@ class CharacterLayout(Base):
     # NEW: Optional background image for enhanced cards
     background_image_url = Column(String(500), nullable=True)
 
+    # NEW: Image position offsets for background image positioning (Phase 3.4)
+    background_image_offset_x = Column(Integer, nullable=False, default=0)  # -100 to 100, % offset from center
+    background_image_offset_y = Column(Integer, nullable=False, default=0)  # -100 to 100, % offset from center
+
     # Color scheme
     border_color_count = Column(Integer, default=2, nullable=False)  # 2 or 4 colors for gradient
     border_colors = Column(JSONB, nullable=False, default={})  # List of hex codes for card/frame border

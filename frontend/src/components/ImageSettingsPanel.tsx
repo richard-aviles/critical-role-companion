@@ -8,17 +8,21 @@ interface ImageSettingsPanelProps {
   widthPercent: number;
   aspectRatio: 'square' | 'portrait' | 'landscape';
   backgroundImageUrl?: string;
+  backgroundImageOffsetX?: number;
+  backgroundImageOffsetY?: number;
   campaignId?: string;
   layoutId?: string;
   onWidthChange: (width: number) => void;
   onAspectRatioChange: (ratio: 'square' | 'portrait' | 'landscape') => void;
-  onBackgroundImageChange: (url: string | undefined) => void;
+  onBackgroundImageChange: (data: { url?: string; offset_x?: number; offset_y?: number }) => void;
 }
 
 export default function ImageSettingsPanel({
   widthPercent,
   aspectRatio,
   backgroundImageUrl,
+  backgroundImageOffsetX = 0,
+  backgroundImageOffsetY = 0,
   campaignId,
   layoutId,
   onWidthChange,
@@ -28,6 +32,8 @@ export default function ImageSettingsPanel({
   console.log('[ImageSettingsPanel] Rendering:', { campaignId, layoutId, backgroundImageUrl });
 
   const [preview, setPreview] = useState<string | null>(backgroundImageUrl || null);
+  const [offsetX, setOffsetX] = useState<number>(backgroundImageOffsetX);
+  const [offsetY, setOffsetY] = useState<number>(backgroundImageOffsetY);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -61,14 +67,14 @@ export default function ImageSettingsPanel({
         const result = await uploadLayoutBackgroundImage(campaignId, layoutId, file);
         setPreview(result.url);
         setSelectedFile(file);
-        onBackgroundImageChange(result.url);
+        onBackgroundImageChange({ url: result.url, offset_x: offsetX, offset_y: offsetY });
       } else {
         console.log('[ImageSettingsPanel.handleFileSelect] Using local preview (no layoutId yet)');
         // Fallback: just generate local preview
         const previewUrl = await generateImagePreview(file);
         setPreview(previewUrl);
         setSelectedFile(file);
-        onBackgroundImageChange(previewUrl);
+        onBackgroundImageChange({ url: previewUrl, offset_x: offsetX, offset_y: offsetY });
       }
     } catch (err: any) {
       const errorMsg = err.message || 'Failed to upload image';
@@ -128,7 +134,9 @@ export default function ImageSettingsPanel({
     setPreview(null);
     setSelectedFile(null);
     setError(null);
-    onBackgroundImageChange(undefined);
+    setOffsetX(0);
+    setOffsetY(0);
+    onBackgroundImageChange({ url: undefined, offset_x: 0, offset_y: 0 });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -176,6 +184,49 @@ export default function ImageSettingsPanel({
         </div>
       </div>
 
+      {/* Image Position Sliders - Only show when preview exists */}
+      {preview && (
+        <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          {/* Horizontal Position Slider */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Horizontal Position: {offsetX}%
+            </label>
+            <input
+              type="range"
+              min="-100"
+              max="100"
+              value={offsetX}
+              onChange={(e) => setOffsetX(parseInt(e.target.value))}
+              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-600 dark:accent-purple-500"
+              disabled={isUploading}
+            />
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Negative = move left, Positive = move right
+            </div>
+          </div>
+
+          {/* Vertical Position Slider */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Vertical Position: {offsetY}%
+            </label>
+            <input
+              type="range"
+              min="-100"
+              max="100"
+              value={offsetY}
+              onChange={(e) => setOffsetY(parseInt(e.target.value))}
+              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-600 dark:accent-purple-500"
+              disabled={isUploading}
+            />
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Negative = move up, Positive = move down
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Background Image Upload */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -196,11 +247,14 @@ export default function ImageSettingsPanel({
         {/* Preview or drop zone */}
         {preview ? (
           <div className="relative">
-            <div className="relative w-full h-40 rounded-lg border-2 border-purple-300 dark:border-purple-700 shadow-lg overflow-hidden">
+            <div className="relative w-full h-40 rounded-lg border-2 border-purple-300 dark:border-purple-700 shadow-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
               <img
                 src={preview}
                 alt="Background preview"
                 className="w-full h-full object-cover"
+                style={{
+                  objectPosition: `calc(50% + ${offsetX}%) calc(50% + ${offsetY}%)`
+                }}
               />
               {isUploading && (
                 <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
