@@ -9,32 +9,35 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getPublicCharacter, getPublicCampaign } from '@/lib/api';
+import { getPublicCharacter, getPublicCampaign, getPublicCampaignLayout } from '@/lib/api';
 
 function CharacterDetailPageContent() {
   const params = useParams<{ slug: string; 'character-slug': string }>();
   const [character, setCharacter] = useState<any | null>(null);
   const [campaign, setCampaign] = useState<any | null>(null);
+  const [layout, setLayout] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const campaignSlug = params.slug;
   const characterSlug = params['character-slug'];
 
-  // Fetch character and campaign data
+  // Fetch character, campaign, and layout data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const [characterData, campaignData] = await Promise.all([
+        const [characterData, campaignData, layoutData] = await Promise.all([
           getPublicCharacter(campaignSlug, characterSlug),
           getPublicCampaign(campaignSlug),
+          getPublicCampaignLayout(campaignSlug),
         ]);
 
         setCharacter(characterData);
         setCampaign(campaignData);
+        setLayout(layoutData);
       } catch (err: any) {
         setError(err.message || 'Failed to load character');
       } finally {
