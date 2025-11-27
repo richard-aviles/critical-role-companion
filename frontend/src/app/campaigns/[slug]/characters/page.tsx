@@ -42,6 +42,7 @@ function CharacterRosterPageContent() {
         setCharacters(charactersData);
         setFilteredCharacters(charactersData); // Initialize with all characters
         setLayout(layoutData);
+        console.log('[CharacterRoster] Layout data received:', layoutData);
       } catch (err: any) {
         setError(err.message || 'Failed to load characters');
       } finally {

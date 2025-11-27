@@ -115,8 +115,8 @@ export default function CardPreview({ layout }: { layout: Layout }) {
         <div
           className="absolute left-4 top-4 rounded-lg overflow-hidden shadow-lg border-2 group-hover:scale-105 transition-transform"
           style={{
-            width: `${layout.image_width_percent || 30}%`,
-            height: `${layout.image_width_percent || 30}%`,
+            width: `${layout.image_width_percent || 35}%`,
+            aspectRatio: '1',
             borderColor: layout.border_colors[0],
           }}
         >

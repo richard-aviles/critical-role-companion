@@ -15,6 +15,15 @@ interface PublicCharacterCardProps {
 }
 
 export function PublicCharacterCard({ character, campaignSlug, layout }: PublicCharacterCardProps) {
+  // Debug: Log layout props for this character
+  if (layout?.card_type === 'enhanced') {
+    console.log(`[PublicCharacterCard] ${character.name} - Enhanced layout:`, {
+      card_type: layout.card_type,
+      background_image_url: layout.background_image_url,
+      image_width_percent: layout.image_width_percent,
+    });
+  }
+
   // Styling hierarchy: character override > campaign layout > default
   // Character-level customization takes precedence
   const borderColor = character.color_theme_override?.border_colors?.[0] ||
@@ -63,8 +72,8 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
               <div
                 className="absolute left-4 top-4 rounded-lg overflow-hidden shadow-lg border-2 group-hover:scale-105 transition-transform"
                 style={{
-                  width: `${layout?.image_width_percent || 30}%`,
-                  height: `${layout?.image_width_percent || 30}%`,
+                  width: `${layout?.image_width_percent || 35}%`,
+                  aspectRatio: '1',
                   borderColor: borderColor,
                 }}
               >
