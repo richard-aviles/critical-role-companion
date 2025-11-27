@@ -186,6 +186,8 @@ export interface Character {
   backstory?: string;
   image_url?: string;
   image_r2_key?: string;
+  background_image_url?: string;
+  background_image_r2_key?: string;
   level?: number;
   is_active?: boolean;
   color_theme_override?: ColorThemeOverride | null;
@@ -374,6 +376,45 @@ export const deleteCharacter = async (campaignId: string, characterId: string, a
       throw new Error(error.response.data.detail);
     }
     throw new Error('Failed to delete character');
+  }
+};
+
+/**
+ * Upload character background image
+ * Separate endpoint for uploading background images to R2
+ */
+export const uploadCharacterBackgroundImage = async (
+  campaignId: string,
+  characterId: string,
+  file: File,
+  adminToken?: string
+): Promise<Character> => {
+  try {
+    // Create FormData for multipart upload
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Use campaign admin token for this request if provided
+    const config = adminToken ? { headers: { 'X-Token': adminToken } } : {};
+
+    console.log('[API] Uploading background image to:', `/campaigns/${campaignId}/characters/${characterId}/background`);
+    const response = await apiClient.post(
+      `/campaigns/${campaignId}/characters/${characterId}/background`,
+      formData,
+      config
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Character not found');
+    }
+    if (error.response?.status === 403) {
+      throw new Error('You do not have permission to update this character');
+    }
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail);
+    }
+    throw new Error('Failed to upload background image');
   }
 };
 
@@ -633,6 +674,28 @@ export const getPublicCharacters = async (campaignSlug: string): Promise<Charact
       throw new Error('Campaign not found');
     }
     throw new Error('Failed to fetch characters');
+  }
+};
+
+/**
+ * Get campaign default character layout for public display (public - no auth required)
+ */
+export const getPublicCampaignLayout = async (campaignSlug: string): Promise<any> => {
+  try {
+    const response = await apiClient.get(`/public/campaigns/${campaignSlug}/layout`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      throw new Error('Campaign not found');
+    }
+    // If layout fetch fails, return a safe default
+    console.warn('Failed to fetch campaign layout, using defaults');
+    return {
+      card_type: 'simple',
+      border_colors: ['#3b82f6'],
+      badge_colors: ['#3b82f6'],
+      text_color: '#1f2937',
+    };
   }
 };
 
@@ -912,6 +975,46 @@ export const updateCharacterLayout = async (campaignId: string, layoutId: string
   } catch (error: any) {
     const errorDetail = error.response?.data?.detail || error.response?.data?.message || JSON.stringify(error.response?.data) || error.message;
     console.error('Failed to update character layout:', { error, detail: errorDetail, response: error.response?.data });
+    throw new Error(errorDetail);
+  }
+};
+
+export const uploadLayoutBackgroundImage = async (campaignId: string, layoutId: string, file: File) => {
+  try {
+    const url = `/campaigns/${campaignId}/character-layouts/${layoutId}/background`;
+    const token = localStorage.getItem(`campaign_${campaignId}_token`) || '';
+
+    console.log('[uploadLayoutBackgroundImage] Starting upload:', {
+      campaignId,
+      layoutId,
+      url,
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      hasToken: !!token,
+    });
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Don't manually set Content-Type - let browser set it with boundary
+    const config = { headers: { 'X-Token': token } };
+    const response = await apiClient.post(url, formData, config);
+
+    console.log('[uploadLayoutBackgroundImage] Upload successful:', response.data);
+    return response.data;
+  } catch (error: any) {
+    const errorDetail = error.response?.data?.detail || error.response?.data?.message || JSON.stringify(error.response?.data) || error.message;
+    const status = error.response?.status;
+
+    console.error('[uploadLayoutBackgroundImage] Upload failed:', {
+      campaignId,
+      layoutId,
+      status,
+      detail: errorDetail,
+      fullResponse: error.response?.data,
+      requestUrl: error.config?.url,
+    });
     throw new Error(errorDetail);
   }
 };

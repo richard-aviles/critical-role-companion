@@ -1,5 +1,5 @@
 """
-Critical Role Companion - FastAPI Backend
+Mythweaver Studio - FastAPI Backend
 Multi-tenant D&D campaign companion with real-time WebSocket updates
 """
 
@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List, Set
 from io import BytesIO
 
-from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File, Header, Form, Request
+from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File, Header, Form, Request, Path
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -35,7 +35,7 @@ from episodes import router as episodes_router
 # ============================================================================
 
 app = FastAPI(
-    title="Critical Role Companion API",
+    title="Mythweaver Studio API",
     version=os.getenv("COMMIT_SHA", "dev"),
     description="Multi-tenant D&D campaign companion API"
 )
@@ -81,7 +81,7 @@ def startup():
 # AUTHENTICATION & HELPERS
 # ============================================================================
 
-def verify_campaign_token(campaign_id: str, token: str = Header(None, alias="X-Token"), db: Session = Depends(get_db), request: Request = None) -> Campaign:
+def verify_campaign_token(campaign_id: str = Path(...), token: str = Header(None, alias="X-Token"), db: Session = Depends(get_db), request: Request = None) -> Campaign:
     """
     Verify admin token and return campaign
     Must be called on admin-only endpoints
@@ -108,6 +108,30 @@ def verify_campaign_token(campaign_id: str, token: str = Header(None, alias="X-T
     return campaign
 
 
+# Alternative dependency factory approach for cases where Path() doesn't work
+def make_verify_campaign_token(campaign_id: str):
+    """Factory to create a campaign token verifier with campaign_id bound"""
+    async def verify(token: str = Header(None, alias="X-Token"), db: Session = Depends(get_db)) -> Campaign:
+        if not token:
+            raise HTTPException(status_code=401, detail="Missing X-Token header")
+
+        try:
+            campaign_uuid = uuid.UUID(campaign_id)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid campaign ID format")
+
+        campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
+        if not campaign:
+            raise HTTPException(status_code=404, detail="Campaign not found")
+
+        if campaign.admin_token != token:
+            raise HTTPException(status_code=403, detail="Invalid token")
+
+        return campaign
+
+    return verify
+
+
 # ============================================================================
 # HEALTH & VERSION
 # ============================================================================
@@ -127,6 +151,25 @@ def version():
         "timestamp": datetime.utcnow().isoformat()
     }
 
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+def pydantic_to_dict(obj):
+    """Convert Pydantic models and nested structures to dictionaries for JSON serialization"""
+    if obj is None:
+        return None
+    elif isinstance(obj, dict):
+        return {k: pydantic_to_dict(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [pydantic_to_dict(item) for item in obj]
+    elif hasattr(obj, 'model_dump'):  # Pydantic v2
+        return pydantic_to_dict(obj.model_dump())
+    elif hasattr(obj, 'dict'):  # Pydantic v1
+        return pydantic_to_dict(obj.dict())
+    else:
+        return obj
 
 # ============================================================================
 # AUTHENTICATION ENDPOINTS
@@ -985,8 +1028,9 @@ async def upload_background(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
-    # Update character
-    character.background_url = url
+    # Update character - use correct field name
+    character.background_image_url = url
+    character.background_image_r2_key = key
     character.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(character)
@@ -997,11 +1041,7 @@ async def upload_background(
         "character": character.to_dict()
     })
 
-    return {
-        "url": url,
-        "character_id": str(character.id),
-        "message": "Background uploaded successfully"
-    }
+    return character.to_dict()
 
 
 # ============================================================================
@@ -1466,7 +1506,7 @@ async def create_character_layout(
         print(f"Other defaults unset")
 
     print(f"Creating layout object...")
-    # Convert Pydantic models to dicts for JSON serialization
+    # Convert Pydantic models to dicts for JSON serialization (recursively)
     stats_config_list = payload.stats_config or [
         {"key": "str", "label": "STR", "visible": True, "order": 0},
         {"key": "dex", "label": "DEX", "visible": True, "order": 1},
@@ -1475,9 +1515,10 @@ async def create_character_layout(
         {"key": "wis", "label": "WIS", "visible": True, "order": 4},
         {"key": "cha", "label": "CHA", "visible": True, "order": 5},
     ]
-    stats_config_dicts = [s.dict() if hasattr(s, 'dict') else s for s in stats_config_list]
 
-    badge_layout_dicts = [b.dict() if hasattr(b, 'dict') else b for b in (payload.badge_layout or [])]
+    # Use the helper function to recursively convert all Pydantic models
+    stats_config_dicts = pydantic_to_dict(stats_config_list)
+    badge_layout_dicts = pydantic_to_dict(payload.badge_layout or [])
 
     layout = CharacterLayout(
         campaign_id=campaign_uuid,
@@ -1490,11 +1531,12 @@ async def create_character_layout(
         image_aspect_ratio=payload.image_aspect_ratio or "square",
         background_image_url=payload.background_image_url,
         border_color_count=payload.border_color_count or 2,
-        border_colors=payload.border_colors or [],
+        border_colors=pydantic_to_dict(payload.border_colors or []),
+        badge_colors=pydantic_to_dict(payload.badge_colors or []),
         text_color=payload.text_color or "#FFFFFF",
-        badge_interior_gradient=payload.badge_interior_gradient or {},
-        hp_color=payload.hp_color or {},
-        ac_color=payload.ac_color or {},
+        badge_interior_gradient=pydantic_to_dict(payload.badge_interior_gradient or {}),
+        hp_color=pydantic_to_dict(payload.hp_color or {}),
+        ac_color=pydantic_to_dict(payload.ac_color or {}),
         badge_layout=badge_layout_dicts,
         color_preset=payload.color_preset,
     )
@@ -1563,6 +1605,58 @@ def get_character_layout(
     return layout.to_dict()
 
 
+@app.post("/campaigns/{campaign_id}/character-layouts/{layout_id}/background")
+async def upload_layout_background(
+    campaign_id: str,
+    layout_id: str,
+    file: UploadFile = File(...),
+    campaign: Campaign = Depends(verify_campaign_token),
+    db: Session = Depends(get_db)
+):
+    """Upload background image for character layout (admin only)"""
+    try:
+        layout_uuid = uuid.UUID(layout_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid layout ID")
+
+    # Verify layout exists and belongs to campaign
+    layout = db.query(CharacterLayout).filter(
+        and_(CharacterLayout.id == layout_uuid, CharacterLayout.campaign_id == campaign.id)
+    ).first()
+
+    if not layout:
+        raise HTTPException(status_code=404, detail="Layout not found")
+
+    # Read and validate file
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:  # 5MB limit
+        raise HTTPException(status_code=400, detail="File too large (max 5MB)")
+
+    # Validate file type
+    valid_types = ["image/jpeg", "image/png", "image/webp"]
+    if file.content_type not in valid_types:
+        raise HTTPException(status_code=400, detail="Invalid file type (jpg, png, webp only)")
+
+    # Upload to R2
+    try:
+        key = f"{campaign.slug}/layouts/{str(layout.id)}-background.webp"
+        url = s3_client.upload_image(key, contents, file.content_type)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
+
+    # Update layout
+    layout.background_image_url = url
+    layout.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(layout)
+
+    return {
+        "url": url,
+        "layout_id": str(layout.id),
+        "message": "Background uploaded successfully"
+    }
+
+
 @app.patch("/campaigns/{campaign_id}/character-layouts/{layout_id}", response_model=CharacterLayoutResponse)
 async def update_character_layout(
     campaign_id: str,
@@ -1600,7 +1694,17 @@ async def update_character_layout(
     if payload.card_type is not None:
         layout.card_type = payload.card_type
     if payload.stats_config is not None:
-        layout.stats_config = payload.stats_config
+        stats_config_dicts = []
+        for s in payload.stats_config:
+            if isinstance(s, dict):
+                stats_config_dicts.append(s)
+            elif hasattr(s, 'model_dump'):
+                stats_config_dicts.append(s.model_dump())
+            elif hasattr(s, 'dict'):
+                stats_config_dicts.append(s.dict())
+            else:
+                stats_config_dicts.append(s)
+        layout.stats_config = stats_config_dicts
     if payload.stats_to_display is not None:
         layout.stats_to_display = payload.stats_to_display
     if payload.image_width_percent is not None:
@@ -1613,6 +1717,8 @@ async def update_character_layout(
         layout.border_color_count = payload.border_color_count
     if payload.border_colors is not None:
         layout.border_colors = payload.border_colors
+    if payload.badge_colors is not None:
+        layout.badge_colors = payload.badge_colors
     if payload.text_color is not None:
         layout.text_color = payload.text_color
     if payload.badge_interior_gradient is not None:
@@ -1622,7 +1728,17 @@ async def update_character_layout(
     if payload.ac_color is not None:
         layout.ac_color = payload.ac_color
     if payload.badge_layout is not None:
-        layout.badge_layout = [b.dict() if hasattr(b, 'dict') else b for b in payload.badge_layout]
+        badge_layout_dicts = []
+        for b in payload.badge_layout:
+            if isinstance(b, dict):
+                badge_layout_dicts.append(b)
+            elif hasattr(b, 'model_dump'):
+                badge_layout_dicts.append(b.model_dump())
+            elif hasattr(b, 'dict'):
+                badge_layout_dicts.append(b.dict())
+            else:
+                badge_layout_dicts.append(b)
+        layout.badge_layout = badge_layout_dicts
     if payload.color_preset is not None:
         layout.color_preset = payload.color_preset
 
@@ -2027,6 +2143,37 @@ def get_public_characters(slug: str, db: Session = Depends(get_db)):
     ).all()
 
     return [c.to_dict() for c in characters]
+
+
+@app.get("/public/campaigns/{slug}/layout")
+def get_public_campaign_layout(slug: str, db: Session = Depends(get_db)):
+    """
+    Get default campaign character layout for public display (public - no auth required)
+    Returns: CharacterLayout object with styling configuration
+    """
+    campaign = db.query(Campaign).filter(Campaign.slug == slug).first()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    # Get the default layout for the campaign
+    layout = db.query(CharacterLayout).filter(
+        and_(CharacterLayout.campaign_id == campaign.id, CharacterLayout.is_default == True)
+    ).first()
+
+    if not layout:
+        # If no default layout exists, return a minimal response
+        return {
+            "id": None,
+            "campaign_id": str(campaign.id),
+            "name": "Default",
+            "is_default": True,
+            "card_type": "simple",
+            "border_colors": ["#3b82f6"],
+            "badge_colors": ["#3b82f6"],
+            "text_color": "#1f2937",
+        }
+
+    return layout.to_dict()
 
 
 @app.get("/public/campaigns/{slug}/characters/{character_slug}")
