@@ -50,9 +50,9 @@ function CharacterDetailPageContent() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-sky-50 to-blue-50 dark:from-gray-950 dark:via-sky-950/20 dark:to-blue-950/20">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-950 dark:to-purple-950/20">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-4 border-sky-700 dark:border-sky-500 border-t-transparent rounded-full mx-auto shadow-lg"></div>
+          <div className="animate-spin h-12 w-12 border-4 border-purple-600 dark:border-purple-500 border-t-transparent rounded-full mx-auto shadow-primary"></div>
           <p className="mt-4 text-gray-700 dark:text-gray-300 font-medium">Loading character...</p>
         </div>
       </div>
@@ -62,7 +62,7 @@ function CharacterDetailPageContent() {
   // Error state
   if (error || !character || !campaign) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-sky-50 to-blue-50 dark:from-gray-950 dark:via-sky-950/20 dark:to-blue-950/20">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-950 dark:to-purple-950/20">
         <div className="text-center max-w-md bg-white dark:bg-gray-900 rounded-xl shadow-elevated p-8 border border-gray-200 dark:border-gray-800">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Character Not Found</h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -70,7 +70,7 @@ function CharacterDetailPageContent() {
           </p>
           <Link
             href={`/campaigns/${campaignSlug}/characters`}
-            className="inline-block px-6 py-3 bg-sky-700 dark:bg-sky-600 text-white rounded-lg hover:bg-sky-800 dark:hover:bg-sky-500 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 transition-all duration-200 font-semibold shadow-primary hover:shadow-lg hover:-translate-y-0.5 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
           >
             Back to Roster
           </Link>
@@ -86,30 +86,30 @@ function CharacterDetailPageContent() {
   const accentBgColor = character.color_theme_override?.badge_interior_gradient?.colors?.[0] || '#dbeafe';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-sky-50 to-blue-50 dark:from-gray-950 dark:via-sky-950/20 dark:to-blue-950/20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-950 dark:to-purple-950/20">
       {/* Header */}
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-sky-200 dark:border-sky-900/50 shadow-sm">
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-lg">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
-            <Link href={`/campaigns/${campaignSlug}`} className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors font-medium">
+            <Link href={`/campaigns/${campaignSlug}`} className="hover:text-purple-700 dark:hover:text-purple-300 transition-colors duration-200 font-medium">
               {campaign.name}
             </Link>
             <span>/</span>
             <Link
               href={`/campaigns/${campaignSlug}/characters`}
-              className="hover:text-sky-700 dark:hover:text-sky-400 transition-colors font-medium"
+              className="hover:text-purple-700 dark:hover:text-purple-300 transition-colors duration-200 font-medium"
             >
               Characters
             </Link>
             <span>/</span>
-            <span className="text-sky-700 dark:text-sky-300 font-semibold">{character.name}</span>
+            <span className="text-purple-700 dark:text-purple-300 font-semibold">{character.name}</span>
           </div>
 
           {/* Back button */}
           <Link
             href={`/campaigns/${campaignSlug}/characters`}
-            className="text-sky-700 dark:text-sky-400 hover:text-sky-800 dark:hover:text-sky-300 text-sm font-semibold flex items-center gap-1 transition-colors"
+            className="text-purple-700 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 text-sm font-semibold flex items-center gap-1 transition-colors duration-200"
           >
             ← Back to Roster
           </Link>
@@ -136,11 +136,11 @@ function CharacterDetailPageContent() {
                 />
               ) : (
                 <div
-                  className="w-full h-full flex items-center justify-center bg-gradient-to-br from-sky-100 to-blue-100 dark:from-sky-900/30 dark:to-blue-900/30"
+                  className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30"
                   style={{ backgroundColor: accentBgColor }}
                 >
                   <svg
-                    className="w-24 h-24 text-sky-400 dark:text-sky-500"
+                    className="w-24 h-24 text-purple-400 dark:text-purple-500"
                     fill="currentColor"
                     viewBox="0 0 24 24"
                   >
@@ -151,7 +151,7 @@ function CharacterDetailPageContent() {
             </div>
 
             {/* Quick Info Card */}
-            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg border border-sky-200 dark:border-sky-900/50 p-6">
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-800 p-6">
               {character.level && (
                 <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-sm mb-1 dark:text-gray-400" style={{ color: '#6b7280' }}>Level</p>
@@ -213,9 +213,9 @@ function CharacterDetailPageContent() {
 
             {/* Description */}
             {character.description && (
-              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg border border-sky-200 dark:border-sky-900/50 p-6 mb-8">
+              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-800 p-6 mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <span className="h-1 w-8 bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-500 dark:to-blue-500 rounded-full"></span>
+                  <span className="h-1 w-8 bg-gradient-to-r from-purple-600 to-purple-900 dark:from-purple-500 dark:to-purple-300 rounded-full"></span>
                   Overview
                 </h2>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
@@ -226,9 +226,9 @@ function CharacterDetailPageContent() {
 
             {/* Backstory */}
             {character.backstory && (
-              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg border border-sky-200 dark:border-sky-900/50 p-6 mb-8">
+              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-800 p-6 mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <span className="h-1 w-8 bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-500 dark:to-blue-500 rounded-full"></span>
+                  <span className="h-1 w-8 bg-gradient-to-r from-purple-600 to-purple-900 dark:from-purple-500 dark:to-purple-300 rounded-full"></span>
                   Backstory
                 </h2>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
@@ -239,7 +239,7 @@ function CharacterDetailPageContent() {
 
             {/* Color Override Indicator */}
             {character.color_theme_override && (
-              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg border border-sky-200 dark:border-sky-900/50 p-6">
+              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-lg dark:shadow-xl border border-gray-200 dark:border-gray-800 p-6">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Character Theme</h3>
                 <div className="flex items-center gap-4">
                   <div
@@ -258,7 +258,7 @@ function CharacterDetailPageContent() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-gray-900 to-gray-950 dark:from-gray-950 dark:to-black text-gray-300 dark:text-gray-400 py-12 mt-12 border-t border-sky-800/50 dark:border-sky-900/30">
+      <footer className="bg-gradient-to-br from-gray-900 to-gray-950 dark:from-gray-950 dark:to-black text-gray-300 dark:text-gray-400 py-12 mt-12 border-t border-gray-800 dark:border-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
           <p>&copy; {new Date().getFullYear()} Critical Role Companion. All rights reserved.</p>
         </div>

@@ -1,5 +1,5 @@
 """
-Pydantic schemas for Critical Role Companion API
+Pydantic schemas for Mythweaver Studio API
 Request/response validation and serialization
 """
 
@@ -272,6 +272,7 @@ class CharacterLayoutCreateRequest(BaseModel):
     # Color scheme
     border_color_count: int = Field(default=2, description="2 or 4 colors for gradient")
     border_colors: Optional[List[str]] = Field(default=None, description="Array of hex colors for border")
+    badge_colors: Optional[List[str]] = Field(default=None, description="Array of hex colors for stat badges (2 colors)")
     text_color: str = Field(default="#FFFFFF", description="Hex color for stat text")
     badge_interior_gradient: Optional[Dict[str, Any]] = Field(
         default=None,
@@ -342,6 +343,7 @@ class CharacterLayoutUpdateRequest(BaseModel):
     background_image_url: Optional[str] = None
     border_color_count: Optional[int] = None
     border_colors: Optional[List[str]] = None
+    badge_colors: Optional[List[str]] = None
     text_color: Optional[str] = None
     badge_interior_gradient: Optional[Dict[str, Any]] = None
     hp_color: Optional[Dict[str, Any]] = None
@@ -364,6 +366,7 @@ class CharacterLayoutResponse(BaseModel):
     background_image_url: Optional[str]
     border_color_count: int
     border_colors: List[str]
+    badge_colors: List[str]
     text_color: str
     badge_interior_gradient: Dict[str, Any]
     hp_color: Dict[str, Any]

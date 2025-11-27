@@ -5,6 +5,7 @@
 
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -29,13 +30,17 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ title }) => {
           <div className="flex items-center gap-8">
             <button
               onClick={() => router.push('/admin')}
-              className="flex items-center gap-2 hover:opacity-75 transition-opacity focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 rounded-lg p-1"
+              className="flex items-center gap-3 hover:opacity-75 transition-opacity focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50 rounded-lg p-1"
             >
-              <div className="w-8 h-8 bg-purple-600 dark:bg-purple-700 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CR</span>
-              </div>
+              <Image
+                src="/mythweaver-logo.png"
+                alt="Mythweaver Studio"
+                width={40}
+                height={40}
+                className="w-10 h-10"
+              />
               <span className="font-bold text-gray-900 dark:text-white hidden sm:inline">
-                Critical Role Companion
+                Mythweaver Studio
               </span>
             </button>
 

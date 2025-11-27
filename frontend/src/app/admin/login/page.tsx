@@ -48,7 +48,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            Critical Role Companion
+            Mythweaver Studio
           </h1>
           <p className="text-purple-100">
             {mode === 'login'

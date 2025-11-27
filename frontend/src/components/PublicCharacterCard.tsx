@@ -10,12 +10,21 @@ import { Character } from '@/lib/api';
 interface PublicCharacterCardProps {
   character: Character;
   campaignSlug: string;
+  layout?: any;
 }
 
-export function PublicCharacterCard({ character, campaignSlug }: PublicCharacterCardProps) {
-  // Get border color from color_theme_override or use default
-  const borderColor = character.color_theme_override?.border_colors?.[0] || '#3b82f6';
-  const textColor = character.color_theme_override?.text_color || '#1f2937';
+export function PublicCharacterCard({ character, campaignSlug, layout }: PublicCharacterCardProps) {
+  // Styling hierarchy: character override > campaign layout > default
+  // Character-level customization takes precedence
+  const borderColor = character.color_theme_override?.border_colors?.[0] ||
+                      layout?.border_colors?.[0] ||
+                      '#3b82f6';
+  const textColor = character.color_theme_override?.text_color ||
+                    layout?.text_color ||
+                    '#1f2937';
+  const badgeColor = character.color_theme_override?.border_colors?.[0] ||
+                     layout?.badge_colors?.[0] ||
+                     '#3b82f6';
 
   return (
     <Link href={`/campaigns/${campaignSlug}/characters/${character.slug}`}>
@@ -76,7 +85,7 @@ export function PublicCharacterCard({ character, campaignSlug }: PublicCharacter
             <div className="flex items-center gap-2">
               <span
                 className="px-3 py-1 rounded-full text-white text-sm font-semibold"
-                style={{ backgroundColor: borderColor }}
+                style={{ backgroundColor: badgeColor }}
               >
                 Level {character.level}
               </span>

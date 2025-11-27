@@ -18,8 +18,8 @@ export default function CardTypeToggle({ cardType, onChange }: CardTypeTogglePro
           className="w-4 h-4"
         />
         <div>
-          <div className="font-medium text-gray-900">Simple</div>
-          <div className="text-sm text-gray-600">Text-based character info</div>
+          <div className="font-medium text-gray-900 dark:text-white">Simple</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Text-based character info</div>
         </div>
       </label>
 
@@ -33,8 +33,8 @@ export default function CardTypeToggle({ cardType, onChange }: CardTypeTogglePro
           className="w-4 h-4"
         />
         <div>
-          <div className="font-medium text-gray-900">Enhanced</div>
-          <div className="text-sm text-gray-600">Visual badges with positioning</div>
+          <div className="font-medium text-gray-900 dark:text-white">Enhanced</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400">Visual badges with positioning</div>
         </div>
       </label>
     </div>

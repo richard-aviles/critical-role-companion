@@ -347,6 +347,27 @@ C:\Development\Twitch_CriticalRole_Project\
 
 ---
 
+## 📋 Future Upgrades & Enhancements
+
+### Phase 3 Tier 3+ Enhancements (Backlog)
+- [ ] **Gradient Colors for Badges & Borders**
+  - Support gradient backgrounds for stat badges (radial/linear gradients)
+  - Support gradient borders for portrait frames and cards
+  - Requires: Schema update for gradient objects, UI gradient editor, CardPreview updates
+  - Priority: Medium (nice-to-have visual enhancement)
+
+### Additional Planned Features
+- [ ] Real-time stat updates during streams
+- [ ] Session recording and replay system
+- [ ] Advanced character sheet integration
+- [ ] Custom badge shapes and sizes
+- [ ] Animated transitions for roster changes
+- [ ] Stream overlay integration with OBS
+- [ ] Community voting/poll system
+- [ ] Integration with DND Beyond API
+
+---
+
 ## 🚀 High-Level Roadmap
 
 | Phase | Name | Status | Est. Duration |

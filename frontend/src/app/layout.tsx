@@ -28,7 +28,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Critical Role Companion",
+  title: "Mythweaver Studio",
   description: "A campaign hub for exploring campaigns, characters, and episodes",
 };
 

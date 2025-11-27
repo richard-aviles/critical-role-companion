@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { Character, CreateCharacterData, UpdateCharacterData, ColorThemeOverride } from '@/lib/api';
 import { ImageUploadField } from './ImageUploadField';
+import { BackgroundImageUploadField } from './BackgroundImageUploadField';
 import { CharacterColorOverrideForm } from './CharacterColorOverrideForm';
 import { ColorPreset } from './ColorPresetSelector';
 
@@ -94,7 +95,7 @@ interface CharacterFormProps {
   mode: 'create' | 'edit';
   campaignId?: string;
   initialData?: Character;
-  onSubmit: (data: CreateCharacterData | UpdateCharacterData, imageFile?: File) => Promise<void>;
+  onSubmit: (data: CreateCharacterData | UpdateCharacterData, imageFile?: File, backgroundImageFile?: File) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
 }
@@ -116,6 +117,9 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
     backstory: initialData?.backstory || '',
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedBackgroundImage, setSelectedBackgroundImage] = useState<File | null>(null);
+  const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | undefined>(initialData?.background_image_url);
+  const [isBackgroundImageLoading, setIsBackgroundImageLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nameTouched, setNameTouched] = useState(false);
   const [useColorOverride, setUseColorOverride] = useState(!!initialData?.color_theme_override);
@@ -142,6 +146,20 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
   const handleImageSelect = (file: File) => {
     setSelectedImage(file);
     setError(null);
+  };
+
+  const handleBackgroundImageFileSelect = (file: File | null) => {
+    setSelectedBackgroundImage(file);
+    setError(null);
+  };
+
+  const handleBackgroundImageChange = (url: string | undefined) => {
+    setBackgroundImageUrl(url);
+    setError(null);
+  };
+
+  const handleBackgroundImageLoading = (loading: boolean) => {
+    setIsBackgroundImageLoading(loading);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -193,7 +211,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
         submitData,
       });
 
-      await onSubmit(submitData, selectedImage || undefined);
+      await onSubmit(submitData, selectedImage || undefined, selectedBackgroundImage || undefined);
     } catch (err: any) {
       setError(err.message || 'Failed to save character');
     }
@@ -382,9 +400,20 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
       <ImageUploadField
         onFileSelect={handleImageSelect}
         initialImage={initialData?.image_url}
-        label="Character Image"
+        label="Character Portrait"
         disabled={isLoading}
       />
+
+      {/* Background Image Upload */}
+      <div className="border-t pt-6">
+        <BackgroundImageUploadField
+          imageUrl={backgroundImageUrl}
+          onImageChange={handleBackgroundImageChange}
+          onFileSelect={handleBackgroundImageFileSelect}
+          onLoading={handleBackgroundImageLoading}
+          disabled={isLoading}
+        />
+      </div>
 
       {/* Form Actions */}
       <div className="flex gap-3">

@@ -80,10 +80,10 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
     <div className="space-y-6">
       {/* Current Stats */}
       <div>
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Current Stats</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Current Stats</h3>
         <div className="space-y-2">
           {sortedStats.map((stat, index) => (
-            <div key={stat.key} className="flex items-center gap-3 p-3 bg-gray-50 rounded-md">
+            <div key={stat.key} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-700 rounded-md">
               <input
                 type="checkbox"
                 checked={stat.visible}
@@ -95,7 +95,7 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
                 type="text"
                 value={stat.label}
                 onChange={(e) => handleRenameLabel(stat.key, e.target.value)}
-                className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded"
+                className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
               />
 
               <div className="flex gap-1">
@@ -130,31 +130,31 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
 
       {/* Add New Stat */}
       {stats.length < 8 && (
-        <form onSubmit={handleAddStat} className="p-4 bg-blue-50 rounded-md border border-blue-200">
-          <h3 className="text-sm font-medium text-gray-900 mb-3">Add Custom Stat</h3>
+        <form onSubmit={handleAddStat} className="p-4 bg-purple-50 dark:bg-purple-950/30 rounded-md border border-purple-200 dark:border-purple-800">
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Add Custom Stat</h3>
           <div className="flex gap-2">
             <input
               type="text"
               value={newStatKey}
               onChange={(e) => setNewStatKey(e.target.value)}
               placeholder="Key (e.g., hp, ac)"
-              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md"
+              className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />
             <input
               type="text"
               value={newStatLabel}
               onChange={(e) => setNewStatLabel(e.target.value)}
               placeholder="Label (e.g., HP, AC)"
-              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md"
+              className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+              className="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white text-sm font-medium rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors"
             >
               Add
             </button>
           </div>
-          <div className="text-xs text-gray-600 mt-2">
+          <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
             You can add up to {8 - stats.length} more custom stats
           </div>
         </form>

@@ -10,7 +10,7 @@ export default function Home() {
       <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm dark:shadow-lg">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 animate-fade-in">
           <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
-            Critical Role Companion
+            Mythweaver Studio
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
             Explore campaigns, characters, and episodes from your favorite stories
@@ -28,7 +28,7 @@ export default function Home() {
             <div className="animate-fade-in-stagger">
               <h3 className="text-white font-bold text-lg mb-4">About</h3>
               <p className="text-base leading-relaxed text-gray-400">
-                Critical Role Companion is a campaign hub for exploring characters, episodes, and stories.
+                Mythweaver Studio is a campaign hub for exploring characters, episodes, and stories.
               </p>
             </div>
             <div className="animate-fade-in-stagger delay-100">
@@ -54,7 +54,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-700 pt-8 text-center text-base text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Critical Role Companion. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Mythweaver Studio. All rights reserved.</p>
           </div>
         </div>
       </footer>

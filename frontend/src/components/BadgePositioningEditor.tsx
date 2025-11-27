@@ -133,13 +133,13 @@ export default function BadgePositioningEditor({
     <div className="space-y-6">
       {/* Canvas */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Drag badges to position them
         </label>
 
         <div
           ref={canvasRef}
-          className="relative w-full bg-gradient-to-br from-gray-100 to-gray-200 border-2 border-gray-300 rounded-lg overflow-hidden"
+          className="relative w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden"
           style={{ paddingBottom: '50%' }}
         >
           {/* Grid Background */}
@@ -204,7 +204,7 @@ export default function BadgePositioningEditor({
 
       {/* Add Badges */}
       <div>
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Add Badges</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Add Badges</h3>
 
         <div className="grid grid-cols-3 gap-2">
           {stats.map((stat) => (
@@ -212,7 +212,7 @@ export default function BadgePositioningEditor({
               key={stat.key}
               onClick={() => handleAddBadge(stat)}
               disabled={badges.some((b) => b.stat === stat.key)}
-              className="px-3 py-2 text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-200"
+              className="px-3 py-2 text-sm font-medium bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 rounded hover:bg-purple-100 dark:hover:bg-purple-900/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:border-gray-200 dark:disabled:border-gray-700"
             >
               {stat.label}
             </button>
@@ -222,23 +222,23 @@ export default function BadgePositioningEditor({
 
       {/* Badge List */}
       <div>
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Active Badges</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Active Badges</h3>
 
         <div className="space-y-2">
           {badges.map((badge) => (
-            <div key={badge.stat} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+            <div key={badge.stat} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-700 rounded-md">
               <div className="text-sm">
-                <div className="font-medium text-gray-900">
+                <div className="font-medium text-gray-900 dark:text-white">
                   {stats.find((s) => s.key === badge.stat)?.label || badge.stat}
                 </div>
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-gray-600 dark:text-gray-400">
                   Position: {badge.x.toFixed(0)}%, {badge.y.toFixed(0)}%
                 </div>
               </div>
 
               <button
                 onClick={() => handleRemoveBadge(badge.stat)}
-                className="px-3 py-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded"
+                className="px-3 py-1 text-xs bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded"
               >
                 Remove
               </button>

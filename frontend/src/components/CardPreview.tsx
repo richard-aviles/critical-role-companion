@@ -23,6 +23,7 @@ interface Layout {
   image_aspect_ratio: 'square' | 'portrait' | 'landscape';
   background_image_url?: string;
   border_colors: string[];
+  badge_colors: string[];
   text_color: string;
   badge_layout: Badge[];
 }
@@ -94,12 +95,6 @@ export default function CardPreview({ layout }: { layout: Layout }) {
               </div>
             ))}
           </div>
-
-          <div className="flex gap-2">
-            <button className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700">
-              View
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -153,11 +148,11 @@ export default function CardPreview({ layout }: { layout: Layout }) {
             {layout.badge_layout.map((badge, idx) => (
               <div
                 key={badge.stat}
-                className="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg"
+                className="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg border-2 border-white"
                 style={{
                   left: `${badge.x}%`,
                   top: `${badge.y}%`,
-                  backgroundColor: layout.border_colors[idx % layout.border_colors.length],
+                  backgroundColor: layout.badge_colors[idx % layout.badge_colors.length],
                   transform: 'translate(-50%, -50%)',
                 }}
               >
@@ -188,9 +183,9 @@ export default function CardPreview({ layout }: { layout: Layout }) {
       </div>
 
       {/* Info Message */}
-      <div className="px-4 pb-4 text-xs text-gray-500">
+      <div className="px-4 pb-4 text-xs text-gray-500 dark:text-gray-400">
         {layout.badge_layout.length === 0 && (
-          <div className="text-blue-600">Configure badge positions to see preview</div>
+          <div className="text-purple-600 dark:text-purple-400">Configure badge positions to see preview</div>
         )}
       </div>
     </div>

@@ -98,7 +98,7 @@ function CharacterDetailContent() {
     };
   }, [characterId, isDeleting]);
 
-  const handleUpdate = async (data: UpdateCharacterData, imageFile?: File) => {
+  const handleUpdate = async (data: UpdateCharacterData, imageFile?: File, backgroundImageFile?: File) => {
     setIsUpdating(true);
     setError(null);
 
@@ -108,11 +108,17 @@ function CharacterDetailContent() {
       // First, update text fields via JSON
       updatedCharacter = await updateCharacter(campaignId, characterId, data, undefined, adminToken || undefined);
 
-      // Then, if there's an image, upload it separately
+      // Then, if there's a portrait image, upload it separately
       if (imageFile) {
         const formData = new FormData();
         formData.append('image', imageFile);
         updatedCharacter = await updateCharacter(campaignId, characterId, formData, imageFile, adminToken || undefined);
+      }
+
+      // Finally, if there's a background image, upload it separately
+      if (backgroundImageFile) {
+        const { uploadCharacterBackgroundImage } = await import('@/lib/api');
+        updatedCharacter = await uploadCharacterBackgroundImage(campaignId, characterId, backgroundImageFile, adminToken || undefined);
       }
 
       setCharacter(updatedCharacter);
@@ -162,9 +168,9 @@ function CharacterDetailContent() {
   // Loading state or deleting
   if (loading || isDeleting) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 dark:from-gray-950 dark:via-purple-950/20 dark:to-gray-900">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto"></div>
+          <div className="animate-spin h-8 w-8 border-4 border-purple-600 dark:border-purple-500 border-t-transparent rounded-full mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-300">{isDeleting ? 'Deleting character...' : 'Loading character...'}</p>
         </div>
       </div>
@@ -174,10 +180,10 @@ function CharacterDetailContent() {
   // Error state or character not found (but not if deleting)
   if (error || !character) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 dark:from-gray-950 dark:via-purple-950/20 dark:to-gray-900">
         <AdminHeader title="Character Not Found" />
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+          <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50 rounded-lg p-6 text-center shadow-lg border-l-4 border-l-red-500">
             <h3 className="text-lg font-semibold text-red-900 dark:text-red-300 mb-2">
               {error || 'Character Not Found'}
             </h3>
@@ -187,14 +193,14 @@ function CharacterDetailContent() {
             <div className="flex gap-3 justify-center">
               <button
                 onClick={() => router.push(`/admin/campaigns/${campaignId}/characters`)}
-                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold transition-colors"
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 font-semibold transition-all duration-200 shadow-lg focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50"
               >
                 Back to Characters
               </button>
               {error && (
                 <button
                   onClick={() => window.location.reload()}
-                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 font-medium transition-colors"
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 font-medium transition-all duration-200 focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
                 >
                   Try Again
                 </button>
@@ -209,7 +215,7 @@ function CharacterDetailContent() {
   const placeholderImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="48" fill="%239ca3af"%3ENo Image%3C/text%3E%3C/svg%3E';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-100 dark:from-gray-950 dark:via-purple-950/20 dark:to-gray-900">
       <AdminHeader title={character.name} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -219,7 +225,7 @@ function CharacterDetailContent() {
             <li>
               <button
                 onClick={() => router.push('/admin/campaigns')}
-                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
               >
                 Campaigns
               </button>
@@ -228,7 +234,7 @@ function CharacterDetailContent() {
             <li>
               <button
                 onClick={() => router.push(`/admin/campaigns/${campaignId}`)}
-                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
               >
                 Campaign
               </button>
@@ -237,7 +243,7 @@ function CharacterDetailContent() {
             <li>
               <button
                 onClick={() => router.push(`/admin/campaigns/${campaignId}/characters`)}
-                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
               >
                 Characters
               </button>
@@ -249,7 +255,7 @@ function CharacterDetailContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950 p-4">
+          <div className="mb-6 rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/50 p-4 shadow-lg border-l-4 border-l-red-500">
             <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
           </div>
         )}
@@ -259,7 +265,7 @@ function CharacterDetailContent() {
           {/* Left Sidebar: Image and Quick Info */}
           <div className="lg:col-span-1">
             {/* Character Image */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg overflow-hidden mb-6">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-xl overflow-hidden mb-6 border border-purple-100 dark:border-purple-900/30 transition-all duration-200">
               <div className="relative w-full aspect-square bg-gray-200 dark:bg-gray-700">
                 <img
                   src={character.image_url || placeholderImage}
@@ -284,7 +290,7 @@ function CharacterDetailContent() {
             </div>
 
             {/* Character Stats */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6 mb-6">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-xl p-6 mb-6 border border-purple-100 dark:border-purple-900/30 transition-all duration-200 border-l-4 border-l-purple-500">
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Stats</h3>
               <dl className="space-y-3">
                 {character.class_name && (
@@ -307,7 +313,7 @@ function CharacterDetailContent() {
             </div>
 
             {/* Timestamps */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg p-6">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-xl p-6 border border-purple-100 dark:border-purple-900/30 transition-all duration-200 border-l-4 border-l-purple-500">
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Info</h3>
               <dl className="space-y-3 text-sm">
                 <div>
@@ -335,7 +341,7 @@ function CharacterDetailContent() {
           {/* Right Content: Details/Edit Form */}
           <div className="lg:col-span-2">
             {/* View/Edit Toggle */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow dark:shadow-lg mb-6">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-xl mb-6 border border-purple-100 dark:border-purple-900/30 transition-all duration-200 border-l-4 border-l-purple-500">
               <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
@@ -344,7 +350,7 @@ function CharacterDetailContent() {
                   {!isEditing && (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-semibold transition-colors"
+                      className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 font-semibold transition-all duration-200 shadow-lg focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50"
                     >
                       Edit
                     </button>
@@ -404,14 +410,14 @@ function CharacterDetailContent() {
             </div>
 
             {/* Danger Zone */}
-            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-6">
+            <div className="bg-red-50 dark:bg-red-950/50 backdrop-blur-sm border border-red-200 dark:border-red-800/50 rounded-lg p-6 shadow-lg border-l-4 border-l-red-500 transition-all duration-200">
               <h3 className="text-lg font-bold text-red-900 dark:text-red-300 mb-2">Danger Zone</h3>
               <p className="text-sm text-red-700 dark:text-red-400 mb-4">
                 Deleting a character cannot be undone. All associated data will be lost.
               </p>
               <button
                 onClick={() => setShowDeleteDialog(true)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-semibold transition-colors"
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-600 text-sm font-semibold transition-all duration-200 shadow-lg focus:ring-4 focus:ring-red-500 focus:ring-opacity-50"
               >
                 Delete Character
               </button>

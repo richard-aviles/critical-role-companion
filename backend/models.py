@@ -1,5 +1,5 @@
 """
-SQLAlchemy ORM Models for Critical Role Companion
+SQLAlchemy ORM Models for Mythweaver Studio
 Multi-tenant architecture - all entities scoped by campaign
 """
 
@@ -97,7 +97,8 @@ class Character(Base):
     # Image/Media
     image_url = Column(String(500), nullable=True)  # Public R2 URL (portrait)
     image_r2_key = Column(String(255), nullable=True)  # R2 storage key for deletion
-    background_image_url = Column(String(500), nullable=True)  # Background image URL
+    background_image_url = Column(String(500), nullable=True)  # Background image URL (public R2 URL)
+    background_image_r2_key = Column(String(255), nullable=True)  # R2 storage key for background deletion
 
     # Status & Metadata
     is_active = Column(Boolean, default=True)
@@ -333,7 +334,8 @@ class CharacterLayout(Base):
 
     # Color scheme
     border_color_count = Column(Integer, default=2, nullable=False)  # 2 or 4 colors for gradient
-    border_colors = Column(JSONB, nullable=False, default={})  # {count: [colors]} or list of hex codes
+    border_colors = Column(JSONB, nullable=False, default={})  # List of hex codes for card/frame border
+    badge_colors = Column(JSONB, nullable=False, default=[])  # List of hex codes for stat badges (2 colors)
     text_color = Column(String(7), nullable=False, default="#FFFFFF")  # Hex color
     badge_interior_gradient = Column(JSONB, nullable=False, default={})  # {type, start, end} for radial
 
@@ -368,6 +370,7 @@ class CharacterLayout(Base):
             "background_image_url": self.background_image_url,
             "border_color_count": self.border_color_count,
             "border_colors": self.border_colors or [],
+            "badge_colors": self.badge_colors or [],
             "text_color": self.text_color,
             "badge_interior_gradient": self.badge_interior_gradient or {},
             "hp_color": self.hp_color or {},
