@@ -194,8 +194,6 @@ export default function ImageSettingsPanel({
         />
 
         {/* Preview or drop zone */}
-        {preview && console.log('[ImageSettingsPanel] Showing PREVIEW - should not be adding new image')}
-        {!preview && console.log('[ImageSettingsPanel] Showing UPLOAD ZONE - ready for new image')}
         {preview ? (
           <div className="relative">
             <div className="relative w-full h-40 rounded-lg border-2 border-purple-300 dark:border-purple-700 shadow-lg overflow-hidden">
