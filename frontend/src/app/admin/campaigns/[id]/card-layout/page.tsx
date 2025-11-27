@@ -279,29 +279,26 @@ export default function CardLayoutPage() {
       <div className="bg-white dark:bg-gray-900 shadow dark:shadow-lg border-b border-gray-200 dark:border-gray-800 border-t-2 border-t-purple-500/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Card Preview</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Preview of how cards will appear on public pages (responsive grid layout)</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Show cards for each card type to compare */}
             <div>
               <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Simple Card Style</div>
-              <CardPreview
-                layout={{
-                  ...layout,
-                  card_type: 'simple',
-                }}
-              />
+              <div className="max-w-sm">
+                <CardPreview
+                  layout={{
+                    ...layout,
+                    card_type: 'simple',
+                  }}
+                />
+              </div>
             </div>
 
             {/* Enhanced Card Preview */}
             <div>
               <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enhanced Card Style (Current Selection)</div>
-              <CardPreview layout={layout} />
-            </div>
-
-            {/* Show current selection preview */}
-            <div>
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Mode</div>
-              <CardPreview layout={layout} />
+              <div className="max-w-md">
+                <CardPreview layout={layout} />
+              </div>
             </div>
           </div>
         </div>
