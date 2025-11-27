@@ -48,10 +48,11 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
             style={{
               height: '300px',
               backgroundImage: layout?.background_image_url
-                ? `url(${layout.background_image_url})`
+                ? `url('${layout.background_image_url}')`
                 : 'linear-gradient(135deg, rgb(229, 231, 235), rgb(209, 213, 219))',
               backgroundSize: 'cover',
               backgroundPosition: `calc(50% + ${layout?.background_image_offset_x || 0}%) calc(50% + ${layout?.background_image_offset_y || 0}%)`,
+              backgroundRepeat: 'no-repeat',
             }}
           >
             {/* Dark overlay for readability */}
