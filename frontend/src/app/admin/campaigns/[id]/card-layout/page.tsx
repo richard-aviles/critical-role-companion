@@ -37,6 +37,8 @@ interface Layout {
   image_width_percent: number;
   image_aspect_ratio: 'square' | 'portrait' | 'landscape';
   background_image_url?: string;
+  background_image_offset_x?: number;
+  background_image_offset_y?: number;
   border_colors: string[];
   badge_colors: string[];
   text_color: string;
@@ -342,8 +344,13 @@ export default function CardLayoutPage() {
               onAspectRatioChange={(ratio) =>
                 setLayout({ ...layout, image_aspect_ratio: ratio })
               }
-              onBackgroundImageChange={(url) =>
-                setLayout({ ...layout, background_image_url: url })
+              onBackgroundImageChange={(data) =>
+                setLayout({
+                  ...layout,
+                  background_image_url: data.url,
+                  background_image_offset_x: data.offset_x || 0,
+                  background_image_offset_y: data.offset_y || 0,
+                })
               }
             />
           </div>

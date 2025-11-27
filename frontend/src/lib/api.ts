@@ -190,6 +190,7 @@ export interface Character {
   background_image_r2_key?: string;
   level?: number;
   is_active?: boolean;
+  stats?: Record<string, number>;
   color_theme_override?: ColorThemeOverride | null;
   created_at: string;
   updated_at: string;

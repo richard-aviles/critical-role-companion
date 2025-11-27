@@ -112,7 +112,7 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
                   .filter((stat: any) => stat.visible)
                   .slice(0, 6)
                   .map((stat: any) => {
-                    const value = character.stats[stat.key];
+                    const value = character.stats?.[stat.key];
                     return (
                       <div key={stat.key} className="text-center">
                         <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">
