@@ -1825,6 +1825,15 @@ async def update_character(
 ):
     """Update character info and stats (admin only)"""
 
+    # DEBUG: Log incoming payload
+    print("\n" + "="*80)
+    print("[UPDATE CHARACTER - DEBUG]")
+    print("="*80)
+    print(f"Character ID: {character_id}")
+    print(f"Payload dict: {payload.model_dump()}")
+    print(f"Image offsets - X: {payload.image_offset_x}, Y: {payload.image_offset_y}")
+    print(f"Background offsets - X: {payload.background_image_offset_x}, Y: {payload.background_image_offset_y}")
+    print("="*80 + "\n")
 
     try:
         campaign_uuid = uuid.UUID(campaign_id)
@@ -1884,6 +1893,14 @@ async def update_character(
     character.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(character)
+
+    # DEBUG: Log what was saved
+    print("\n" + "="*80)
+    print("[UPDATE CHARACTER - SAVED VALUES]")
+    print("="*80)
+    print(f"Image offsets - X: {character.image_offset_x}, Y: {character.image_offset_y}")
+    print(f"Background offsets - X: {character.background_image_offset_x}, Y: {character.background_image_offset_y}")
+    print("="*80 + "\n")
 
     return character.to_dict()
 
