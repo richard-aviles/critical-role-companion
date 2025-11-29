@@ -268,9 +268,9 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
       >
         {/* Character Image */}
         <div
-          className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-700"
+          className="relative w-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
           style={{
-            height: '200px'
+            height: '280px'
           }}
         >
           {character.image_url ? (
@@ -278,7 +278,7 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
               src={character.image_url}
               alt={character.name}
               fill
-              className="object-cover group-hover:scale-105 transition-transform"
+              className="object-contain group-hover:scale-105 transition-transform"
               style={{
                 objectPosition: `calc(50% + ${character.image_offset_x || 0}%) calc(50% + ${character.image_offset_y || 0}%)`
               }}
