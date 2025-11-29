@@ -338,6 +338,8 @@ export default function CardLayoutPage() {
               widthPercent={layout.image_width_percent}
               aspectRatio={layout.image_aspect_ratio}
               backgroundImageUrl={layout.background_image_url}
+              backgroundImageOffsetX={layout.background_image_offset_x}
+              backgroundImageOffsetY={layout.background_image_offset_y}
               campaignId={campaignId}
               layoutId={existingLayout?.id}
               onWidthChange={(width) => setLayout({ ...layout, image_width_percent: width })}

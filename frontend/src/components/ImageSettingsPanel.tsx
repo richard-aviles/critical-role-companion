@@ -197,7 +197,11 @@ export default function ImageSettingsPanel({
               min="-100"
               max="100"
               value={offsetX}
-              onChange={(e) => setOffsetX(parseInt(e.target.value))}
+              onChange={(e) => {
+                const newOffsetX = parseInt(e.target.value);
+                setOffsetX(newOffsetX);
+                onBackgroundImageChange({ url: preview || undefined, offset_x: newOffsetX, offset_y: offsetY });
+              }}
               className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-600 dark:accent-purple-500"
               disabled={isUploading}
             />
@@ -216,7 +220,11 @@ export default function ImageSettingsPanel({
               min="-100"
               max="100"
               value={offsetY}
-              onChange={(e) => setOffsetY(parseInt(e.target.value))}
+              onChange={(e) => {
+                const newOffsetY = parseInt(e.target.value);
+                setOffsetY(newOffsetY);
+                onBackgroundImageChange({ url: preview || undefined, offset_x: offsetX, offset_y: newOffsetY });
+              }}
               className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-600 dark:accent-purple-500"
               disabled={isUploading}
             />
