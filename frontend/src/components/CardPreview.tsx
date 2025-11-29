@@ -5,6 +5,7 @@ interface Stat {
   label: string;
   visible: boolean;
   order: number;
+  required?: boolean;
 }
 
 interface Badge {
@@ -28,6 +29,8 @@ interface Layout {
   badge_colors: string[];
   text_color: string;
   badge_layout: Badge[];
+  hp_color?: any;
+  ac_color?: any;
 }
 
 export default function CardPreview({ layout }: { layout: Layout }) {
@@ -128,20 +131,35 @@ export default function CardPreview({ layout }: { layout: Layout }) {
         {/* Badge Overlay - positioned badges from layout configuration */}
         {layout.badge_layout && layout.badge_layout.length > 0 && (
           <div className="absolute inset-0 pointer-events-none">
-            {layout.badge_layout.map((badge: any, idx: number) => (
-              <div
-                key={badge.stat}
-                className="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg border-2 border-white"
-                style={{
-                  left: `${badge.x}%`,
-                  top: `${badge.y}%`,
-                  backgroundColor: layout.badge_colors[idx % layout.badge_colors.length],
-                  transform: 'translate(-50%, -50%)',
-                }}
-              >
-                {badge.stat[0].toUpperCase()}
-              </div>
-            ))}
+            {layout.badge_layout.map((badge: any, idx: number) => {
+              // Determine badge color based on stat type
+              let badgeColor = layout.badge_colors[idx % layout.badge_colors.length];
+              let borderColor = 'white';
+
+              if (badge.stat === 'hp' && layout.hp_color) {
+                badgeColor = layout.hp_color.border || badgeColor;
+                borderColor = layout.hp_color.border || borderColor;
+              } else if (badge.stat === 'ac' && layout.ac_color) {
+                badgeColor = layout.ac_color.border || badgeColor;
+                borderColor = layout.ac_color.border || borderColor;
+              }
+
+              return (
+                <div
+                  key={badge.stat}
+                  className="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg border-2"
+                  style={{
+                    left: `${badge.x}%`,
+                    top: `${badge.y}%`,
+                    backgroundColor: badgeColor,
+                    borderColor: borderColor,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
+                  {badge.stat.toUpperCase()}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

@@ -7,6 +7,7 @@ interface Stat {
   label: string;
   visible: boolean;
   order: number;
+  required?: boolean;
 }
 
 interface Badge {

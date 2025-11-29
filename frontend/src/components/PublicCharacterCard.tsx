@@ -28,6 +28,9 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
     character_colors: character.color_theme_override?.border_colors,
     layout_colors: layout?.border_colors,
     badge_colors: layout?.badge_colors,
+    character_stats: character.stats,
+    has_hp: character.stats?.hp !== undefined,
+    has_ac: character.stats?.ac !== undefined,
   });
 
   // Styling hierarchy: character override > campaign layout > default
@@ -123,9 +126,12 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
             )}
 
             {/* Badge Overlay - positioned badges from layout configuration */}
+            {/* Filter out HP and AC since they appear in the fixed info section below */}
             {layout?.badge_layout && layout.badge_layout.length > 0 && (
               <div className="absolute inset-0 pointer-events-none">
-                {layout.badge_layout.map((badge: any, idx: number) => {
+                {layout.badge_layout
+                  .filter((badge: any) => badge.stat !== 'hp' && badge.stat !== 'ac')
+                  .map((badge: any, idx: number) => {
                   // Use character color override for badges if available
                   const badgeColors = character.color_theme_override?.badge_interior_gradient?.colors ||
                                      character.color_theme_override?.border_colors ||
@@ -198,17 +204,41 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
               )}
             </div>
 
-            {/* Level Badge */}
-            {character.level && (
-              <div className="flex items-center gap-2">
+            {/* Level Badge and HP/AC - Enhanced Layout */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {character.level && (
                 <span
                   className="px-3 py-1 rounded-full text-white text-sm font-semibold"
                   style={{ backgroundColor: badgeColor }}
                 >
                   Level {character.level}
                 </span>
+              )}
+
+              {/* HP Badge with Heart Icon (default to 0 if not set) */}
+              <div
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-white text-sm font-semibold shadow-md"
+                style={{
+                  background: `linear-gradient(135deg, ${layout?.hp_color?.interior_gradient?.colors?.[0] || '#FF6B6B'}, ${layout?.hp_color?.interior_gradient?.colors?.[1] || '#CC0000'})`,
+                  border: `2px solid ${layout?.hp_color?.border || '#FF0000'}`,
+                }}
+              >
+                <span className="text-base">❤️</span>
+                <span>{character.stats?.hp ?? 0}</span>
               </div>
-            )}
+
+              {/* AC Badge with Shield Icon (default to 0 if not set) */}
+              <div
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-white text-sm font-semibold shadow-md"
+                style={{
+                  background: `linear-gradient(135deg, ${layout?.ac_color?.interior_gradient?.colors?.[0] || '#A9A9A9'}, ${layout?.ac_color?.interior_gradient?.colors?.[1] || '#696969'})`,
+                  border: `2px solid ${layout?.ac_color?.border || '#808080'}`,
+                }}
+              >
+                <span className="text-base">🛡️</span>
+                <span>{character.stats?.ac ?? 0}</span>
+              </div>
+            </div>
 
             {/* Player Name */}
             {character.player_name && (
@@ -290,24 +320,34 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
             )}
           </div>
 
-          {/* Level Badge */}
-          {character.level && (
-            <div className="flex items-center gap-2">
+          {/* Level Badge and HP/AC - Simple Layout */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {character.level && (
               <span
                 className="px-3 py-1 rounded-full text-white text-sm font-semibold"
                 style={{ backgroundColor: badgeColor }}
               >
                 Level {character.level}
               </span>
-            </div>
-          )}
+            )}
 
-          {/* Enhanced Layout: Display Stats if configured */}
-          {cardType === 'enhanced' && layout?.stats_config && character.stats && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            {/* HP - Plain text style for Simple layout (default to 0 if not set) */}
+            <span className="px-3 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm font-semibold border border-red-300 dark:border-red-700">
+              HP: {character.stats?.hp ?? 0}
+            </span>
+
+            {/* AC - Plain text style for Simple layout (default to 0 if not set) */}
+            <span className="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold border border-gray-300 dark:border-gray-600">
+              AC: {character.stats?.ac ?? 0}
+            </span>
+          </div>
+
+          {/* Display other stats if configured */}
+          {layout?.stats_config && (
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
               <div className="grid grid-cols-3 gap-2">
                 {layout.stats_config
-                  .filter((stat: any) => stat.visible)
+                  .filter((stat: any) => stat.visible && stat.key !== 'hp' && stat.key !== 'ac')
                   .slice(0, 6)
                   .map((stat: any) => {
                     const value = character.stats?.[stat.key];
@@ -316,56 +356,13 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
                         <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">
                           {stat.label}
                         </p>
-                        <p
-                          className="text-lg font-bold"
-                          style={{ color: textColor }}
-                        >
-                          {value || '-'}
+                        <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                          {value ?? '-'}
                         </p>
                       </div>
                     );
                   })}
               </div>
-
-              {/* Display HP and AC separately if available */}
-              {(character.stats?.hp || character.stats?.ac) && (
-                <div className="flex gap-3 mt-3">
-                  {character.stats?.hp && (
-                    <div
-                      className="flex-1 px-3 py-2 rounded text-center"
-                      style={{
-                        backgroundColor: layout.hp_color?.border || badgeColor,
-                        opacity: 0.1
-                      }}
-                    >
-                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">HP</p>
-                      <p
-                        className="text-sm font-bold"
-                        style={{ color: textColor }}
-                      >
-                        {character.stats.hp}
-                      </p>
-                    </div>
-                  )}
-                  {character.stats?.ac && (
-                    <div
-                      className="flex-1 px-3 py-2 rounded text-center"
-                      style={{
-                        backgroundColor: layout.ac_color?.border || badgeColor,
-                        opacity: 0.1
-                      }}
-                    >
-                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">AC</p>
-                      <p
-                        className="text-sm font-bold"
-                        style={{ color: textColor }}
-                      >
-                        {character.stats.ac}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           )}
 

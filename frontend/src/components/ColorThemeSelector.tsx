@@ -227,6 +227,146 @@ export default function ColorThemeSelector({
                 className="w-12 h-12 rounded cursor-pointer"
               />
             </div>
+
+            {/* HP Color Configuration */}
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                HP Badge Colors (Heart ❤️)
+              </label>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Border Color</label>
+                  <input
+                    type="color"
+                    value={hpColor?.border || '#FF0000'}
+                    onChange={(e) => {
+                      if (onHpColorChange) {
+                        onHpColorChange({
+                          ...hpColor,
+                          border: e.target.value,
+                        });
+                      }
+                    }}
+                    className="w-12 h-12 rounded cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Interior Gradient</label>
+                  <div className="flex gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Start</label>
+                      <input
+                        type="color"
+                        value={hpColor?.interior_gradient?.colors?.[0] || '#FF6B6B'}
+                        onChange={(e) => {
+                          if (onHpColorChange) {
+                            const colors = hpColor?.interior_gradient?.colors || ['#FF6B6B', '#CC0000'];
+                            onHpColorChange({
+                              ...hpColor,
+                              interior_gradient: {
+                                type: 'radial',
+                                colors: [e.target.value, colors[1]],
+                              },
+                            });
+                          }
+                        }}
+                        className="w-12 h-12 rounded cursor-pointer"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">End</label>
+                      <input
+                        type="color"
+                        value={hpColor?.interior_gradient?.colors?.[1] || '#CC0000'}
+                        onChange={(e) => {
+                          if (onHpColorChange) {
+                            const colors = hpColor?.interior_gradient?.colors || ['#FF6B6B', '#CC0000'];
+                            onHpColorChange({
+                              ...hpColor,
+                              interior_gradient: {
+                                type: 'radial',
+                                colors: [colors[0], e.target.value],
+                              },
+                            });
+                          }
+                        }}
+                        className="w-12 h-12 rounded cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* AC Color Configuration */}
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                AC Badge Colors (Shield 🛡️)
+              </label>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Border Color</label>
+                  <input
+                    type="color"
+                    value={acColor?.border || '#808080'}
+                    onChange={(e) => {
+                      if (onAcColorChange) {
+                        onAcColorChange({
+                          ...acColor,
+                          border: e.target.value,
+                        });
+                      }
+                    }}
+                    className="w-12 h-12 rounded cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Interior Gradient</label>
+                  <div className="flex gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">Start</label>
+                      <input
+                        type="color"
+                        value={acColor?.interior_gradient?.colors?.[0] || '#A9A9A9'}
+                        onChange={(e) => {
+                          if (onAcColorChange) {
+                            const colors = acColor?.interior_gradient?.colors || ['#A9A9A9', '#696969'];
+                            onAcColorChange({
+                              ...acColor,
+                              interior_gradient: {
+                                type: 'radial',
+                                colors: [e.target.value, colors[1]],
+                              },
+                            });
+                          }
+                        }}
+                        className="w-12 h-12 rounded cursor-pointer"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-500 mb-1">End</label>
+                      <input
+                        type="color"
+                        value={acColor?.interior_gradient?.colors?.[1] || '#696969'}
+                        onChange={(e) => {
+                          if (onAcColorChange) {
+                            const colors = acColor?.interior_gradient?.colors || ['#A9A9A9', '#696969'];
+                            onAcColorChange({
+                              ...acColor,
+                              interior_gradient: {
+                                type: 'radial',
+                                colors: [colors[0], e.target.value],
+                              },
+                            });
+                          }
+                        }}
+                        className="w-12 h-12 rounded cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

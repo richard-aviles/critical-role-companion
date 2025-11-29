@@ -15,6 +15,7 @@ interface Stat {
   label: string;
   visible: boolean;
   order: number;
+  required?: boolean; // If true, cannot be hidden/removed
 }
 
 interface Badge {
@@ -51,12 +52,14 @@ interface Layout {
 }
 
 const DEFAULT_STATS: Stat[] = [
-  { key: 'str', label: 'STR', visible: true, order: 0 },
-  { key: 'dex', label: 'DEX', visible: true, order: 1 },
-  { key: 'con', label: 'CON', visible: true, order: 2 },
-  { key: 'int', label: 'INT', visible: true, order: 3 },
-  { key: 'wis', label: 'WIS', visible: true, order: 4 },
-  { key: 'cha', label: 'CHA', visible: true, order: 5 },
+  { key: 'hp', label: 'HP', visible: true, order: 0, required: true },
+  { key: 'ac', label: 'AC', visible: true, order: 1, required: true },
+  { key: 'str', label: 'STR', visible: true, order: 2 },
+  { key: 'dex', label: 'DEX', visible: true, order: 3 },
+  { key: 'con', label: 'CON', visible: true, order: 4 },
+  { key: 'int', label: 'INT', visible: true, order: 5 },
+  { key: 'wis', label: 'WIS', visible: true, order: 6 },
+  { key: 'cha', label: 'CHA', visible: true, order: 7 },
 ];
 
 const DEFAULT_GOLD_THEME = {
@@ -133,8 +136,40 @@ export default function CardLayoutPage() {
         if (layouts && layouts.length > 0) {
           // Load the default layout or the first one
           const defaultLayout = layouts.find((l: any) => l.is_default) || layouts[0];
-          setLayout(defaultLayout);
-          setExistingLayout(defaultLayout);
+
+          // Ensure HP and AC are in the stats_config (migrate old layouts)
+          const existingStatKeys = new Set(defaultLayout.stats_config?.map((s: Stat) => s.key) || []);
+          const updatedStats = [...(defaultLayout.stats_config || [])];
+
+          // Add HP if not present
+          if (!existingStatKeys.has('hp')) {
+            updatedStats.unshift({ key: 'hp', label: 'HP', visible: true, order: 0, required: true });
+          }
+
+          // Add AC if not present
+          if (!existingStatKeys.has('ac')) {
+            const acOrder = existingStatKeys.has('hp') ? 1 : 0;
+            updatedStats.splice(existingStatKeys.has('hp') ? 1 : 0, 0, {
+              key: 'ac',
+              label: 'AC',
+              visible: true,
+              order: acOrder,
+              required: true
+            });
+          }
+
+          // Reorder all stats
+          updatedStats.forEach((stat, index) => {
+            stat.order = index;
+          });
+
+          const migratedLayout = {
+            ...defaultLayout,
+            stats_config: updatedStats,
+          };
+
+          setLayout(migratedLayout);
+          setExistingLayout(migratedLayout);
         }
       } catch (err: any) {
         console.error('Error loading layout:', err);

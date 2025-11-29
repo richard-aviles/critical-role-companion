@@ -7,6 +7,7 @@ interface Stat {
   label: string;
   visible: boolean;
   order: number;
+  required?: boolean;
 }
 
 interface StatConfigPanelProps {
@@ -88,7 +89,9 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
                 type="checkbox"
                 checked={stat.visible}
                 onChange={() => handleToggleVisibility(stat.key)}
-                className="w-4 h-4"
+                disabled={stat.required}
+                className="w-4 h-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={stat.required ? 'This stat is required and cannot be hidden' : ''}
               />
 
               <input
@@ -115,10 +118,10 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
                 </button>
               </div>
 
-              {!['str', 'dex', 'con', 'int', 'wis', 'cha'].includes(stat.key) && (
+              {!stat.required && (
                 <button
                   onClick={() => handleRemoveStat(stat.key)}
-                  className="px-2 py-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded"
+                  className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded"
                 >
                   Remove
                 </button>
