@@ -117,12 +117,8 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
     backstory: initialData?.backstory || '',
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imageOffsetX, setImageOffsetX] = useState<number>(initialData?.image_offset_x || 0);
-  const [imageOffsetY, setImageOffsetY] = useState<number>(initialData?.image_offset_y || 0);
   const [selectedBackgroundImage, setSelectedBackgroundImage] = useState<File | null>(null);
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | undefined>(initialData?.background_image_url);
-  const [backgroundImageOffsetX, setBackgroundImageOffsetX] = useState<number>(initialData?.background_image_offset_x || 0);
-  const [backgroundImageOffsetY, setBackgroundImageOffsetY] = useState<number>(initialData?.background_image_offset_y || 0);
   const [isBackgroundImageLoading, setIsBackgroundImageLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nameTouched, setNameTouched] = useState(false);
@@ -152,11 +148,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
     setError(null);
   };
 
-  const handleImageOffsetChange = (offsetX: number, offsetY: number) => {
-    setImageOffsetX(offsetX);
-    setImageOffsetY(offsetY);
-  };
-
   const handleBackgroundImageFileSelect = (file: File | null) => {
     setSelectedBackgroundImage(file);
     setError(null);
@@ -169,11 +160,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
 
   const handleBackgroundImageLoading = (loading: boolean) => {
     setIsBackgroundImageLoading(loading);
-  };
-
-  const handleBackgroundImageOffsetChange = (offsetX: number, offsetY: number) => {
-    setBackgroundImageOffsetX(offsetX);
-    setBackgroundImageOffsetY(offsetY);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -207,18 +193,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
         ? { color_theme_override: colorOverride }
         : { color_theme_override: null };
 
-      // Include image offset values for portrait
-      const imageOffsetData = {
-        image_offset_x: imageOffsetX,
-        image_offset_y: imageOffsetY,
-      };
-
-      // Include background image offset values
-      const backgroundImageData = {
-        background_image_offset_x: backgroundImageOffsetX,
-        background_image_offset_y: backgroundImageOffsetY,
-      };
-
       const submitData: CreateCharacterData | UpdateCharacterData = mode === 'create'
         ? {
             campaign_id: campaignId!,
@@ -228,8 +202,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
         : {
             ...baseData,
             ...colorThemeData,
-            ...imageOffsetData,
-            ...backgroundImageData,
           };
 
       console.log('[CharacterForm] Submitting data:', {
@@ -428,9 +400,6 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
       <ImageUploadField
         onFileSelect={handleImageSelect}
         initialImage={initialData?.image_url}
-        offsetX={imageOffsetX}
-        offsetY={imageOffsetY}
-        onOffsetChange={handleImageOffsetChange}
         label="Character Portrait"
         disabled={isLoading}
       />
@@ -439,11 +408,8 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
       <div className="border-t pt-6">
         <BackgroundImageUploadField
           imageUrl={backgroundImageUrl}
-          offsetX={backgroundImageOffsetX}
-          offsetY={backgroundImageOffsetY}
           onImageChange={handleBackgroundImageChange}
           onFileSelect={handleBackgroundImageFileSelect}
-          onOffsetChange={handleBackgroundImageOffsetChange}
           onLoading={handleBackgroundImageLoading}
           disabled={isLoading}
         />

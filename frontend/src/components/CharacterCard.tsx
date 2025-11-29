@@ -24,12 +24,12 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg overflow-hidden hover:shadow-lg dark:hover:shadow-primary transition-all duration-200 hover:-translate-y-1">
       {/* Character Image */}
-      <div className="relative w-full h-64 bg-gray-200 dark:bg-gray-700">
+      <div className="relative w-full h-64 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
         <img
           src={character.image_url || placeholderImage}
           alt={character.name}
           loading="lazy"
-          className="w-full h-full object-cover"
+          className="max-w-full max-h-full object-contain"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = placeholderImage;

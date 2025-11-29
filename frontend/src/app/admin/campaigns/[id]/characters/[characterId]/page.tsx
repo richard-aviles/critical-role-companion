@@ -37,6 +37,18 @@ function CharacterDetailContent() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [adminToken, setAdminToken] = useState<string | null>(null);
 
+  // Check for edit query parameter
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('edit') === 'true') {
+        setIsEditing(true);
+        // Remove the query parameter from URL without reload
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, []);
+
   // Get campaign's admin token on mount
   useEffect(() => {
     // Find the campaign's admin_token from the campaigns list
@@ -266,11 +278,11 @@ function CharacterDetailContent() {
           <div className="lg:col-span-1">
             {/* Character Image */}
             <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-xl overflow-hidden mb-6 border border-purple-100 dark:border-purple-900/30 transition-all duration-200">
-              <div className="relative w-full aspect-square bg-gray-200 dark:bg-gray-700">
+              <div className="relative w-full aspect-square bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                 <img
                   src={character.image_url || placeholderImage}
                   alt={character.name}
-                  className="w-full h-full object-cover"
+                  className="max-w-full max-h-full object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = placeholderImage;

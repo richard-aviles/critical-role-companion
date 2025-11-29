@@ -60,7 +60,7 @@ function CharacterListContent() {
   };
 
   const handleEditCharacter = (characterId: string) => {
-    router.push(`/admin/campaigns/${campaignId}/characters/${characterId}`);
+    router.push(`/admin/campaigns/${campaignId}/characters/${characterId}?edit=true`);
   };
 
   // Loading state
