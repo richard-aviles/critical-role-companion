@@ -97,6 +97,8 @@ class Character(Base):
     # Image/Media
     image_url = Column(String(500), nullable=True)  # Public R2 URL (portrait)
     image_r2_key = Column(String(255), nullable=True)  # R2 storage key for deletion
+    image_offset_x = Column(Integer, default=0, nullable=False)  # Portrait image horizontal offset (-100 to 100)
+    image_offset_y = Column(Integer, default=0, nullable=False)  # Portrait image vertical offset (-100 to 100)
     background_image_url = Column(String(500), nullable=True)  # Background image URL (public R2 URL)
     background_image_r2_key = Column(String(255), nullable=True)  # R2 storage key for background deletion
 
@@ -130,6 +132,8 @@ class Character(Base):
             "description": self.description,
             "backstory": self.backstory,
             "image_url": self.image_url,
+            "image_offset_x": self.image_offset_x,
+            "image_offset_y": self.image_offset_y,
             "background_image_url": self.background_image_url,
             "level": self.level,
             "is_active": self.is_active,
