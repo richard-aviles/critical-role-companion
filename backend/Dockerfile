@@ -10,4 +10,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 # Default port Fly will route to (matches fly.toml)
 ENV PORT=8080
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--ws", "auto", "--proxy-headers"]
+# Run database migrations on startup, then start the server
+CMD ["sh", "-c", "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8080 --ws auto --proxy-headers"]
