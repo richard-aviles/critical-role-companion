@@ -4,22 +4,30 @@ import { validateImageFile, generateImagePreview, formatFileSize } from '@/lib/i
 
 interface BackgroundImageUploadFieldProps {
   imageUrl?: string;
+  offsetX?: number;
+  offsetY?: number;
   onImageChange: (url: string | undefined) => void;
   onFileSelect: (file: File | null) => void;
+  onOffsetChange?: (offsetX: number, offsetY: number) => void;
   onLoading: (loading: boolean) => void;
   disabled?: boolean;
 }
 
 export const BackgroundImageUploadField: React.FC<BackgroundImageUploadFieldProps> = ({
   imageUrl,
+  offsetX = 0,
+  offsetY = 0,
   onImageChange,
   onFileSelect,
+  onOffsetChange,
   onLoading,
   disabled = false,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [enabled, setEnabled] = useState(!!imageUrl);
   const [preview, setPreview] = useState<string | null>(imageUrl || null);
+  const [localOffsetX, setLocalOffsetX] = useState<number>(offsetX);
+  const [localOffsetY, setLocalOffsetY] = useState<number>(offsetY);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -89,8 +97,11 @@ export const BackgroundImageUploadField: React.FC<BackgroundImageUploadFieldProp
     setFileName(null);
     setFileSize(null);
     setError(null);
+    setLocalOffsetX(0);
+    setLocalOffsetY(0);
     onImageChange(undefined);
     onFileSelect(null);
+    onOffsetChange?.(0, 0);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -140,6 +151,9 @@ export const BackgroundImageUploadField: React.FC<BackgroundImageUploadFieldProp
                   src={preview}
                   alt="Background preview"
                   className="w-full h-full object-cover"
+                  style={{
+                    objectPosition: `calc(50% + ${localOffsetX}%) calc(50% + ${localOffsetY}%)`
+                  }}
                 />
                 {isLoading && (
                   <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
@@ -177,6 +191,55 @@ export const BackgroundImageUploadField: React.FC<BackgroundImageUploadFieldProp
                   {fileName} ({fileSize !== null ? formatFileSize(fileSize) : ''})
                 </p>
               )}
+
+              {/* Position Sliders */}
+              <div className="mt-4 space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                {/* Horizontal Position Slider */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Horizontal Position: {localOffsetX}%
+                  </label>
+                  <input
+                    type="range"
+                    min="-100"
+                    max="100"
+                    value={localOffsetX}
+                    onChange={(e) => {
+                      const newOffsetX = parseInt(e.target.value);
+                      setLocalOffsetX(newOffsetX);
+                      onOffsetChange?.(newOffsetX, localOffsetY);
+                    }}
+                    disabled={isLoading || disabled}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-600 dark:accent-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Negative = move left, Positive = move right
+                  </div>
+                </div>
+
+                {/* Vertical Position Slider */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Vertical Position: {localOffsetY}%
+                  </label>
+                  <input
+                    type="range"
+                    min="-100"
+                    max="100"
+                    value={localOffsetY}
+                    onChange={(e) => {
+                      const newOffsetY = parseInt(e.target.value);
+                      setLocalOffsetY(newOffsetY);
+                      onOffsetChange?.(localOffsetX, newOffsetY);
+                    }}
+                    disabled={isLoading || disabled}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-600 dark:accent-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Negative = move up, Positive = move down
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div
