@@ -208,7 +208,9 @@ export default function BadgePositioningEditor({
         <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Add Badges</h3>
 
         <div className="grid grid-cols-3 gap-2">
-          {stats.map((stat) => (
+          {stats
+            .filter((stat) => !stat.required) // Filter out required stats (HP, AC)
+            .map((stat) => (
             <button
               key={stat.key}
               onClick={() => handleAddBadge(stat)}
@@ -226,7 +228,12 @@ export default function BadgePositioningEditor({
         <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Active Badges</h3>
 
         <div className="space-y-2">
-          {badges.map((badge) => (
+          {badges
+            .filter((badge) => {
+              const stat = stats.find((s) => s.key === badge.stat);
+              return !stat?.required; // Filter out required stats (HP, AC)
+            })
+            .map((badge) => (
             <div key={badge.stat} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-700 rounded-md">
               <div className="text-sm">
                 <div className="font-medium text-gray-900 dark:text-white">
@@ -247,7 +254,10 @@ export default function BadgePositioningEditor({
           ))}
         </div>
 
-        {badges.length === 0 && (
+        {badges.filter((badge) => {
+          const stat = stats.find((s) => s.key === badge.stat);
+          return !stat?.required;
+        }).length === 0 && (
           <p className="text-sm text-gray-600">No badges added yet</p>
         )}
       </div>
