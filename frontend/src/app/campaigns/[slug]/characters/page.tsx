@@ -110,7 +110,7 @@ function CharacterRosterPageContent() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className={layout?.card_type === 'enhanced' ? 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12' : 'max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12'}>
         {characters.length === 0 ? (
           <div className="text-center py-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-elevated dark:shadow-lg border border-gray-200 dark:border-gray-800">
             <svg className="mx-auto h-16 w-16 text-purple-400 dark:text-purple-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
