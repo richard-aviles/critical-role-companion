@@ -186,6 +186,8 @@ export interface Character {
   backstory?: string;
   image_url?: string;
   image_r2_key?: string;
+  image_offset_x?: number;
+  image_offset_y?: number;
   background_image_url?: string;
   background_image_r2_key?: string;
   background_image_offset_x?: number;
@@ -217,6 +219,8 @@ export interface UpdateCharacterData {
   player_name?: string;
   description?: string;
   backstory?: string;
+  image_offset_x?: number;
+  image_offset_y?: number;
   background_image_offset_x?: number;
   background_image_offset_y?: number;
   color_theme_override?: ColorThemeOverride | null;

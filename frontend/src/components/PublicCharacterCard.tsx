@@ -116,7 +116,7 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
                   fill
                   className="object-cover"
                   style={{
-                    objectPosition: `calc(50% + ${layout?.background_image_offset_x || 0}%) calc(50% + ${layout?.background_image_offset_y || 0}%)`,
+                    objectPosition: `calc(50% + ${character.image_offset_x || 0}%) calc(50% + ${character.image_offset_y || 0}%)`,
                   }}
                 />
               </div>
@@ -250,7 +250,7 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
               fill
               className="object-cover group-hover:scale-105 transition-transform"
               style={{
-                objectPosition: `calc(50% + ${layout?.background_image_offset_x || 0}%) calc(50% + ${layout?.background_image_offset_y || 0}%)`
+                objectPosition: `calc(50% + ${character.image_offset_x || 0}%) calc(50% + ${character.image_offset_y || 0}%)`
               }}
             />
           ) : (

@@ -117,6 +117,8 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
     backstory: initialData?.backstory || '',
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imageOffsetX, setImageOffsetX] = useState<number>(initialData?.image_offset_x || 0);
+  const [imageOffsetY, setImageOffsetY] = useState<number>(initialData?.image_offset_y || 0);
   const [selectedBackgroundImage, setSelectedBackgroundImage] = useState<File | null>(null);
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | undefined>(initialData?.background_image_url);
   const [backgroundImageOffsetX, setBackgroundImageOffsetX] = useState<number>(initialData?.background_image_offset_x || 0);
@@ -148,6 +150,11 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
   const handleImageSelect = (file: File) => {
     setSelectedImage(file);
     setError(null);
+  };
+
+  const handleImageOffsetChange = (offsetX: number, offsetY: number) => {
+    setImageOffsetX(offsetX);
+    setImageOffsetY(offsetY);
   };
 
   const handleBackgroundImageFileSelect = (file: File | null) => {
@@ -200,6 +207,12 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
         ? { color_theme_override: colorOverride }
         : { color_theme_override: null };
 
+      // Include image offset values for portrait
+      const imageOffsetData = {
+        image_offset_x: imageOffsetX,
+        image_offset_y: imageOffsetY,
+      };
+
       // Include background image offset values
       const backgroundImageData = {
         background_image_offset_x: backgroundImageOffsetX,
@@ -215,6 +228,7 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
         : {
             ...baseData,
             ...colorThemeData,
+            ...imageOffsetData,
             ...backgroundImageData,
           };
 
@@ -414,6 +428,9 @@ export const CharacterForm: React.FC<CharacterFormProps> = ({
       <ImageUploadField
         onFileSelect={handleImageSelect}
         initialImage={initialData?.image_url}
+        offsetX={imageOffsetX}
+        offsetY={imageOffsetY}
+        onOffsetChange={handleImageOffsetChange}
         label="Character Portrait"
         disabled={isLoading}
       />
