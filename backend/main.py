@@ -1857,8 +1857,16 @@ async def update_character(
         character.backstory = payload.backstory
     if payload.image_url is not None:
         character.image_url = payload.image_url
+    if payload.image_offset_x is not None:
+        character.image_offset_x = payload.image_offset_x
+    if payload.image_offset_y is not None:
+        character.image_offset_y = payload.image_offset_y
     if payload.background_image_url is not None:
         character.background_image_url = payload.background_image_url
+    if payload.background_image_offset_x is not None:
+        character.background_image_offset_x = payload.background_image_offset_x
+    if payload.background_image_offset_y is not None:
+        character.background_image_offset_y = payload.background_image_offset_y
     if payload.level is not None:
         character.level = payload.level
     if payload.is_active is not None:

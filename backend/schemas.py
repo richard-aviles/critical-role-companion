@@ -83,7 +83,11 @@ class CharacterUpdateRequest(BaseModel):
     description: Optional[str] = None
     backstory: Optional[str] = None
     image_url: Optional[str] = None
+    image_offset_x: Optional[int] = None
+    image_offset_y: Optional[int] = None
     background_image_url: Optional[str] = None
+    background_image_offset_x: Optional[int] = None
+    background_image_offset_y: Optional[int] = None
     level: Optional[int] = None
     is_active: Optional[bool] = None
     stats: Optional[CharacterStatsInput] = None
