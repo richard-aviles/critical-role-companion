@@ -372,6 +372,8 @@ class CharacterLayout(Base):
             "image_width_percent": self.image_width_percent,
             "image_aspect_ratio": self.image_aspect_ratio,
             "background_image_url": self.background_image_url,
+            "background_image_offset_x": self.background_image_offset_x,
+            "background_image_offset_y": self.background_image_offset_y,
             "border_color_count": self.border_color_count,
             "border_colors": self.border_colors or [],
             "badge_colors": self.badge_colors or [],

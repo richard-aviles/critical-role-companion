@@ -15,26 +15,47 @@ interface PublicCharacterCardProps {
 }
 
 export function PublicCharacterCard({ character, campaignSlug, layout }: PublicCharacterCardProps) {
-  // Debug: Log layout props for this character
-  if (layout?.card_type === 'enhanced') {
-    console.log(`[PublicCharacterCard] ${character.name} - Enhanced layout:`, {
-      card_type: layout.card_type,
-      background_image_url: layout.background_image_url,
-      image_width_percent: layout.image_width_percent,
-    });
-  }
+  // Determine background image URL (character takes precedence)
+  const backgroundImageUrl = character.background_image_url || layout?.background_image_url;
+
+  // Debug: Log layout and character color data
+  console.log(`[PublicCharacterCard] ${character.name}:`, {
+    card_type: layout?.card_type,
+    character_background: character.background_image_url,
+    layout_background: layout?.background_image_url,
+    final_background_url: backgroundImageUrl,
+    background_url_constructed: backgroundImageUrl ? `url("${backgroundImageUrl}")` : 'none',
+    character_colors: character.color_theme_override?.border_colors,
+    layout_colors: layout?.border_colors,
+    badge_colors: layout?.badge_colors,
+  });
 
   // Styling hierarchy: character override > campaign layout > default
   // Character-level customization takes precedence
-  const borderColor = character.color_theme_override?.border_colors?.[0] ||
-                      layout?.border_colors?.[0] ||
-                      '#3b82f6';
+  const borderColors = character.color_theme_override?.border_colors ||
+                       layout?.border_colors ||
+                       ['#3b82f6'];
+  const borderColor = borderColors[0]; // For single color fallback
+  const borderGradient = borderColors.length >= 4
+    ? `linear-gradient(135deg, ${borderColors[0]}, ${borderColors[1]}, ${borderColors[2]}, ${borderColors[3]})`
+    : borderColors.length === 2
+    ? `linear-gradient(135deg, ${borderColors[0]}, ${borderColors[1]})`
+    : borderColor;
+
   const textColor = character.color_theme_override?.text_color ||
                     layout?.text_color ||
                     '#1f2937';
   const badgeColor = character.color_theme_override?.border_colors?.[0] ||
                      layout?.badge_colors?.[0] ||
                      '#3b82f6';
+
+  // Debug: Log resolved colors
+  console.log(`[PublicCharacterCard] ${character.name} - Resolved colors:`, {
+    borderColors,
+    borderGradient,
+    textColor,
+    badgeColor,
+  });
 
   // Determine which layout to use: layout?.card_type or default to "simple"
   const cardType = layout?.card_type || 'simple';
@@ -46,9 +67,11 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
     return (
       <Link href={`/campaigns/${campaignSlug}/characters/${character.slug}`}>
         <div
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow overflow-hidden cursor-pointer group border border-gray-200 dark:border-gray-700"
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow overflow-hidden cursor-pointer group"
           style={{
-            borderLeft: `4px solid ${borderColor}`,
+            border: '3px solid',
+            borderImage: `${borderGradient} 1`,
+            borderRadius: '0.5rem',
           }}
         >
           {/* Background Image Container with Badge Overlay */}
@@ -56,8 +79,8 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
             className="relative w-full overflow-hidden"
             style={{
               height: '300px',
-              backgroundImage: layout?.background_image_url
-                ? `url('${layout.background_image_url}')`
+              backgroundImage: backgroundImageUrl
+                ? `url("${backgroundImageUrl}")`
                 : 'linear-gradient(135deg, rgb(229, 231, 235), rgb(209, 213, 219))',
               backgroundSize: 'cover',
               backgroundPosition: `calc(50% + ${layout?.background_image_offset_x || 0}%) calc(50% + ${layout?.background_image_offset_y || 0}%)`,
@@ -65,16 +88,26 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
             }}
           >
             {/* Dark overlay for readability */}
-            <div className="absolute inset-0 bg-black bg-opacity-20" />
+            {backgroundImageUrl && (
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.15)' }}
+              />
+            )}
 
             {/* Character Image - positioned at top-left with configurable width */}
             {character.image_url && (
               <div
-                className="absolute left-4 top-4 rounded-lg overflow-hidden shadow-lg border-2 group-hover:scale-105 transition-transform"
+                className="absolute left-4 top-4 rounded-lg overflow-hidden shadow-lg group-hover:scale-105 transition-transform"
                 style={{
-                  width: `${layout?.image_width_percent || 35}%`,
-                  aspectRatio: '1',
-                  borderColor: borderColor,
+                  width: layout?.image_aspect_ratio === 'landscape'
+                    ? `${(layout?.image_width_percent || 35) * 1.5}%`  // 50% wider for landscape
+                    : `${layout?.image_width_percent || 35}%`,
+                  aspectRatio: layout?.image_aspect_ratio === 'portrait' ? '2/3' :
+                              layout?.image_aspect_ratio === 'landscape' ? '4/3' : '1',
+                  border: '4px solid',
+                  borderImage: `${borderGradient} 1`,
+                  borderRadius: '0.5rem',
                 }}
               >
                 <Image
@@ -92,20 +125,51 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
             {/* Badge Overlay - positioned badges from layout configuration */}
             {layout?.badge_layout && layout.badge_layout.length > 0 && (
               <div className="absolute inset-0 pointer-events-none">
-                {layout.badge_layout.map((badge: any, idx: number) => (
-                  <div
-                    key={badge.stat}
-                    className="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg border-2 border-white"
-                    style={{
-                      left: `${badge.x}%`,
-                      top: `${badge.y}%`,
-                      backgroundColor: layout.badge_colors[idx % layout.badge_colors.length],
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                  >
-                    {badge.stat[0].toUpperCase()}
-                  </div>
-                ))}
+                {layout.badge_layout.map((badge: any, idx: number) => {
+                  // Use character color override for badges if available
+                  const badgeColors = character.color_theme_override?.badge_interior_gradient?.colors ||
+                                     character.color_theme_override?.border_colors ||
+                                     layout?.badge_colors;
+
+                  // Create gradient background for badge interior
+                  let badgeBgGradient;
+                  if (badgeColors && badgeColors.length >= 2) {
+                    badgeBgGradient = `radial-gradient(circle, ${badgeColors[0]}, ${badgeColors[1]})`;
+                  } else {
+                    badgeBgGradient = badgeColors ? badgeColors[idx % badgeColors.length] : '#3b82f6';
+                  }
+
+                  return (
+                    <div
+                      key={badge.stat}
+                      className="absolute"
+                      style={{
+                        left: `${badge.x}%`,
+                        top: `${badge.y}%`,
+                        transform: 'translate(-50%, -50%)',
+                      }}
+                    >
+                      {/* Gradient border wrapper */}
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center"
+                        style={{
+                          background: borderGradient,
+                          padding: '3px',
+                        }}
+                      >
+                        {/* Badge content with gradient background */}
+                        <div
+                          className="w-full h-full rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg"
+                          style={{
+                            background: badgeBgGradient,
+                          }}
+                        >
+                          {badge.stat[0].toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -165,9 +229,11 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
   return (
     <Link href={`/campaigns/${campaignSlug}/characters/${character.slug}`}>
       <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow h-full overflow-hidden cursor-pointer group border border-gray-200 dark:border-gray-700"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg hover:shadow-lg dark:hover:shadow-xl transition-shadow h-full overflow-hidden cursor-pointer group"
         style={{
-          borderLeft: `4px solid ${borderColor}`,
+          border: '3px solid',
+          borderImage: `${borderGradient} 1`,
+          borderRadius: '0.5rem',
         }}
       >
         {/* Character Image */}
