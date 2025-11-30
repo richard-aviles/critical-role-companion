@@ -132,6 +132,11 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
                 {layout.badge_layout
                   .filter((badge: any) => badge.stat !== 'hp' && badge.stat !== 'ac')
                   .map((badge: any, idx: number) => {
+                  // Find the stat config to get abbreviation
+                  const statConfig = layout.stats_config?.find((s: any) => s.key === badge.stat);
+                  const abbreviation = statConfig?.abbreviation || badge.stat.slice(0, 3).toUpperCase();
+                  const statValue = character.stats?.[badge.stat] ?? '—';
+
                   // Use character color override for badges if available
                   const badgeColors = character.color_theme_override?.badge_interior_gradient?.colors ||
                                      character.color_theme_override?.border_colors ||
@@ -163,14 +168,15 @@ export function PublicCharacterCard({ character, campaignSlug, layout }: PublicC
                           padding: '3px',
                         }}
                       >
-                        {/* Badge content with gradient background */}
+                        {/* Badge content with gradient background - two-line display */}
                         <div
-                          className="w-full h-full rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg"
+                          className="w-full h-full rounded-full flex flex-col items-center justify-center text-white shadow-lg"
                           style={{
                             background: badgeBgGradient,
                           }}
                         >
-                          {badge.stat[0].toUpperCase()}
+                          <div className="text-[0.5rem] font-semibold leading-tight">{abbreviation}</div>
+                          <div className="text-sm font-bold leading-tight">{statValue}</div>
                         </div>
                       </div>
                     </div>

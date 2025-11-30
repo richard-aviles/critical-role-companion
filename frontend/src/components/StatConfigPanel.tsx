@@ -5,6 +5,7 @@ import { useState } from 'react';
 interface Stat {
   key: string;
   label: string;
+  abbreviation?: string;
   visible: boolean;
   order: number;
   required?: boolean;
@@ -18,6 +19,7 @@ interface StatConfigPanelProps {
 export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProps) {
   const [newStatKey, setNewStatKey] = useState('');
   const [newStatLabel, setNewStatLabel] = useState('');
+  const [newStatAbbr, setNewStatAbbr] = useState('');
 
   const handleToggleVisibility = (key: string) => {
     onChange(
@@ -35,6 +37,16 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
     );
   };
 
+  const handleRenameAbbreviation = (key: string, newAbbr: string) => {
+    // Limit to 3 characters
+    const trimmedAbbr = newAbbr.slice(0, 3).toUpperCase();
+    onChange(
+      stats.map((stat) =>
+        stat.key === key ? { ...stat, abbreviation: trimmedAbbr } : stat
+      )
+    );
+  };
+
   const handleRemoveStat = (key: string) => {
     onChange(stats.filter((stat) => stat.key !== key));
   };
@@ -45,11 +57,15 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
 
     const maxOrder = stats.length > 0 ? Math.max(...stats.map(s => s.order)) + 1 : 0;
 
+    // Use provided abbreviation or default to first 3 letters of label
+    const abbr = newStatAbbr.trim() || newStatLabel.slice(0, 3).toUpperCase();
+
     onChange([
       ...stats,
       {
         key: newStatKey.toLowerCase().replace(/\s+/g, '_'),
         label: newStatLabel.toUpperCase(),
+        abbreviation: abbr.toUpperCase(),
         visible: true,
         order: maxOrder,
       },
@@ -57,6 +73,7 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
 
     setNewStatKey('');
     setNewStatLabel('');
+    setNewStatAbbr('');
   };
 
   const handleMoveUp = (index: number) => {
@@ -98,21 +115,32 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
                 type="text"
                 value={stat.label}
                 onChange={(e) => handleRenameLabel(stat.key, e.target.value)}
+                placeholder="Label"
                 className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+              />
+
+              <input
+                type="text"
+                value={stat.abbreviation || ''}
+                onChange={(e) => handleRenameAbbreviation(stat.key, e.target.value)}
+                placeholder="Abbr"
+                maxLength={3}
+                className="w-16 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-center"
+                title="3-letter abbreviation for badge display"
               />
 
               <div className="flex gap-1">
                 <button
                   onClick={() => handleMoveUp(index)}
                   disabled={index === 0}
-                  className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-500 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   ↑
                 </button>
                 <button
                   onClick={() => handleMoveDown(index)}
                   disabled={index === sortedStats.length - 1}
-                  className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 py-1 text-xs bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-500 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   ↓
                 </button>
@@ -150,6 +178,15 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
               placeholder="Label (e.g., HP, AC)"
               className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />
+            <input
+              type="text"
+              value={newStatAbbr}
+              onChange={(e) => setNewStatAbbr(e.target.value.slice(0, 3).toUpperCase())}
+              placeholder="Abbr"
+              maxLength={3}
+              className="w-20 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-center"
+              title="3-letter abbreviation (optional, defaults to first 3 letters of label)"
+            />
             <button
               type="submit"
               className="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white text-sm font-medium rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors"
@@ -158,7 +195,7 @@ export default function StatConfigPanel({ stats, onChange }: StatConfigPanelProp
             </button>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-            You can add up to {8 - stats.length} more custom stats
+            You can add up to {8 - stats.length} more custom stats. Abbreviation defaults to first 3 letters if not specified.
           </div>
         </form>
       )}

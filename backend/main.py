@@ -1699,11 +1699,14 @@ async def update_character_layout(
             if isinstance(s, dict):
                 stats_config_dicts.append(s)
             elif hasattr(s, 'model_dump'):
-                stats_config_dicts.append(s.model_dump())
+                # Use model_dump with exclude_none=False to preserve all fields including abbreviation
+                dumped = s.model_dump(exclude_none=False, by_alias=False)
+                stats_config_dicts.append(dumped)
             elif hasattr(s, 'dict'):
-                stats_config_dicts.append(s.dict())
+                stats_config_dicts.append(s.dict(exclude_none=False))
             else:
                 stats_config_dicts.append(s)
+        print(f"[update_character_layout] Saving stats_config to database: {stats_config_dicts}")
         layout.stats_config = stats_config_dicts
     if payload.stats_to_display is not None:
         layout.stats_to_display = payload.stats_to_display
@@ -1883,7 +1886,8 @@ async def update_character(
     if payload.stats is not None:
         # Stats can be any dict with stat keys (str, dex, con, int, wis, cha, hp, ac, or custom)
         # We don't validate keys here - let DM set whatever they want
-        character.stats = payload.stats
+        # Convert Pydantic model to dict, excluding None values
+        character.stats = payload.stats.model_dump(by_alias=True, exclude_none=True)
 
     # Update color theme override if provided in the request
     # Check if the field was explicitly set (either to a value or to null)
@@ -1899,7 +1903,6 @@ async def update_character(
     print("[UPDATE CHARACTER - SAVED VALUES]")
     print("="*80)
     print(f"Image offsets - X: {character.image_offset_x}, Y: {character.image_offset_y}")
-    print(f"Background offsets - X: {character.background_image_offset_x}, Y: {character.background_image_offset_y}")
     print("="*80 + "\n")
 
     return character.to_dict()

@@ -225,6 +225,7 @@ class StatConfig(BaseModel):
     """Stat configuration for character card layout"""
     key: str = Field(..., description="Stat key (str, dex, con, int, wis, cha, or custom)")
     label: str = Field(..., description="Display label for stat")
+    abbreviation: Optional[str] = Field(None, max_length=3, description="3-letter abbreviation for badge display")
     visible: bool = Field(default=True, description="Whether this stat is visible")
     order: int = Field(..., description="Display order (0-7)")
 
@@ -233,6 +234,7 @@ class StatConfig(BaseModel):
             "example": {
                 "key": "str",
                 "label": "STR",
+                "abbreviation": "STR",
                 "visible": True,
                 "order": 0
             }
@@ -250,14 +252,14 @@ class CharacterLayoutCreateRequest(BaseModel):
     # NEW: Stat configuration (1-8 stats with custom labels)
     stats_config: List[StatConfig] = Field(
         default=[
-            {"key": "str", "label": "STR", "visible": True, "order": 0},
-            {"key": "dex", "label": "DEX", "visible": True, "order": 1},
-            {"key": "con", "label": "CON", "visible": True, "order": 2},
-            {"key": "int", "label": "INT", "visible": True, "order": 3},
-            {"key": "wis", "label": "WIS", "visible": True, "order": 4},
-            {"key": "cha", "label": "CHA", "visible": True, "order": 5},
+            {"key": "str", "label": "STR", "abbreviation": "STR", "visible": True, "order": 0},
+            {"key": "dex", "label": "DEX", "abbreviation": "DEX", "visible": True, "order": 1},
+            {"key": "con", "label": "CON", "abbreviation": "CON", "visible": True, "order": 2},
+            {"key": "int", "label": "INT", "abbreviation": "INT", "visible": True, "order": 3},
+            {"key": "wis", "label": "WIS", "abbreviation": "WIS", "visible": True, "order": 4},
+            {"key": "cha", "label": "CHA", "abbreviation": "CHA", "visible": True, "order": 5},
         ],
-        description="Stat configuration (key, label, visibility, order)"
+        description="Stat configuration (key, label, abbreviation, visibility, order)"
     )
 
     # LEGACY: Keeping for backward compatibility

@@ -13,6 +13,7 @@ import ImageSettingsPanel from '@/components/ImageSettingsPanel';
 interface Stat {
   key: string;
   label: string;
+  abbreviation?: string;
   visible: boolean;
   order: number;
   required?: boolean; // If true, cannot be hidden/removed
@@ -52,14 +53,14 @@ interface Layout {
 }
 
 const DEFAULT_STATS: Stat[] = [
-  { key: 'hp', label: 'HP', visible: true, order: 0, required: true },
-  { key: 'ac', label: 'AC', visible: true, order: 1, required: true },
-  { key: 'str', label: 'STR', visible: true, order: 2 },
-  { key: 'dex', label: 'DEX', visible: true, order: 3 },
-  { key: 'con', label: 'CON', visible: true, order: 4 },
-  { key: 'int', label: 'INT', visible: true, order: 5 },
-  { key: 'wis', label: 'WIS', visible: true, order: 6 },
-  { key: 'cha', label: 'CHA', visible: true, order: 7 },
+  { key: 'hp', label: 'HP', abbreviation: 'HP', visible: true, order: 0, required: true },
+  { key: 'ac', label: 'AC', abbreviation: 'AC', visible: true, order: 1, required: true },
+  { key: 'str', label: 'STR', abbreviation: 'STR', visible: true, order: 2 },
+  { key: 'dex', label: 'DEX', abbreviation: 'DEX', visible: true, order: 3 },
+  { key: 'con', label: 'CON', abbreviation: 'CON', visible: true, order: 4 },
+  { key: 'int', label: 'INT', abbreviation: 'INT', visible: true, order: 5 },
+  { key: 'wis', label: 'WIS', abbreviation: 'WIS', visible: true, order: 6 },
+  { key: 'cha', label: 'CHA', abbreviation: 'CHA', visible: true, order: 7 },
 ];
 
 const DEFAULT_GOLD_THEME = {
@@ -136,6 +137,7 @@ export default function CardLayoutPage() {
         if (layouts && layouts.length > 0) {
           // Load the default layout or the first one
           const defaultLayout = layouts.find((l: any) => l.is_default) || layouts[0];
+          console.log('[loadLayout] Loaded layout stats_config:', JSON.stringify(defaultLayout.stats_config, null, 2));
 
           // Ensure HP and AC are in the stats_config (migrate old layouts)
           const existingStatKeys = new Set(defaultLayout.stats_config?.map((s: Stat) => s.key) || []);
@@ -143,7 +145,7 @@ export default function CardLayoutPage() {
 
           // Add HP if not present
           if (!existingStatKeys.has('hp')) {
-            updatedStats.unshift({ key: 'hp', label: 'HP', visible: true, order: 0, required: true });
+            updatedStats.unshift({ key: 'hp', label: 'HP', abbreviation: 'HP', visible: true, order: 0, required: true });
           }
 
           // Add AC if not present
@@ -152,21 +154,28 @@ export default function CardLayoutPage() {
             updatedStats.splice(existingStatKeys.has('hp') ? 1 : 0, 0, {
               key: 'ac',
               label: 'AC',
+              abbreviation: 'AC',
               visible: true,
               order: acOrder,
               required: true
             });
           }
 
-          // Reorder all stats
+          // Reorder all stats and ensure abbreviations exist
           updatedStats.forEach((stat, index) => {
             stat.order = index;
+            // Add default abbreviation if missing
+            if (!stat.abbreviation) {
+              stat.abbreviation = stat.label?.slice(0, 3).toUpperCase() || stat.key.slice(0, 3).toUpperCase();
+            }
           });
 
           const migratedLayout = {
             ...defaultLayout,
             stats_config: updatedStats,
           };
+
+          console.log('[loadLayout] After migration, stats_config:', JSON.stringify(updatedStats, null, 2));
 
           setLayout(migratedLayout);
           setExistingLayout(migratedLayout);
@@ -209,6 +218,7 @@ export default function CardLayoutPage() {
 
       if (existingLayout?.id) {
         console.log('[handleSave] Updating existing layout:', existingLayout.id);
+        console.log('[handleSave] Layout stats_config being saved:', JSON.stringify(layout.stats_config, null, 2));
         // Update existing layout
         await updateCharacterLayout(campaignId, existingLayout.id, layout);
       } else {
@@ -355,14 +365,22 @@ export default function CardLayoutPage() {
           <div className="bg-white dark:bg-gray-900 rounded-lg shadow dark:shadow-lg border-l-4 border-l-purple-500 p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Character Stats</h2>
             <StatConfigPanel
-              stats={layout.stats_config}
-              onChange={(stats) =>
+              stats={layout.stats_config.filter(s => s.key !== 'hp' && s.key !== 'ac')}
+              onChange={(stats) => {
+                // Preserve HP and AC in the stats_config, merge with updated stats
+                const hpStat = layout.stats_config.find(s => s.key === 'hp');
+                const acStat = layout.stats_config.find(s => s.key === 'ac');
+                const mergedStats = [
+                  ...(hpStat ? [hpStat] : []),
+                  ...(acStat ? [acStat] : []),
+                  ...stats,
+                ];
                 setLayout({
                   ...layout,
-                  stats_config: stats,
-                  stats_to_display: stats.filter(s => s.visible).map(s => s.key),
-                })
-              }
+                  stats_config: mergedStats,
+                  stats_to_display: mergedStats.filter(s => s.visible).map(s => s.key),
+                });
+              }}
             />
           </div>
 
@@ -434,7 +452,7 @@ export default function CardLayoutPage() {
                 <div>
                   <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Positioning Canvas</div>
                   <BadgePositioningEditor
-                    stats={layout.stats_config.filter(s => s.visible)}
+                    stats={layout.stats_config.filter(s => s.visible && s.key !== 'hp' && s.key !== 'ac')}
                     badges={layout.badge_layout}
                     onChange={(badges) => setLayout({ ...layout, badge_layout: badges })}
                   />

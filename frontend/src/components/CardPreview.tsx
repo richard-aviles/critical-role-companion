@@ -132,6 +132,10 @@ export default function CardPreview({ layout }: { layout: Layout }) {
         {layout.badge_layout && layout.badge_layout.length > 0 && (
           <div className="absolute inset-0 pointer-events-none">
             {layout.badge_layout.map((badge: any, idx: number) => {
+              // Find the stat config to get abbreviation
+              const statConfig = layout.stats_config?.find((s: any) => s.key === badge.stat);
+              const abbreviation = statConfig?.abbreviation || badge.stat.slice(0, 3).toUpperCase();
+
               // Determine badge color based on stat type
               let badgeColor = layout.badge_colors[idx % layout.badge_colors.length];
               let borderColor = 'white';
@@ -156,7 +160,7 @@ export default function CardPreview({ layout }: { layout: Layout }) {
                     transform: 'translate(-50%, -50%)',
                   }}
                 >
-                  {badge.stat.toUpperCase()}
+                  {abbreviation}
                 </div>
               );
             })}
