@@ -3,6 +3,7 @@
 interface Stat {
   key: string;
   label: string;
+  abbreviation?: string;
   visible: boolean;
   order: number;
   required?: boolean;
