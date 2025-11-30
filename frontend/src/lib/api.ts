@@ -223,6 +223,7 @@ export interface UpdateCharacterData {
   image_offset_y?: number;
   background_image_offset_x?: number;
   background_image_offset_y?: number;
+  stats?: { [key: string]: number | undefined };
   color_theme_override?: ColorThemeOverride | null;
 }
 
