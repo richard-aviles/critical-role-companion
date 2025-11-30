@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 interface Stat {
   key: string;
   label: string;
+  abbreviation?: string;
   visible: boolean;
   order: number;
   required?: boolean;
@@ -174,22 +175,27 @@ export default function BadgePositioningEditor({
           )}
 
           {/* Badges */}
-          {badges.map((badge) => (
-            <div
-              key={badge.stat}
-              className={`absolute w-12 h-12 rounded-full flex items-center justify-center text-xs font-bold text-white cursor-move shadow-lg transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform ${
-                draggingBadge === badge.stat ? 'scale-125 shadow-xl' : ''
-              }`}
-              style={{
-                left: `${badge.x}%`,
-                top: `${badge.y}%`,
-                backgroundColor: '#3b82f6',
-              }}
-              onMouseDown={(e) => handleMouseDown(e, badge.stat)}
-            >
-              {badge.stat[0].toUpperCase()}
-            </div>
-          ))}
+          {badges.map((badge) => {
+            const stat = stats.find((s) => s.key === badge.stat);
+            const abbreviation = stat?.abbreviation || stat?.label?.slice(0, 3).toUpperCase() || badge.stat.slice(0, 3).toUpperCase();
+
+            return (
+              <div
+                key={badge.stat}
+                className={`absolute w-12 h-12 rounded-full flex items-center justify-center text-xs font-bold text-white cursor-move shadow-lg transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform ${
+                  draggingBadge === badge.stat ? 'scale-125 shadow-xl' : ''
+                }`}
+                style={{
+                  left: `${badge.x}%`,
+                  top: `${badge.y}%`,
+                  backgroundColor: '#3b82f6',
+                }}
+                onMouseDown={(e) => handleMouseDown(e, badge.stat)}
+              >
+                {abbreviation}
+              </div>
+            );
+          })}
 
           {badges.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
@@ -233,25 +239,30 @@ export default function BadgePositioningEditor({
               const stat = stats.find((s) => s.key === badge.stat);
               return !stat?.required; // Filter out required stats (HP, AC)
             })
-            .map((badge) => (
-            <div key={badge.stat} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-700 rounded-md">
-              <div className="text-sm">
-                <div className="font-medium text-gray-900 dark:text-white">
-                  {stats.find((s) => s.key === badge.stat)?.label || badge.stat}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  Position: {badge.x.toFixed(0)}%, {badge.y.toFixed(0)}%
-                </div>
-              </div>
+            .map((badge) => {
+              const stat = stats.find((s) => s.key === badge.stat);
+              const abbreviation = stat?.abbreviation || stat?.label?.slice(0, 3).toUpperCase() || badge.stat.slice(0, 3).toUpperCase();
 
-              <button
-                onClick={() => handleRemoveBadge(badge.stat)}
-                className="px-3 py-1 text-xs bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
+              return (
+                <div key={badge.stat} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-700 rounded-md">
+                  <div className="text-sm">
+                    <div className="font-medium text-gray-900 dark:text-white">
+                      {stat?.label || badge.stat} ({abbreviation})
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                      Position: {badge.x.toFixed(0)}%, {badge.y.toFixed(0)}%
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleRemoveBadge(badge.stat)}
+                    className="px-3 py-1 text-xs bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded"
+                  >
+                    Remove
+                  </button>
+                </div>
+              );
+            })}
         </div>
 
         {badges.filter((badge) => {

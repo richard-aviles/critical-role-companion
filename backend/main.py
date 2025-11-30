@@ -1666,6 +1666,13 @@ async def update_character_layout(
     db: Session = Depends(get_db)
 ):
     """Update a character layout (admin only)"""
+    # DEBUG: Log incoming payload
+    print(f"\n[update_character_layout] ===== INCOMING PAYLOAD =====")
+    print(f"[update_character_layout] payload.stats_config is None: {payload.stats_config is None}")
+    print(f"[update_character_layout] payload.stats_config value: {payload.stats_config}")
+    print(f"[update_character_layout] Full payload dict: {payload.model_dump()}")
+    print(f"[update_character_layout] =============================\n")
+
     try:
         campaign_uuid = uuid.UUID(campaign_id)
         layout_uuid = uuid.UUID(layout_id)
@@ -2568,3 +2575,4 @@ def get_overlay_active_episode(campaign_id: str, db: Session = Depends(get_db)):
 # ============================================================================
 
 app.include_router(episodes_router, tags=["episodes"])
+
